@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The AMBAR Orlando Comparable Set · Marriott-brand hotels in Orlando</title>
+<meta name="description" content="What is happening now, and over time, at eight Marriott-brand Orlando hotels comparable to AMBAR Residences Orlando. Lowest public nightly rates observed, updated weekly.">
+<meta name="theme-color" content="#1E3A2C">
+<link rel="icon" href="assets/ambar-logo.png">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/vendor/leaflet.css">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="brand-mark" href="#top" aria-label="AMBAR Residences Orlando, back to top">
+      <img src="assets/ambar-logo.png" alt="AMBAR Residences · Orlando" width="156" height="66">
+    </a>
+    <nav class="site-nav" aria-label="Sections">
+      <a href="#week-ahead">Week ahead</a>
+      <a href="#history">History</a>
+      <a href="#brands">Brand matrix</a>
+      <a href="#hotels">Hotels</a>
+      <a href="#demand">Demand</a>
+      <a href="#news">News</a>
+      <a href="#sources">Sources</a>
+    </nav>
+    <span class="update-pill" id="updatePill">Updated weekly</span>
+  </div>
+</header>
+
+<main id="main">
+  <!-- 1 HERO -->
+  <section class="hero" id="top" aria-labelledby="heroTitle">
+    <div class="hero-bands" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow">Marriott-brand hotels · Orlando, Florida</p>
+      <h1 id="heroTitle">The AMBAR Orlando <em>Comparable Set</em></h1>
+      <p class="lede">A weekly, purely informational view of what is happening at eight Marriott-brand hotels comparable to AMBAR Residences Orlando: nightly rates, how they have moved, and the events behind them.</p>
+      <dl class="hero-stats" id="heroStats"></dl>
+      <p class="hero-note" id="heroNote"></p>
+      <div class="hero-cta">
+        <a class="btn btn-gold" href="#week-ahead">See the week ahead</a>
+        <a class="btn btn-ghost" href="#brands">Explore the brand matrix</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 WEEK AHEAD -->
+  <section class="section" id="week-ahead" aria-labelledby="waTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">01 · Week ahead</p>
+        <h2 id="waTitle">Nightly rates across the set</h2>
+        <p class="section-sub" id="waSub"></p>
+      </header>
+      <div class="toolbar">
+        <div class="seg" role="tablist" aria-label="Choose a week" id="weekTabs"></div>
+        <div class="legend" id="heatLegend" aria-label="Colour legend"></div>
+      </div>
+      <div class="heat-wrap" id="heatWrap" tabindex="0" aria-label="Nightly rate grid, scrolls horizontally on small screens"></div>
+      <p class="fineprint" id="heatFoot"></p>
+    </div>
+  </section>
+
+  <!-- 3 HISTORY -->
+  <section class="section section-alt" id="history" aria-labelledby="hiTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">02 · History</p>
+        <h2 id="hiTitle">How rates have moved, week over week</h2>
+        <p class="section-sub">Each line is the lowest public nightly rate observed for that night. The shaded band is the set’s range on each night and the dashed line is the set median. Gaps are shown as gaps.</p>
+      </header>
+      <div class="chart-controls">
+        <div class="seg" role="group" aria-label="Chart view">
+          <button type="button" class="seg-btn" data-view="nightly" aria-pressed="true">Nightly</button>
+          <button type="button" class="seg-btn" data-view="weekly" aria-pressed="false">Weekly mean</button>
+        </div>
+        <div class="seg" role="group" aria-label="Set overlays">
+          <button type="button" class="seg-btn" id="toggleBand" aria-pressed="true">Set range &amp; median</button>
+          <button type="button" class="seg-btn" id="toggleCap" aria-pressed="true">Cap extreme values</button>
+        </div>
+        <div class="seg" role="group" aria-label="Select hotels">
+          <button type="button" class="seg-btn" id="allHotels">All</button>
+          <button type="button" class="seg-btn" id="noHotels">None</button>
+        </div>
+      </div>
+      <div class="chips" id="hotelChips" role="group" aria-label="Show or hide hotels"></div>
+      <figure class="chart-card">
+        <div class="chart-box"><canvas id="historyChart" role="img" aria-label="Line chart of lowest public nightly rates by hotel"></canvas></div>
+        <p class="cap-note" id="capNote" aria-live="polite"></p>
+        <figcaption class="fineprint" id="historyCaption"></figcaption>
+      </figure>
+      <h3 class="sub-title">By hotel</h3>
+      <div class="multiples" id="multiples"></div>
+    </div>
+  </section>
+
+  <!-- 4 BRAND MATRIX -->
+  <section class="section section-deep" id="brands" aria-labelledby="brTitle">
+    <div class="wrap">
+      <header class="section-head on-dark">
+        <p class="kicker">03 · Marriott brand matrix</p>
+        <h2 id="brTitle">Where the set sits in the Marriott portfolio</h2>
+        <p class="section-sub">Marriott organises its brands by tier. AMBAR is placed in the Premium tier, alongside Autograph Collection, Tribute Portfolio and peers. Hover, focus or tap any brand.</p>
+      </header>
+      <div class="matrix-toolbar">
+        <button type="button" class="seg-btn on-dark" id="compOnly" aria-pressed="false">Highlight comp-set brands</button>
+      </div>
+      <div class="matrix-layout">
+        <div class="matrix" id="matrix"></div>
+        <aside class="brand-panel" id="brandPanel" aria-live="polite"></aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 HOTELS + MAP -->
+  <section class="section" id="hotels" aria-labelledby="hoTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">04 · The comparable hotels</p>
+        <h2 id="hoTitle">Eight Marriott-brand hotels</h2>
+        <p class="section-sub" id="hotelsSub"></p>
+      </header>
+      <div class="hotels-layout">
+        <div class="hotel-grid" id="hotelGrid"></div>
+        <div class="map-card">
+          <div id="map" role="region" aria-label="Map of the comparable hotels"></div>
+          <p class="fineprint map-note" id="mapNote">Map tiles © OpenStreetMap contributors. Tiles need an internet connection; everything else on this page works offline.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 DEMAND -->
+  <section class="section section-alt" id="demand" aria-labelledby="deTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">05 · Demand context</p>
+        <h2 id="deTitle">Events and Disney calendar notes</h2>
+        <p class="section-sub">What was on in Orlando each week, as recorded in the weekly briefs. Market occupancy below is metro-wide, not for this set.</p>
+      </header>
+      <div class="market-strip" id="marketStrip"></div>
+      <div class="timeline" id="timeline"></div>
+      <div class="ahead" id="ahead"></div>
+    </div>
+  </section>
+
+  <!-- 7 NEWS -->
+  <section class="section" id="news" aria-labelledby="neTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">06 · Marriott news</p>
+        <h2 id="neTitle">Headlines from the weekly briefs</h2>
+      </header>
+      <div class="news" id="newsList"></div>
+    </div>
+  </section>
+</main>
+
+<!-- 8 SOURCES -->
+<footer class="site-footer" id="sources" aria-labelledby="soTitle">
+  <div class="wrap">
+    <div class="footer-top">
+      <img src="assets/ambar-logo.png" alt="AMBAR Residences · Orlando" width="156" height="66">
+      <div>
+        <p class="kicker on-dark">07 · Sources &amp; methodology</p>
+        <h2 id="soTitle">How these figures are gathered</h2>
+        <p class="updated" id="updatedNote"></p>
+      </div>
+    </div>
+    <div class="footer-grid">
+      <div>
+        <h3>What the numbers are</h3>
+        <p id="rateDef"></p>
+        <ul class="caveats" id="caveats"></ul>
+      </div>
+      <div>
+        <h3>Rate sources by week</h3>
+        <ul class="srcs" id="weekSources"></ul>
+        <h3>Locations &amp; distances</h3>
+        <p id="distMethod"></p>
+        <h3>Excluded</h3>
+        <ul class="caveats" id="excluded"></ul>
+      </div>
+    </div>
+    <p class="disclaimer">Informational only. This page describes publicly observed prices at other hotels. It is not a forecast, projection or statement about rates, occupancy or returns at AMBAR Residences Orlando, and it is not an offer. Marriott brand names are trademarks of their owners and are shown as text for identification only.</p>
+    <p class="fineprint on-dark">Compiled by Callum Brown · Headings in Cormorant Garamond, body in DM Sans (SIL Open Font License) · Charts: Chart.js · Map: Leaflet &amp; OpenStreetMap</p>
+  </div>
+</footer>
+
+<div class="tip" id="tip" role="tooltip" hidden></div>
+
+<script src="assets/vendor/chart.umd.min.js"></script>
+<script src="assets/vendor/leaflet.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
