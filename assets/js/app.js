@@ -12,7 +12,7 @@
     return n;
   };
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const money = (v) => (v == null ? "—" : "$" + Math.round(v).toLocaleString("en-US"));
+  const money = (v) => (v == null || !(Number(v) > 0) ? "—" : "$" + Math.round(v).toLocaleString("en-US"));
   const D = (iso) => new Date(iso + "T12:00:00");
   const fmt = (iso, o) => D(iso).toLocaleDateString("en-US", o);
   const fDay = (iso) => fmt(iso, { weekday: "short" });
@@ -54,7 +54,7 @@
   }
 
   const ratesFor = (week) => DB.rates.filter((r) => r.week === week);
-  const priced = (rs) => rs.filter((r) => r.status === "OK" && r.rate != null).map((r) => r.rate);
+  const priced = (rs) => rs.filter((r) => r && r.status === "OK" && Number(r.rate) > 0).map((r) => r.rate);
   const weekDates = (w) => Array.from({ length: 7 }, (_, i) => { const d = D(w.week); d.setDate(d.getDate() + i); return d.toISOString().slice(0, 10); });
   const sourcesOf = (rs) => [...new Set(rs.map((r) => r.source))];
 
@@ -141,8 +141,9 @@
       row.forEach((r, i) => {
         if (!r) { html += `<td class="cell nc" tabindex="0" data-tip="">n/a</td>`; return; }
         const t = encodeURIComponent(JSON.stringify({ h: h.short, d: dates[i], r: r.rate, s: r.status, src: r.source, sd: r.source_date, n: r.note }));
-        const lab = r.status === "OK" ? money(r.rate) : r.status === "UNAVAILABLE" ? "unavailable" : "not collected";
-        if (r.status === "OK") {
+        const ok = r.status === "OK" && Number(r.rate) > 0;
+        const lab = ok ? money(r.rate) : r.status === "UNAVAILABLE" ? "unavailable" : "not collected";
+        if (ok) {
           const c = heatColor(r.rate);
           html += `<td class="cell" tabindex="0" style="background:${c.bg};color:${c.fg}" data-tip="${t}" aria-label="${esc(h.short)}, ${fDay(dates[i])} ${fMD(dates[i])}: ${lab}">${money(r.rate)}${r.note ? "<sup>*</sup>" : ""}</td>`;
         } else if (r.status === "UNAVAILABLE") {
@@ -163,9 +164,9 @@
     wrap.querySelectorAll(".cell[data-tip]").forEach((c) => {
       const on = () => {
         if (!c.dataset.tip) return; const o = JSON.parse(decodeURIComponent(c.dataset.tip));
-        if (o.set) return showTip(`<b>Median · ${fDay(o.d)} ${fMD(o.d)}</b><span class="t-rate">${money(o.r)}</span>Median of ${o.k} hotels with a public price that night.`, c);
+        if (o.set) return showTip(`<b>Median · ${fDay(o.d)} ${fMD(o.d)}</b><span class="t-rate">${o.k ? money(o.r) : "Not collected"}</span>${o.k ? `Median of ${o.k} hotels with a public price that night.` : "No hotels had a public price that night."}`, c);
         const head = `<b>${esc(o.h)} · ${fDay(o.d)} ${fMD(o.d)}</b>`;
-        const body = o.s === "OK" ? `<span class="t-rate">${money(o.r)}</span>Lowest public nightly rate observed` :
+        const body = o.s === "OK" && Number(o.r) > 0 ? `<span class="t-rate">${money(o.r)}</span>Lowest public nightly rate observed` :
           o.s === "UNAVAILABLE" ? `<span class="t-rate">Unavailable</span>` : `<span class="t-rate">Not collected</span>`;
         showTip(`${head}${body}<br><small>${esc(o.src)}, ${fMD(o.sd)}</small>${o.n ? `<br><small>${esc(o.n)}</small>` : ""}`, c);
       };
@@ -227,7 +228,7 @@
     if (view === "nightly") {
       const dates = allDates();
       const labels = dates.map((d) => fMD(d));
-      const val = (hid, d) => { const r = DB.rates.find((x) => x.hotel === hid && x.date === d); return r && r.status === "OK" ? r.rate : null; };
+      const val = (hid, d) => { const r = DB.rates.find((x) => x.hotel === hid && x.date === d); return r && r.status === "OK" && Number(r.rate) > 0 ? r.rate : null; };
       const per = H.map((h) => ({ h, data: dates.map((d) => val(h.id, d)) }));
       const set = dates.map((d) => priced(DB.rates.filter((r) => r.date === d)));
       const gaps = weeks.map((w, i) => w.status === "missing" ? [i * 7, i * 7 + 6, `Week of ${fMD(w.week)}\nnot collected`] : null).filter(Boolean);
@@ -285,7 +286,7 @@
         responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, animation: { duration: 450 }, layout: { padding: { top: 12 } },
         scales: {
           x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, autoSkipPadding: 14 } },
-          y: { grid: { color: "rgba(30,58,44,.08)" }, ticks: { callback: (v) => "$" + v.toLocaleString("en-US") }, title: { display: true, text: "Lowest public nightly rate (USD)" } }
+          y: { grid: { color: "rgba(30,58,44,.08)" }, beginAtZero: false, ticks: { callback: (v) => (Number(v) > 0 ? "$" + Number(v).toLocaleString("en-US") : "") }, title: { display: true, text: "Lowest public nightly rate (USD)" } }
         },
         plugins: {
           legend: { display: false }, gapShade: { ranges: s.gaps }, capLine: { on: false },
@@ -322,14 +323,14 @@
          <canvas aria-hidden="true"></canvas>`);
       card.addEventListener("click", () => { visible.clear(); visible.add(h.id); syncChips(); updateChart(); $("#history").scrollIntoView({ behavior: "smooth" }); });
       box.appendChild(card);
-      const data = dates.map((d) => { const r = DB.rates.find((x) => x.hotel === h.id && x.date === d); return r && r.status === "OK" ? r.rate : null; });
+      const data = dates.map((d) => { const r = DB.rates.find((x) => x.hotel === h.id && x.date === d); return r && r.status === "OK" && Number(r.rate) > 0 ? r.rate : null; });
       const mc = new Chart($("canvas", card), {
-        type: "line", data: { labels: dates, datasets: [{ data: capArr(data), borderColor: COLORS[h.id], borderWidth: 1.8, tension: 0.3, spanGaps: false, fill: { target: "origin", above: COLORS[h.id] + "22" },
+        type: "line", data: { labels: dates, datasets: [{ data: capArr(data), borderColor: COLORS[h.id], borderWidth: 1.8, tension: 0.3, spanGaps: false, fill: false,
           pointStyle: CAP_SHAPE, pointBackgroundColor: "#F36F43", pointBorderColor: "#fff", pointBorderWidth: 1,
           pointRadius: (c) => (isCapped(data, c.dataIndex) ? 8 : 0), clip: 12 }] },
         plugins: [gapPlugin, capPlugin],
         options: { responsive: true, maintainAspectRatio: false, animation: false, events: [], layout: { padding: { top: 10 } }, plugins: { legend: { display: false }, tooltip: { enabled: false }, gapShade: { ranges: weeks.map((w, i) => w.status === "missing" ? [i * 7, i * 7 + 6, ""] : null).filter(Boolean) } },
-          scales: { x: { display: false }, y: { display: false, suggestedMin: 0, max: miniMax() } } }
+          scales: { x: { display: false }, y: { display: false, min: undefined, suggestedMin: undefined, max: miniMax() } } }
       });
       mc._raw = data; minis.push(mc);
       const capped = data.filter((v) => v != null && v > capValue());
@@ -428,7 +429,7 @@
         <p class="loc">${esc(h.area)}<br>${esc(h.address)}</p>
         ${h.keys ? `<p class="dist">${h.keys.toLocaleString("en-US")} keys</p>` : ""}<p class="dist">${h.on_disney_property ? "On Walt Disney World® property · " : ""}≈ ${h.distance_to_epcot_mi} mi straight-line to EPCOT</p>
         ${(() => { const n = DB.hotel_notes.find((x) => x.hotel === h.id && x.week === latest.week); return n && n.demand_note ? `<p class="hnote"><span>Brief note, w/c ${fMD(latest.week)}:</span> ${esc(n.demand_note)}</p>` : ""; })()}
-        <div class="latest"><span><b>${p.length ? money(Math.min(...p)) + "–" + money(Math.max(...p)).slice(1) : "—"}</b><br>range, w/c ${fMD(latest.week)}</span><span><b>${p.length}/7</b><br>nights priced</span></div>
+        <div class="latest"><span><b>${p.length ? money(Math.min(...p)) + "–" + money(Math.max(...p)).slice(1) : "Not collected"}</b><br>${p.length ? `range, w/c ${fMD(latest.week)}` : `no public rates, w/c ${fMD(latest.week)}`}</span><span><b>${p.length ? p.length + "/7" : "—"}</b><br>${p.length ? "nights priced" : "not collected"}</span></div>
         <div class="actions"><button type="button" class="linkbtn" data-map="${h.id}">Show on map</button><button type="button" class="linkbtn" data-chart="${h.id}">See history</button></div>`;
       grid.appendChild(card);
     });
