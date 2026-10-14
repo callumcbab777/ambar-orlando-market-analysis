@@ -343,3 +343,4 @@ body,h1,h2,h3,h4,.hero-stats dd,.tier-label h3{font-variant-numeric:lining-nums}
 .cap-note strong{color:#8a3a1c}
 .cap-mark{color:var(--orange);font-size:.9em}
 .mini .m-cap{display:block;font-size:.7rem;color:#B4492A;font-weight:600;margin:2px 0 0}
+.pill-nm{background:#F4EFE7;border:1px dashed #B37D50;color:#6E2E1C}

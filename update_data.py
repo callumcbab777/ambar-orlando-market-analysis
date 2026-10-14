@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-update_data.py — parse weekly Marriott Orlando brief .md files into data/comps.json
+update_data.py — parse weekly Orlando market brief .md files into data/comps.json
 (and mirror it to data/comps.js so the site also opens from file:// with no server).
 
 Usage:

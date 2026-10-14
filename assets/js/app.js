@@ -1,4 +1,4 @@
-/* The AMBAR Orlando Comparable Set — all content is rendered from data/comps.json */
+/* AMBAR Orlando Market Landscape — all content is rendered from data/comps.json */
 (function () {
   "use strict";
   const $ = (s, el = document) => el.querySelector(s);
@@ -29,7 +29,8 @@
 
   const COLORS = {
     "swan-reserve": "#B37D50", "jw-bonnet-creek": "#355965", "dolphin": "#6F97A3", "jw-grande-lakes": "#1E3A2C",
-    "gaylord-palms": "#F36F43", "swan": "#D99A2B", "inn-celebration": "#989B74", "celeste": "#757575"
+    "gaylord-palms": "#F36F43", "swan": "#D99A2B", "inn-celebration": "#989B74",
+    "hyatt-grand-cypress": "#7A5C8E", "wyndham-grand-bonnet-creek": "#3F7F6B", "conrad-evermore": "#8C6A3F", "ette-orlando": "#A2505E"
   };
 
   /* ---------- load data (comps.json; comps.js mirror for file:// use) ---------- */
@@ -74,7 +75,7 @@
     const all = DB.rates.filter((r) => r.status === "OK").length;
     const gaps = weeks.filter((w) => w.status === "missing");
     const stats = [
-      ["Comparable hotels", H.length, "Marriott brands only"],
+      ["Hotels tracked", H.length, `${H.filter((h) => !h.non_marriott).length} Marriott · ${H.filter((h) => h.non_marriott).length} non-Marriott`],
       ["Weeks tracked", collected.length, `of ${weeks.length} in window`],
       ["Priced nights", all, "lowest public rates"],
       ["Latest snapshot", fMD(latest.generated), `week of ${fMD(latest.week)}`]
@@ -153,8 +154,8 @@
       const p = priced(row.filter(Boolean));
       html += `<td class="sum">${p.length ? `<b>${money(mean(p))}</b>${p.length}/7 nights priced` : "No prices"}</td></tr>`;
     });
-    html += `<tr class="setrow"><th scope="row" class="row"><strong>Set median</strong><span>across hotels with a price</span></th>`;
-    dates.forEach((d) => { const p = priced(rs.filter((r) => r.date === d)); html += `<td class="cell" tabindex="0" aria-label="Set median ${fMD(d)}: ${money(median(p))}" data-tip="${encodeURIComponent(JSON.stringify({ set: 1, d, r: median(p), k: p.length }))}">${money(median(p))}</td>`; });
+    html += `<tr class="setrow"><th scope="row" class="row"><strong>Median</strong><span>across hotels with a price</span></th>`;
+    dates.forEach((d) => { const p = priced(rs.filter((r) => r.date === d)); html += `<td class="cell" tabindex="0" aria-label="Median ${fMD(d)}: ${money(median(p))}" data-tip="${encodeURIComponent(JSON.stringify({ set: 1, d, r: median(p), k: p.length }))}">${money(median(p))}</td>`; });
     const unav = rs.filter((r) => r.status === "UNAVAILABLE").length;
     html += `<td class="sum">${unav ? `<b>${unav}</b>unavailable nights` : ""}</td></tr></tbody></table>`;
     wrap.innerHTML = html;
@@ -162,7 +163,7 @@
     wrap.querySelectorAll(".cell[data-tip]").forEach((c) => {
       const on = () => {
         if (!c.dataset.tip) return; const o = JSON.parse(decodeURIComponent(c.dataset.tip));
-        if (o.set) return showTip(`<b>Set median · ${fDay(o.d)} ${fMD(o.d)}</b><span class="t-rate">${money(o.r)}</span>Median of ${o.k} hotels with a public price that night.`, c);
+        if (o.set) return showTip(`<b>Median · ${fDay(o.d)} ${fMD(o.d)}</b><span class="t-rate">${money(o.r)}</span>Median of ${o.k} hotels with a public price that night.`, c);
         const head = `<b>${esc(o.h)} · ${fDay(o.d)} ${fMD(o.d)}</b>`;
         const body = o.s === "OK" ? `<span class="t-rate">${money(o.r)}</span>Lowest public nightly rate observed` :
           o.s === "UNAVAILABLE" ? `<span class="t-rate">Unavailable</span>` : `<span class="t-rate">Not collected</span>`;
@@ -242,9 +243,9 @@
   function buildDatasets(s) {
     const ds = [];
     if (showBand) {
-      ds.push({ label: "Set low", data: s.min, borderWidth: 0, pointRadius: 0, fill: false, spanGaps: false, backgroundColor: "rgba(201,163,90,.18)", order: 10, _band: 1 });
-      ds.push({ label: "Set range", data: capArr(s.max), borderWidth: 0, pointRadius: 0, fill: "-1", spanGaps: false, backgroundColor: "rgba(201,163,90,.18)", order: 10, _band: 1 });
-      ds.push({ label: "Set median", data: s.med, borderColor: "#171717", borderDash: [6, 5], borderWidth: 1.6, pointRadius: 0, spanGaps: false, tension: 0.25, order: 1 });
+      ds.push({ label: "Range low", data: s.min, borderWidth: 0, pointRadius: 0, fill: false, spanGaps: false, backgroundColor: "rgba(201,163,90,.18)", order: 10, _band: 1 });
+      ds.push({ label: "Range", data: capArr(s.max), borderWidth: 0, pointRadius: 0, fill: "-1", spanGaps: false, backgroundColor: "rgba(201,163,90,.18)", order: 10, _band: 1 });
+      ds.push({ label: "Median", data: s.med, borderColor: "#171717", borderDash: [6, 5], borderWidth: 1.6, pointRadius: 0, spanGaps: false, tension: 0.25, order: 1 });
     }
     s.per.forEach(({ h, data }) => {
       if (!visible.has(h.id)) return;
@@ -363,7 +364,7 @@
     $("#historyCaption").textContent = (view === "nightly"
       ? "Nightly view: each point is one night’s lowest public rate. Unavailable or uncollected nights break the line."
       : "Weekly view: simple mean of the nights that showed a price, per hotel (illustrative, not ADR).") +
-      " The set band and median are calculated across all eight hotels, whichever hotels are toggled on. Sources: " +
+      ` The range band and median are calculated across all ${H.length} hotels, whichever hotels are toggled on. Sources: ` +
       collected.map((w) => `w/c ${fMD(w.week)}: ${sourcesOf(ratesFor(w.week)).join(" & ")} (${fMD(w.generated)})`).join("; ") + ".";
     $("#historyChart").setAttribute("aria-label", `${view === "nightly" ? "Nightly" : "Weekly mean"} lowest public rates for ${visible.size} hotels from ${fMD(weeks[0].week)} to ${fMD(weeks[weeks.length - 1].week_end)}; week of ${weeks.filter((w) => w.status === "missing").map((w) => fMD(w.week)).join(", ") || "none"} not collected.`);
   }
@@ -382,13 +383,13 @@
     DB.tiers.forEach((t) => {
       const bs = DB.brands.filter((b) => b.tier === t.name), comps = bs.reduce((n, b) => n + b.comps.length, 0);
       const row = el("div", { class: "tier tier-" + t.name.toLowerCase().replace(/[^a-z]/g, ""), role: "group", "aria-label": `${t.name} brands` });
-      row.innerHTML = `<div class="tier-label"><h3>${t.name}</h3><p>${esc(t.line)}</p><span class="count">${bs.filter((b) => !b.featured).length} brands${comps ? ` · ${comps} in set` : ""}</span></div>`;
+      row.innerHTML = `<div class="tier-label"><h3>${t.name}</h3><p>${esc(t.line)}</p><span class="count">${bs.filter((b) => !b.featured).length} brands${comps ? ` · ${comps} tracked` : ""}</span></div>`;
       const list = el("div", { class: "brand-list" });
       bs.forEach((b, i) => {
         const cls = b.featured ? "bchip ambar" : "bchip" + (b.comps.length ? " has-comps" : "");
         const inner = b.featured ? `<img src="assets/ambar-logo.png" alt="AMBAR Residences · Orlando">`
           : `<span class="wm ${WM[b.name] || "wm-serif"}">${esc(b.name)}</span>${b.comps.length ? `<span class="badge" aria-hidden="true">${b.comps.length}</span>` : ""}`;
-        const btn = el("button", { type: "button", class: cls, "aria-pressed": "false", "aria-label": `${b.name}, ${t.name} tier${b.comps.length ? `, ${b.comps.length} comparable hotel${b.comps.length > 1 ? "s" : ""}` : ""}` }, inner);
+        const btn = el("button", { type: "button", class: cls, "aria-pressed": "false", "aria-label": `${b.name}, ${t.name} tier${b.comps.length ? `, ${b.comps.length} tracked hotel${b.comps.length > 1 ? "s" : ""}` : ""}` }, inner);
         btn._b = b;
         btn.addEventListener("mouseenter", () => !pinned && panel(b, btn));
         btn.addEventListener("focus", () => panel(b, btn));
@@ -408,24 +409,24 @@
     document.querySelectorAll(".bchip").forEach((x) => x.classList.toggle("is-active", x._b === b));
     const comps = b.comps.map((id) => byHotel[id]);
     $("#brandPanel").innerHTML = `<span class="bp-tier">${b.tier} tier${b.featured ? " · featured" : ""}</span><h3>${esc(b.name)}</h3><p>${esc(b.description)}</p>
-      <h4>In the comparable set</h4>${comps.length ? `<ul>${comps.map((h) => `<li><a href="#hotel-${h.id}" data-hid="${h.id}"><span>${esc(h.short)}</span><small>${esc(h.area.split(",")[0])}</small></a></li>`).join("")}</ul>`
-        : `<p class="none">${b.featured ? "AMBAR is the subject of the set, so it is not one of the eight comparables." : "No hotels from this brand are in the set."}</p>`}
-      <p class="hint">Tap a brand to pin it. Numbers on a brand show how many comparable hotels it has.</p>`;
+      <h4>Hotels tracked here</h4>${comps.length ? `<ul>${comps.map((h) => `<li><a href="#hotel-${h.id}" data-hid="${h.id}"><span>${esc(h.short)}</span><small>${esc(h.area.split(",")[0])}</small></a></li>`).join("")}</ul>`
+        : `<p class="none">${b.featured ? "AMBAR is the subject of this landscape, so it is not one of the hotels tracked." : "No hotels from this brand are tracked here."}</p>`}
+      <p class="hint">Tap a brand to pin it. Numbers on a brand show how many tracked hotels it has.</p>`;
     $("#brandPanel").querySelectorAll("a[data-hid]").forEach((a) => a.addEventListener("click", () => flashCard(a.dataset.hid)));
   }
 
   /* ---------- 5 hotels + map ---------- */
   let map, markers = {};
   function renderHotels() {
-    $("#hotelsSub").textContent = `Two JW Marriott resorts in the Luxury tier and six Premium-tier hotels across Autograph Collection, Tribute Portfolio, Westin, Sheraton and Gaylord. Distances are straight-line to ${DB.meta.reference_point.name}, computed from OpenStreetMap coordinates.`;
+    $("#hotelsSub").textContent = `Marriott: two JW Marriott resorts in the Luxury tier and five Premium-tier hotels across Autograph Collection, Westin, Sheraton and Gaylord. Non-Marriott: Hyatt Regency Grand Cypress (Hyatt), Wyndham Grand Bonnet Creek (Wyndham), Conrad Orlando (Hilton) and the independent ette, added Oct 14, 2026. Tiers for non-Marriott hotels are indicative. Distances are straight-line to ${DB.meta.reference_point.name}, computed from OpenStreetMap coordinates.`;
     const grid = $("#hotelGrid");
     H.forEach((h, i) => {
       const rs = DB.rates.filter((r) => r.hotel === h.id && r.week === latest.week), p = priced(rs);
       const card = el("article", { class: "hcard", id: "hotel-" + h.id, "aria-labelledby": "hn-" + h.id });
-      card.innerHTML = `<div class="pills"><span class="pill t-${h.tier}">${h.tier}</span><span class="pill">${esc(h.brand)}</span></div>
+      card.innerHTML = `<div class="pills"><span class="pill t-${h.tier}">${h.tier}</span><span class="pill">${esc(h.brand)}</span>${h.non_marriott ? `<span class="pill pill-nm">Non-Marriott${h.parent && h.parent !== h.brand ? " · " + esc(h.parent) : ""}</span>` : ""}</div>
         <h3 id="hn-${h.id}">${i + 1}. ${esc(h.name)}</h3>
         <p class="loc">${esc(h.area)}<br>${esc(h.address)}</p>
-        <p class="dist">${h.on_disney_property ? "On Walt Disney World® property · " : ""}≈ ${h.distance_to_epcot_mi} mi straight-line to EPCOT</p>
+        ${h.keys ? `<p class="dist">${h.keys.toLocaleString("en-US")} keys</p>` : ""}<p class="dist">${h.on_disney_property ? "On Walt Disney World® property · " : ""}≈ ${h.distance_to_epcot_mi} mi straight-line to EPCOT</p>
         ${(() => { const n = DB.hotel_notes.find((x) => x.hotel === h.id && x.week === latest.week); return n && n.demand_note ? `<p class="hnote"><span>Brief note, w/c ${fMD(latest.week)}:</span> ${esc(n.demand_note)}</p>` : ""; })()}
         <div class="latest"><span><b>${p.length ? money(Math.min(...p)) + "–" + money(Math.max(...p)).slice(1) : "—"}</b><br>range, w/c ${fMD(latest.week)}</span><span><b>${p.length}/7</b><br>nights priced</span></div>
         <div class="actions"><button type="button" class="linkbtn" data-map="${h.id}">Show on map</button><button type="button" class="linkbtn" data-chart="${h.id}">See history</button></div>`;
@@ -444,7 +445,7 @@
     H.forEach((h, i) => {
       const icon = L.divIcon({ className: "", html: `<div class="pin" style="background:${COLORS[h.id]}"><span>${i + 1}</span></div>`, iconSize: [30, 30], iconAnchor: [15, 30], popupAnchor: [0, -28] });
       markers[h.id] = L.marker([h.lat, h.lon], { icon, title: h.short, alt: h.short }).addTo(map)
-        .bindPopup(`<b>${esc(h.short)}</b><br>${esc(h.brand)} · ${h.tier}<br>${esc(h.address)}<br><a href="#hotel-${h.id}">View card</a>`);
+        .bindPopup(`<b>${esc(h.short)}</b><br>${esc(h.brand)} · ${h.tier}${h.non_marriott ? " · non-Marriott" : ""}<br>${esc(h.address)}<br><a href="#hotel-${h.id}">View card</a>`);
       pts.push([h.lat, h.lon]);
     });
     const ref = DB.meta.reference_point;
@@ -462,7 +463,7 @@
 
   /* ---------- 6 demand ---------- */
   function renderDemand() {
-    $("#marketStrip").innerHTML = DB.market.map((m) => `<div class="mstat"><div class="p">${esc(m.period)}</div><div class="v">${esc(m.value)}</div><p class="c">${esc(m.metric)} · ${esc(m.change)}</p><p class="s">Metro-wide, not this set. ${esc(m.source)}</p></div>`).join("");
+    $("#marketStrip").innerHTML = DB.market.map((m) => `<div class="mstat"><div class="p">${esc(m.period)}</div><div class="v">${esc(m.value)}</div><p class="c">${esc(m.metric)} · ${esc(m.change)}</p><p class="s">Metro-wide, not these hotels. ${esc(m.source)}</p></div>`).join("");
     const evHTML = (e) => `<div class="ev"><div class="d"><span class="type type-${esc(e.type)}">${esc(e.type)}</span>${esc(e.dates)}</div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="x">${esc(e.detail)}</p>` : ""}${e.hotels.length ? `<p class="x">Linked hotels: ${e.hotels.map((id) => `<a href="#hotel-${id}">${esc(byHotel[id].short)}</a>`).join(", ")}</p>` : ""}<p class="s">${esc(e.source)}</p></div>`;
     $("#timeline").innerHTML = weeks.map((w) => {
       const evs = DB.context[w.week] || [];
@@ -490,7 +491,7 @@
     $("#weekSources").innerHTML = weeks.map((w) => w.status === "missing"
       ? `<li><b>w/c ${fMD(w.week)}:</b> not collected. ${esc(w.note)}</li>`
       : `<li><b>w/c ${fMD(w.week)}</b> (snapshot ${fMD(w.generated)}; ${esc(w.brief_file)}): ${esc(w.rate_sources)}</li>`).join("");
-    $("#distMethod").textContent = `${m.distance_method} Addresses: swandolphin.com for the three Swan & Dolphin hotels, OpenStreetMap for the others.`;
+    $("#distMethod").textContent = `${m.distance_method} Addresses: swandolphin.com for the three Swan & Dolphin hotels, official hotel sites or venue listings for the four non-Marriott hotels, OpenStreetMap for the others; coordinates from OpenStreetMap.`;
     $("#excluded").innerHTML = m.excluded.map((c) => `<li>${esc(c)}</li>`).join("");
   }
 
