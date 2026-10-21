@@ -44,6 +44,24 @@
     const m = cfg.occupancy_model;
     return stepDownOccupancy(cfg.base_occupancy.anchor, m.d, sizeUnits(u.bedrooms, !!u.has_den, m.den_weight));
   }
+  const trunc2 = (x) => Math.floor(x * 100 + 1e-7) / 100; // document: owner share = 50% of the rounded gross, cut to the cent
+  // Example of Owner Economics at base ADR (document's revenue-flow formula); mirrors owner_economics() in engine.py
+  function ownerEconomics(u, cfg, occupancy) {
+    const oe = cfg.owner_economics, w = oe.waterfall_pct;
+    const occ = occupancy == null ? planOccupancy(u, cfg) : occupancy;
+    const adr = u.base_scenario.adr, g = adr * occ * oe.days_per_year / 12, fx = u.fixed_owner_costs_monthly;
+    const fixed = { hoa_condo: fx.hoa_condo, property_tax: fx.property_tax, insurance_estimate: fx.insurance_estimate, utilities_estimate: fx.utilities_estimate };
+    const fixedTotal = r2(fixed.hoa_condo + fixed.property_tax + fixed.insurance_estimate + fixed.utilities_estimate);
+    const net = g * w.owner_share - g * w.ffe_reserve - g * w.ota_commissions - g * w.card_processing - fixedTotal;
+    const netYear = Math.round(net * 12);
+    return { adr, occupancy: Math.round(occ * 1e6) / 1e6,
+      monthly_revenue_flow: { gross_room_revenue: r2(g), marriott_brand_fee_10pct: -r2(g * w.marriott_brand_fee), hotel_operations_40pct: -r2(g * w.hotel_operations),
+        owner_share_50pct: trunc2(r2(g) * w.owner_share), ffe_reserve_4pct: -r2(g * w.ffe_reserve), ota_commissions_2_5pct: -r2(g * w.ota_commissions),
+        card_processing_2_41pct: -r2(g * w.card_processing), fixed_owner_costs: -fixedTotal, owner_net_before_financing: r2(net) },
+      fixed_owner_costs_monthly: { ...fixed, total: fixedTotal },
+      net_per_month: Math.round(net), net_per_year: netYear, cap_rate_pct: r2(netYear / u.reference_list_price * 100),
+      reference_list_price: u.reference_list_price };
+  }
   function planRatios(units, baselineLayout = "s1") {
     const base = units.find((u) => u.id === baselineLayout).base_scenario.adr;
     return Object.fromEntries(units.map((u) => [u.id, u.base_scenario.adr / base]));
@@ -118,7 +136,7 @@
         comp_count: n, method, basis: scaled ? "scaled" : "comp_median", confidence: scaled ? downgrade(conf) : conf,
         base_adr: baseAdr, base_occupancy: Math.round(baseOcc * 1e6) / 1e6, base_revpau: r2(baseRp),
         vs_base_adr_pct: r1((adr / baseAdr - 1) * 100), vs_base_revpau_pct: r1((rp / baseRp - 1) * 100),
-        doc_occupancy: u.base_scenario.occupancy };
+        doc_occupancy: u.base_scenario.occupancy, owner_economics: ownerEconomics(u, cfg) };
     });
     return { mode: "hotel_median", as_of: wk.week, week_start: wk.week, week_end: wk.week_end, week_label: wk.label,
       snapshot_generated: wk.generated, comp_source: wk.rate_sources, data_status: "live",
@@ -134,6 +152,6 @@
     }
     return out;
   }
-  return { median, mean, percentile, trimmedMean, iqrBounds, downgrade, sizeUnits, stepDownOccupancy, planOccupancy, basePlanOccupancy, planRatios,
+  return { median, mean, percentile, trimmedMean, iqrBounds, downgrade, sizeUnits, stepDownOccupancy, planOccupancy, basePlanOccupancy, ownerEconomics, planRatios,
     hotelCompsFromMarket, dedupe, dropStale, runHotelMedian, runAllWeeks, collectedWeeks };
 });

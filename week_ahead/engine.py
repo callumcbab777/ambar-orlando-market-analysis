@@ -115,6 +115,44 @@ def base_plan_occupancy(unit: dict, cfg: dict) -> float:
     return step_down_occupancy(cfg["base_occupancy"]["anchor"], m["d"], size_units(unit["bedrooms"], unit.get("has_den", False), m["den_weight"]))
 
 
+def _trunc2(x: float) -> float:
+    """Truncate to the cent. The document's owner-share line is 50% of the rounded gross cut to the cent (A1 9,827.93 / 2 -> 4,913.96). Mirrored in JS."""
+    return math.floor(x * 100 + 1e-7) / 100
+
+
+def owner_economics(unit: dict, cfg: dict, occupancy: float | None = None) -> dict:
+    """Example of Owner Economics at the plan's base ADR, using the document's revenue-flow formula.
+    occupancy defaults to the estimate's size step-down (occupancy_model). Week-independent."""
+    oe = cfg["owner_economics"]
+    w = oe["waterfall_pct"]
+    occ = plan_occupancy(unit, cfg) if occupancy is None else occupancy
+    adr = unit["base_scenario"]["adr"]
+    g = adr * occ * oe["days_per_year"] / 12
+    fx = unit["fixed_owner_costs_monthly"]
+    fixed = {k: fx[k] for k in ("hoa_condo", "property_tax", "insurance_estimate", "utilities_estimate")}
+    fixed_total = _r(fixed["hoa_condo"] + fixed["property_tax"] + fixed["insurance_estimate"] + fixed["utilities_estimate"], 2)
+    net = g * w["owner_share"] - g * w["ffe_reserve"] - g * w["ota_commissions"] - g * w["card_processing"] - fixed_total
+    net_year = _r(net * 12)
+    return {
+        "adr": adr, "occupancy": _r(occ, 6),
+        "monthly_revenue_flow": {
+            "gross_room_revenue": _r(g, 2),
+            "marriott_brand_fee_10pct": -_r(g * w["marriott_brand_fee"], 2),
+            "hotel_operations_40pct": -_r(g * w["hotel_operations"], 2),
+            "owner_share_50pct": _trunc2(_r(g, 2) * w["owner_share"]),  # document: 50% of the rounded gross, cut to the cent
+            "ffe_reserve_4pct": -_r(g * w["ffe_reserve"], 2),
+            "ota_commissions_2_5pct": -_r(g * w["ota_commissions"], 2),
+            "card_processing_2_41pct": -_r(g * w["card_processing"], 2),
+            "fixed_owner_costs": -fixed_total,
+            "owner_net_before_financing": _r(net, 2),
+        },
+        "fixed_owner_costs_monthly": {**fixed, "total": fixed_total},
+        "net_per_month": _r(net), "net_per_year": net_year,
+        "cap_rate_pct": _r(net_year / unit["reference_list_price"] * 100, 2),
+        "reference_list_price": unit["reference_list_price"],
+    }
+
+
 def revpau(adr: float, occupancy: float) -> float:
     """Revenue per available unit-night = ADR x occupancy."""
     return adr * occupancy
@@ -455,6 +493,7 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
             "vs_base_adr_pct": _r((adr / base_adr - 1) * 100, 1),
             "vs_base_revpau_pct": _r((rp / base_rp - 1) * 100, 1),
             "doc_occupancy": u["base_scenario"]["occupancy"],
+            "owner_economics": owner_economics(u, cfg),
         })
     return {
         "mode": "hotel_median",

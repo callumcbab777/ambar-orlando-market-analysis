@@ -20,8 +20,8 @@
       }));
   }
 
-  function costBlock(u) {
-    const f = u.monthly_revenue_flow, fx = u.fixed_owner_costs_monthly, b = u.base_scenario;
+  function costBlock(u, oe, A) {
+    const f = oe.monthly_revenue_flow, fx = oe.fixed_owner_costs_monthly, OE = A.owner_economics;
     const rowsFlow = [
       ["Gross room revenue", f.gross_room_revenue, 1], ["Marriott brand fee · 10%", f.marriott_brand_fee_10pct], ["Hotel operations · 40%", f.hotel_operations_40pct],
       ["Owner share · 50%", f.owner_share_50pct, 1], ["FF&amp;E reserve · 4%", f.ffe_reserve_4pct], ["OTA commissions · 2.5%", f.ota_commissions_2_5pct],
@@ -33,13 +33,13 @@
       ${fixed.map(([k, v]) => `<tr><td>${k}</td><td>${usd2(v)}</td><td>${usd2(v * 12)}</td></tr>`).join("")}
       <tr class="tot"><td>Total fixed costs</td><td>${usd2(fx.total)}</td><td>${usd2(fx.total * 12)}</td></tr></tbody></table>
       <p class="c-note">Property tax basis ${usd2(u.property_tax_annual)} a year. ${u.note ? esc(u.note) : ""}</p>
-      <p class="c-h">Document’s figures · base scenario · ${usd(b.adr)} ADR · ${pct(b.occupancy)} occupancy · cash purchase</p>
-      <div class="c-kpis"><div><span>Net / month</span><b>${usd(u.net_per_month)}</b></div><div><span>Net / year</span><b>${usd(u.net_per_year)}</b></div><div><span>Cap rate</span><b>${u.cap_rate_pct.toFixed(2)}%</b></div></div>
+      <p class="c-h">${esc(OE.label)} · ${usd(oe.adr)} base ADR · ${pct1(oe.occupancy)} occupancy · cash purchase</p>
+      <div class="c-kpis"><div><span>Net / month</span><b>${usd(oe.net_per_month)}</b></div><div><span>Net / year</span><b>${usd(oe.net_per_year)}</b></div><div><span>Cap rate</span><b>${oe.cap_rate_pct.toFixed(2)}%</b></div></div>
       <table class="ctab"><thead><tr><th>Monthly revenue flow</th><th></th></tr></thead><tbody>
       ${rowsFlow.map(([k, v, bold]) => `<tr${bold ? ' class="tot"' : ""}><td>${k}</td><td class="${v < 0 ? "neg" : ""}">${usd2(v)}</td></tr>`).join("")}
       <tr class="tot"><td>Owner net before financing</td><td>${usd2(f.owner_net_before_financing)}</td></tr></tbody></table>
       <p class="c-note">Reference list price ${usd(u.reference_list_price)} (per floor plan, not a quote for an individual residence). Cap rate = annual owner net ÷ reference price, before financing; no mortgage or closing costs. Insurance and utilities are estimates, not quotes. The 40% hotel operations allocation (Coury Hospitality) is included above, not an additional deduction.</p>
-      <p class="c-note"><b>Note:</b> these net, cap-rate and revenue-flow figures are the document’s own, modeled at the document’s original ${pct(b.occupancy)} occupancy. They are shown unchanged and are not recalculated at the historical base occupancy (73% with size step-down) or this week’s estimate.</p>
+      <p class="c-note"><b>${esc(OE.note)}</b> Gross = base ADR × ${esc(A.occupancy_model.label.toLowerCase())} (${pct1(oe.occupancy)} for this plan) × ${OE.days_per_year} ÷ 12, then the revenue flow above. These figures stay at base ADR and do not change with the selected week.</p>
       <p class="c-note">Source: AMBAR Rental Program Cost Breakdown — Owner Economics, Oct 12, 2026; Building 1 HOA budget updated Oct 9, 2026 (AMBAR Residence Cards, pp. ${u.doc_pages.join("–")}). Illustrative only; not financial advice.</p>`;
   }
 
@@ -147,7 +147,7 @@
         <p class="r-cap">${esc(compCaption(W))}.</p>
         <h4>Historical base</h4>
         <dl class="m-kpis m-kpis-base">
-          ${f("Base ADR", usd(e.base_adr), "document base ADR")}
+          ${f("Base ADR", usd(e.base_adr), "base ADR")}
           ${f("Base occupancy", pct1(e.base_occupancy), esc(A.base_occupancy.label))}
           ${f("Base RevPAU", usd2(e.base_revpau), "base ADR × base occupancy")}
         </dl>
@@ -159,14 +159,16 @@
       </section>
       <section class="m-sec m-costs" aria-label="Costs and owner economics">
         <h3>Costs &amp; owner economics</h3>
+        <p class="c-h">${esc(A.owner_economics.label)}</p>
         <dl class="m-kpis m-kpis-doc">
-          ${f("Net / year (document)", usd(u.net_per_year), `${usd(u.net_per_month)} / month`)}
-          ${f("Cap rate (document)", u.cap_rate_pct.toFixed(2) + "%", "before financing")}
+          ${f("Net / year", usd(e.owner_economics.net_per_year), `${usd(e.owner_economics.net_per_month)} / month`)}
+          ${f("Cap rate", e.owner_economics.cap_rate_pct.toFixed(2) + "%", "before financing")}
           ${f("Reference list price", usd(u.reference_list_price), "per floor plan")}
         </dl>
+        <p class="c-note m-oe-note">${esc(A.owner_economics.note)}</p>
         <p class="c-h">Fee structure</p>
         <p class="c-note">Marriott brand fee 10% · Hotel operations 40% (Coury Hospitality) · Owner share 50% · FF&amp;E reserve 4% · OTA commissions 2.5% · Card processing 2.41% (all % of gross room revenue).</p>
-        ${costBlock(u)}
+        ${costBlock(u, e.owner_economics, A)}
       </section>
       <p class="m-disc"><b>Estimates, not a promise of returns.</b> Illustration only, as of ${asOf}; comparables are Orlando hotel rates, not AMBAR residences. Actual rates, occupancy, costs and owner income will differ. Not an offer or investment advice; subject to review by securities counsel.</p>
       </div>`;
@@ -223,15 +225,16 @@
       <ul>
         <li><b>Comparables.</b> The same weekly comparable hotel rates shown elsewhere on this page (lowest public nightly rates; standard rooms, room types unspecified), for the week selected above. Each hotel contributes the median of its priced nights for the week. Records are de-duplicated, anything older than ${A.pipeline.stale_days} days is dropped, and outliers are trimmed with the interquartile-range rule (k = ${A.pipeline.iqr_k}).</li>
         <li><b>Baseline.</b> The comp-set <b>median</b> is the Studio-equivalent baseline (a trimmed mean if fewer than ${A.pipeline.median_min_n} hotels). The range is the 25th–75th percentile. The mean is kept as a diagnostic; the week is flagged when mean and median differ by more than ${A.pipeline.mean_median_flag_pct}%.</li>
-        <li><b>Per plan.</b> <code>ADR = comp median × realization × position index × plan ratio to S1</code>, with the same factors applied to the range. Plan ratios are the document base ADRs divided by the S1 base ADR ($338). <code>RevPAU = ADR × occupancy</code>. No seasonality adjustment is added; the weekly rates already reflect demand.</li>
-        <li><b>Occupancy.</b> ${esc(OM.label)}: occupancy starts from the Studio at ${pct1(OM.occ_studio)} (the document’s original occupancy) and steps down ${pct1(OM.d)} for each bedroom, with a den counting as ${OM.den_weight} of a bedroom (<code>Occ = ${pct1(OM.occ_studio)} × (1 − ${OM.d}) ^ size</code>). ${esc(BO.label)}: the same step and den weight from a ${pct1(BO.anchor)} Studio anchor (Callum’s historical figure). The two anchors are separate settings; the step and den weight are proposed and adjustable and apply to both.</li>
-        <li><b>Vs. base.</b> Each plan’s base is the document’s base ADR at its historical base occupancy (base RevPAU = base ADR × base occupancy). ADR vs base reflects rates only. RevPAU vs base also reflects the higher estimated occupancy anchor (${pct(OM.occ_studio)} vs ${pct(BO.anchor)}); because both step down by the same factor, that occupancy effect is the same for every plan. Because plans are scaled with ratios from the same document, both percentages are the same for every plan in a given week.</li>
+        <li><b>Per plan.</b> <code>ADR = comp median × realization × position index × plan ratio to S1</code>, with the same factors applied to the range. Plan ratios are each plan’s base ADR divided by the S1 base ADR ($338). <code>RevPAU = ADR × occupancy</code>. No seasonality adjustment is added; the weekly rates already reflect demand.</li>
+        <li><b>Occupancy.</b> ${esc(OM.label)}: occupancy starts from the Studio at ${pct1(OM.occ_studio)} and steps down ${pct1(OM.d)} for each bedroom, with a den counting as ${OM.den_weight} of a bedroom (<code>Occ = ${pct1(OM.occ_studio)} × (1 − ${OM.d}) ^ size</code>). ${esc(BO.label)}: the same step and den weight from a ${pct1(BO.anchor)} Studio anchor (Callum’s historical figure). The two anchors are separate settings; the step and den weight are proposed and adjustable and apply to both.</li>
+        <li><b>Vs. base.</b> Each plan’s base is its base ADR at its historical base occupancy (base RevPAU = base ADR × base occupancy). ADR vs base reflects rates only. RevPAU vs base also reflects the higher estimated occupancy anchor (${pct(OM.occ_studio)} vs ${pct(BO.anchor)}); because both step down by the same factor, that occupancy effect is the same for every plan. Because plans are scaled with ratios from the same base ADRs, both percentages are the same for every plan in a given week.</li>
+        <li><b>Example of Owner Economics.</b> In each expanded view: gross = base ADR × estimated occupancy (size step-down) × 365 ÷ 12, less the Marriott brand fee (10%) and hotel operations (40%); the owner’s 50% share then bears FF&amp;E (4%), OTA (2.5%) and card processing (2.41%) of gross and the fixed costs (HOA, property tax, insurance, utilities). Cap rate = annual net ÷ reference list price. At the original per-plan occupancies this formula reproduces the AMBAR cost breakdown exactly. Example at base ADR with size step-down occupancy; not a forecast, and it does not change with the selected week.</li>
         <li><b>Confidence.</b> High = ${A.pipeline.high_confidence_min_n}+ comparables and not flagged; Medium = fewer comparables or a flagged week; Low = trimmed mean. Plans other than the Studio are scaled, not observed, so their confidence is one step lower.</li>
       </ul>
       <table><thead><tr><th>Plan</th><th>Base ADR</th><th>Ratio to S1</th><th>Size units</th><th>Est. occupancy</th><th>Historical base occ.</th><th>Base RevPAU</th><th>Realization</th><th>Position index</th></tr></thead><tbody>
       ${R.units.map((u) => { const e = byId[u.id], t = ut[u.unit_type]; return `<tr><td>${esc(u.layout)}</td><td>${usd(u.base_scenario.adr)}</td><td>${e.ratio_to_s1.toFixed(3)}</td><td>${e.size_units}</td><td>${pct1(e.occupancy)}</td><td>${pct1(e.base_occupancy)}</td><td>${usd2(e.base_revpau)}</td><td>${t.realization.toFixed(2)}${t.realization_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td><td>${t.position_index.toFixed(2)}${t.position_index_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td></tr>`; }).join("")}
       </tbody></table>
-      <p class="fineprint">Settings live in data/week_ahead/assumptions.json: estimated-occupancy anchor ${pct1(OM.occ_studio)}; historical base anchor ${pct1(BO.anchor)}; step d = ${pct1(OM.d)} and den weight = ${OM.den_weight} (proposed, adjustable). The document’s own net and cap-rate figures in each cost breakdown were modeled at its original per-plan occupancy and are not recomputed. Every figure is computed in your browser from data/comps.json for the selected week, so a new weekly rate update flows straight into the cards.</p>
+      <p class="fineprint">Settings live in data/week_ahead/assumptions.json: estimated-occupancy anchor ${pct1(OM.occ_studio)}; historical base anchor ${pct1(BO.anchor)}; step d = ${pct1(OM.d)} and den weight = ${OM.den_weight} (proposed, adjustable). The Example of Owner Economics in each expanded view is recomputed at base ADR with the estimated size step-down occupancy, using the same revenue-flow formula and fixed costs; it does not change with the selected week. Every figure is computed in your browser from data/comps.json for the selected week, so a new weekly rate update flows straight into the cards.</p>
     </details>`;
   }
 
