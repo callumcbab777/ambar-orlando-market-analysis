@@ -20,6 +20,9 @@ on:
       - "update_week_ahead.py"
       - "tests/**"
       - "assets/js/week-ahead-engine.js"
+      - "assets/js/week-ahead.js"
+      - "assets/css/week-ahead.css"
+      - "index.html"
   workflow_dispatch:
 permissions:
   contents: write
