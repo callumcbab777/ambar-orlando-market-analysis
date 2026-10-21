@@ -1,0 +1,798 @@
+{
+ "as_of": "2026-10-19",
+ "week_start": "2026-10-19",
+ "data_status": "sample",
+ "basis": "ADR and RevPAU (RevPAU = ADR x occupancy), USD per night",
+ "pipeline": {
+  "records_in": 26,
+  "after_dedupe": 25,
+  "after_stale": 24,
+  "duplicates_removed": 1,
+  "stale_removed": 1
+ },
+ "types": {
+  "studio": {
+   "unit_type": "studio",
+   "label": "Studio",
+   "method": "median",
+   "confidence": "High",
+   "comp_count": 9,
+   "raw_count": 10,
+   "trimmed_out": 1,
+   "comp_point": 340.0,
+   "comp_p25": 331.0,
+   "comp_p75": 349.0,
+   "diag_mean": 361.4,
+   "diag_median": 342.0,
+   "gap_pct": 5.6725,
+   "flagged": false,
+   "adr": 340.0,
+   "adr_p25": 331.0,
+   "adr_p75": 349.0,
+   "derived_from": null,
+   "derived_factor": null,
+   "notes": []
+  },
+  "1br": {
+   "unit_type": "1br",
+   "label": "1 Bedroom",
+   "method": "median",
+   "confidence": "Medium",
+   "comp_count": 6,
+   "raw_count": 6,
+   "trimmed_out": 0,
+   "comp_point": 409.5,
+   "comp_p25": 399.75,
+   "comp_p75": 418.5,
+   "diag_mean": 409.3333,
+   "diag_median": 409.5,
+   "gap_pct": 0.0407,
+   "flagged": false,
+   "adr": 409.5,
+   "adr_p25": 399.75,
+   "adr_p75": 418.5,
+   "derived_from": null,
+   "derived_factor": null,
+   "notes": []
+  },
+  "2br": {
+   "unit_type": "2br",
+   "label": "2 Bedroom",
+   "method": "median",
+   "confidence": "Medium",
+   "comp_count": 5,
+   "raw_count": 5,
+   "trimmed_out": 0,
+   "comp_point": 549.0,
+   "comp_p25": 538.0,
+   "comp_p75": 561.0,
+   "diag_mean": 549.8,
+   "diag_median": 549.0,
+   "gap_pct": 0.1457,
+   "flagged": false,
+   "adr": 549.0,
+   "adr_p25": 538.0,
+   "adr_p75": 561.0,
+   "derived_from": null,
+   "derived_factor": null,
+   "notes": []
+  },
+  "3br": {
+   "unit_type": "3br",
+   "label": "3 Bedroom",
+   "method": "derived",
+   "confidence": "Derived",
+   "comp_count": 3,
+   "raw_count": 3,
+   "trimmed_out": 0,
+   "comp_point": 661.878,
+   "comp_p25": 644.3577,
+   "comp_p75": 679.3983,
+   "diag_mean": 655.3333,
+   "diag_median": 649.0,
+   "gap_pct": 0.9759,
+   "flagged": false,
+   "adr": 661.878,
+   "adr_p25": 644.3577,
+   "adr_p75": 679.3983,
+   "derived_from": "studio",
+   "derived_factor": 1.9467,
+   "notes": [
+    "Only 3 clean comps; derived from the best-supported type."
+   ]
+  }
+ },
+ "units": [
+  {
+   "id": "s1",
+   "unit_type": "studio",
+   "adr": 340.0,
+   "adr_p25": 331.0,
+   "adr_p75": 349.0,
+   "occupancy": 0.79,
+   "revpau": 268.6,
+   "revpau_p25": 261.49,
+   "revpau_p75": 275.71,
+   "layout_index": 1.0,
+   "comp_count": 9,
+   "confidence": "High",
+   "method": "median",
+   "derived_from": null
+  },
+  {
+   "id": "a1",
+   "unit_type": "1br",
+   "adr": 409.5,
+   "adr_p25": 399.75,
+   "adr_p75": 418.5,
+   "occupancy": 0.79,
+   "revpau": 323.5,
+   "revpau_p25": 315.8,
+   "revpau_p75": 330.62,
+   "layout_index": 1.0,
+   "comp_count": 6,
+   "confidence": "Medium",
+   "method": "median",
+   "derived_from": null
+  },
+  {
+   "id": "a2",
+   "unit_type": "1br",
+   "adr": 449.55,
+   "adr_p25": 438.85,
+   "adr_p75": 459.43,
+   "occupancy": 0.82,
+   "revpau": 368.63,
+   "revpau_p25": 359.85,
+   "revpau_p75": 376.73,
+   "layout_index": 1.0978,
+   "comp_count": 6,
+   "confidence": "Medium",
+   "method": "median",
+   "derived_from": null
+  },
+  {
+   "id": "a3",
+   "unit_type": "1br",
+   "adr": 504.63,
+   "adr_p25": 492.61,
+   "adr_p75": 515.72,
+   "occupancy": 0.82,
+   "revpau": 413.79,
+   "revpau_p25": 403.94,
+   "revpau_p75": 422.89,
+   "layout_index": 1.2323,
+   "comp_count": 6,
+   "confidence": "Medium",
+   "method": "median",
+   "derived_from": null
+  },
+  {
+   "id": "a4",
+   "unit_type": "1br",
+   "adr": 510.61,
+   "adr_p25": 498.45,
+   "adr_p75": 521.83,
+   "occupancy": 0.82,
+   "revpau": 418.7,
+   "revpau_p25": 408.73,
+   "revpau_p75": 427.9,
+   "layout_index": 1.2469,
+   "comp_count": 6,
+   "confidence": "Medium",
+   "method": "median",
+   "derived_from": null
+  },
+  {
+   "id": "b1",
+   "unit_type": "2br",
+   "adr": 585.78,
+   "adr_p25": 574.05,
+   "adr_p75": 598.59,
+   "occupancy": 0.84,
+   "revpau": 492.06,
+   "revpau_p25": 482.2,
+   "revpau_p75": 502.81,
+   "layout_index": 1.067,
+   "comp_count": 5,
+   "confidence": "Medium",
+   "method": "median",
+   "derived_from": null
+  },
+  {
+   "id": "b2",
+   "unit_type": "2br",
+   "adr": 549.0,
+   "adr_p25": 538.0,
+   "adr_p75": 561.0,
+   "occupancy": 0.84,
+   "revpau": 461.16,
+   "revpau_p25": 451.92,
+   "revpau_p75": 471.24,
+   "layout_index": 1.0,
+   "comp_count": 5,
+   "confidence": "Medium",
+   "method": "median",
+   "derived_from": null
+  },
+  {
+   "id": "b3",
+   "unit_type": "2br",
+   "adr": 549.0,
+   "adr_p25": 538.0,
+   "adr_p75": 561.0,
+   "occupancy": 0.84,
+   "revpau": 461.16,
+   "revpau_p25": 451.92,
+   "revpau_p75": 471.24,
+   "layout_index": 1.0,
+   "comp_count": 5,
+   "confidence": "Medium",
+   "method": "median",
+   "derived_from": null
+  },
+  {
+   "id": "c1",
+   "unit_type": "3br",
+   "adr": 661.88,
+   "adr_p25": 644.36,
+   "adr_p75": 679.4,
+   "occupancy": 0.83,
+   "revpau": 549.36,
+   "revpau_p25": 534.82,
+   "revpau_p75": 563.9,
+   "layout_index": 1.0,
+   "comp_count": 3,
+   "confidence": "Derived",
+   "method": "derived",
+   "derived_from": "studio"
+  }
+ ],
+ "feed_file": "comps_feed.sample.csv",
+ "assumptions": {
+  "unit_types": {
+   "studio": {
+    "label": "Studio",
+    "plural": "studios",
+    "realization": 1.0,
+    "position_index": 1.0
+   },
+   "1br": {
+    "label": "1 Bedroom",
+    "plural": "one-bedrooms",
+    "realization": 1.0,
+    "position_index": 1.0
+   },
+   "2br": {
+    "label": "2 Bedroom",
+    "plural": "two-bedrooms",
+    "realization": 1.0,
+    "position_index": 1.0
+   },
+   "3br": {
+    "label": "3 Bedroom",
+    "plural": "three-bedrooms",
+    "realization": 1.0,
+    "position_index": 1.0
+   }
+  },
+  "layouts": {
+   "s1": {
+    "occupancy": 0.79,
+    "layout_index": 1.0
+   },
+   "a1": {
+    "occupancy": 0.79,
+    "layout_index": 1.0
+   },
+   "a2": {
+    "occupancy": 0.82,
+    "layout_index": 1.0978
+   },
+   "a3": {
+    "occupancy": 0.82,
+    "layout_index": 1.2323
+   },
+   "a4": {
+    "occupancy": 0.82,
+    "layout_index": 1.2469
+   },
+   "b1": {
+    "occupancy": 0.84,
+    "layout_index": 1.067
+   },
+   "b2": {
+    "occupancy": 0.84,
+    "layout_index": 1.0
+   },
+   "b3": {
+    "occupancy": 0.84,
+    "layout_index": 1.0
+   },
+   "c1": {
+    "occupancy": 0.83,
+    "layout_index": 1.0
+   }
+  },
+  "gap_fill": {
+   "method": "ratio",
+   "ratios_to_studio": {
+    "studio": 1.0,
+    "1br": 1.2101,
+    "2br": 1.6331,
+    "3br": 1.9467
+   },
+   "power_beta": null
+  },
+  "pipeline": {
+   "stale_days": 14,
+   "iqr_trim": true,
+   "iqr_k": 1.5,
+   "iqr_min_n": 5,
+   "median_min_n": 5,
+   "gap_fill_min_n": 4,
+   "mean_median_flag_pct": 10,
+   "high_confidence_min_n": 8
+  }
+ },
+ "residences": {
+  "_source": "AMBAR Residence Cards — Complete Collection (PDF, 18 pages). Figures from 'AMBAR Rental Program Cost Breakdown — Owner Economics, October 12, 2026; Building 1 HOA budget updated October 9, 2026'. Transcribed verbatim; do not edit figures without a new source document.",
+  "source_date": "2026-10-12",
+  "revenue_waterfall_pct": {
+   "marriott_brand_fee": 0.1,
+   "hotel_operations": 0.4,
+   "owner_share": 0.5,
+   "ffe_reserve": 0.04,
+   "ota_commissions": 0.025,
+   "card_processing": 0.0241,
+   "_note": "Owner share = 50% of gross. FF&E, OTA and card processing are % of gross room revenue, deducted from the owner share. Hotel operations 40% is managed by Coury Hospitality."
+  },
+  "hotel_operations_allocation_pct": {
+   "Housekeeping": 8.4,
+   "Laundry": 3.4,
+   "Linen replacement": 1.8,
+   "Front office / concierge": 4,
+   "Maintenance / engineering": 3.3,
+   "WiFi / managed internet": 0.3,
+   "Repairs": 1.4,
+   "Guest amenities / supplies": 1,
+   "Cleaning supplies": 1,
+   "Cable / telephone": 0,
+   "Management fee": 3,
+   "Sales & marketing": 7.4,
+   "Administrative & general": 5
+  },
+  "notes": [
+   "Insurance and electricity are estimates, not quotes. Actual costs may vary.",
+   "Cap rate = annual owner net ÷ reference price, before financing. No mortgage or closing costs included.",
+   "Reference prices are per floor plan, not quotes for an individual residence.",
+   "Illustrative only; revenue and costs may vary. Not financial advice.",
+   "Renderings are artist's impressions; furniture and finishes are illustrative."
+  ],
+  "units": [
+   {
+    "id": "s1",
+    "layout": "S1",
+    "name": "Studio",
+    "unit_type": "studio",
+    "bedrooms": 0,
+    "bathrooms": 1,
+    "max_guests": 4,
+    "sqft": 533,
+    "sqm": 49.5,
+    "terrace_sqft": null,
+    "details": "Open studio plan · Full kitchen · Walk-in shower",
+    "image": "assets/residences/s1.jpg",
+    "doc_pages": [
+     1,
+     2
+    ],
+    "base_scenario": {
+     "adr": 338,
+     "occupancy": 0.79,
+     "purchase": "cash"
+    },
+    "monthly_revenue_flow": {
+     "gross_room_revenue": 8121.86,
+     "marriott_brand_fee_10pct": -812.19,
+     "hotel_operations_40pct": -3248.74,
+     "owner_share_50pct": 4060.93,
+     "ffe_reserve_4pct": -324.87,
+     "ota_commissions_2_5pct": -203.05,
+     "card_processing_2_41pct": -195.74,
+     "fixed_owner_costs": -841.57,
+     "owner_net_before_financing": 2495.7
+    },
+    "fixed_owner_costs_monthly": {
+     "hoa_condo": 402.93,
+     "property_tax": 286.95,
+     "insurance_estimate": 81.95,
+     "utilities_estimate": 69.74,
+     "total": 841.57
+    },
+    "property_tax_annual": 3443.4,
+    "net_per_month": 2496,
+    "net_per_year": 29948,
+    "cap_rate_pct": 7.87,
+    "reference_list_price": 380614,
+    "note": null
+   },
+   {
+    "id": "a1",
+    "layout": "A1",
+    "name": "1 Bedroom",
+    "unit_type": "1br",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "max_guests": 4,
+    "sqft": 658,
+    "sqm": 61,
+    "terrace_sqft": 65,
+    "details": "Private balcony · Kitchen island · In-residence laundry",
+    "image": "assets/residences/a1.jpg",
+    "doc_pages": [
+     3,
+     4
+    ],
+    "base_scenario": {
+     "adr": 409,
+     "occupancy": 0.79,
+     "purchase": "cash"
+    },
+    "monthly_revenue_flow": {
+     "gross_room_revenue": 9827.93,
+     "marriott_brand_fee_10pct": -982.79,
+     "hotel_operations_40pct": -3931.17,
+     "owner_share_50pct": 4913.96,
+     "ffe_reserve_4pct": -393.12,
+     "ota_commissions_2_5pct": -245.7,
+     "card_processing_2_41pct": -236.85,
+     "fixed_owner_costs": -1025.33,
+     "owner_net_before_financing": 3012.97
+    },
+    "fixed_owner_costs_monthly": {
+     "hoa_condo": 498.73,
+     "property_tax": 354.26,
+     "insurance_estimate": 86.51,
+     "utilities_estimate": 85.83,
+     "total": 1025.33
+    },
+    "property_tax_annual": 4251.12,
+    "net_per_month": 3013,
+    "net_per_year": 36156,
+    "cap_rate_pct": 7.87,
+    "reference_list_price": 459344,
+    "note": null
+   },
+   {
+    "id": "a2",
+    "layout": "A2",
+    "name": "1 Bedroom + Den",
+    "unit_type": "1br",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "max_guests": 6,
+    "sqft": 764,
+    "sqm": 71,
+    "terrace_sqft": null,
+    "details": "Enclosed den · Angled glass wall · Sleeps six",
+    "image": "assets/residences/a2.jpg",
+    "doc_pages": [
+     5,
+     6
+    ],
+    "base_scenario": {
+     "adr": 449,
+     "occupancy": 0.82,
+     "purchase": "cash"
+    },
+    "monthly_revenue_flow": {
+     "gross_room_revenue": 11198.81,
+     "marriott_brand_fee_10pct": -1119.88,
+     "hotel_operations_40pct": -4479.52,
+     "owner_share_50pct": 5599.4,
+     "ffe_reserve_4pct": -447.95,
+     "ota_commissions_2_5pct": -279.97,
+     "card_processing_2_41pct": -269.89,
+     "fixed_owner_costs": -1176.14,
+     "owner_net_before_financing": 3425.45
+    },
+    "fixed_owner_costs_monthly": {
+     "hoa_condo": 580.07,
+     "property_tax": 405.18,
+     "insurance_estimate": 91.06,
+     "utilities_estimate": 99.83,
+     "total": 1176.14
+    },
+    "property_tax_annual": 4862.16,
+    "net_per_month": 3425,
+    "net_per_year": 41105,
+    "cap_rate_pct": 7.92,
+    "reference_list_price": 518900,
+    "note": null
+   },
+   {
+    "id": "a3",
+    "layout": "A3",
+    "name": "1 Bedroom + Den",
+    "unit_type": "1br",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "max_guests": 6,
+    "sqft": 861,
+    "sqm": 80,
+    "terrace_sqft": null,
+    "details": "Corner exposure · Dining for six · Double vanity",
+    "image": "assets/residences/a3.jpg",
+    "doc_pages": [
+     7,
+     8
+    ],
+    "base_scenario": {
+     "adr": 504,
+     "occupancy": 0.82,
+     "purchase": "cash"
+    },
+    "monthly_revenue_flow": {
+     "gross_room_revenue": 12570.6,
+     "marriott_brand_fee_10pct": -1257.06,
+     "hotel_operations_40pct": -5028.24,
+     "owner_share_50pct": 6285.3,
+     "ffe_reserve_4pct": -502.82,
+     "ota_commissions_2_5pct": -314.27,
+     "card_processing_2_41pct": -302.95,
+     "fixed_owner_costs": -1315.37,
+     "owner_net_before_financing": 3849.89
+    },
+    "fixed_owner_costs_monthly": {
+     "hoa_condo": 654.58,
+     "property_tax": 457.34,
+     "insurance_estimate": 91.06,
+     "utilities_estimate": 112.39,
+     "total": 1315.37
+    },
+    "property_tax_annual": 5488.08,
+    "net_per_month": 3850,
+    "net_per_year": 46199,
+    "cap_rate_pct": 7.97,
+    "reference_list_price": 579900,
+    "note": null
+   },
+   {
+    "id": "a4",
+    "layout": "A4",
+    "name": "1 Bedroom + Den",
+    "unit_type": "1br",
+    "bedrooms": 1,
+    "bathrooms": 1,
+    "max_guests": 6,
+    "sqft": 820,
+    "sqm": 76,
+    "terrace_sqft": 100,
+    "details": "100 sq ft terrace · Separate den suite · Side-by-side laundry",
+    "image": "assets/residences/a4.jpg",
+    "doc_pages": [
+     9,
+     10
+    ],
+    "base_scenario": {
+     "adr": 510,
+     "occupancy": 0.82,
+     "purchase": "cash"
+    },
+    "monthly_revenue_flow": {
+     "gross_room_revenue": 12720.25,
+     "marriott_brand_fee_10pct": -1272.03,
+     "hotel_operations_40pct": -5088.1,
+     "owner_share_50pct": 6360.12,
+     "ffe_reserve_4pct": -508.81,
+     "ota_commissions_2_5pct": -318.01,
+     "card_processing_2_41pct": -306.56,
+     "fixed_owner_costs": -1299.0,
+     "owner_net_before_financing": 3927.75
+    },
+    "fixed_owner_costs_monthly": {
+     "hoa_condo": 624.93,
+     "property_tax": 475.72,
+     "insurance_estimate": 91.06,
+     "utilities_estimate": 107.29,
+     "total": 1299.0
+    },
+    "property_tax_annual": 5708.64,
+    "net_per_month": 3928,
+    "net_per_year": 47133,
+    "cap_rate_pct": 7.84,
+    "reference_list_price": 601400,
+    "note": null
+   },
+   {
+    "id": "b1",
+    "layout": "B1",
+    "name": "2 Bedroom + Den",
+    "unit_type": "2br",
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "max_guests": 8,
+    "sqft": 1089,
+    "sqm": 101,
+    "terrace_sqft": 74,
+    "details": "Sleeps eight · Two full baths · Central island kitchen",
+    "image": "assets/residences/b1.jpg",
+    "doc_pages": [
+     11,
+     12
+    ],
+    "base_scenario": {
+     "adr": 589,
+     "occupancy": 0.84,
+     "purchase": "cash"
+    },
+    "monthly_revenue_flow": {
+     "gross_room_revenue": 15048.95,
+     "marriott_brand_fee_10pct": -1504.9,
+     "hotel_operations_40pct": -6019.58,
+     "owner_share_50pct": 7524.47,
+     "ffe_reserve_4pct": -601.96,
+     "ota_commissions_2_5pct": -376.22,
+     "card_processing_2_41pct": -362.68,
+     "fixed_owner_costs": -1614.5,
+     "owner_net_before_financing": 4569.11
+    },
+    "fixed_owner_costs_monthly": {
+     "hoa_condo": 826.39,
+     "property_tax": 550.02,
+     "insurance_estimate": 95.61,
+     "utilities_estimate": 142.48,
+     "total": 1614.5
+    },
+    "property_tax_annual": 6600.24,
+    "net_per_month": 4569,
+    "net_per_year": 54829,
+    "cap_rate_pct": 7.97,
+    "reference_list_price": 688300,
+    "note": null
+   },
+   {
+    "id": "b2",
+    "layout": "B2",
+    "name": "2 Bedroom Corner",
+    "unit_type": "2br",
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "max_guests": 6,
+    "sqft": 1043,
+    "sqm": 97,
+    "terrace_sqft": 135,
+    "details": "135 sq ft terrace · Dual en-suites · Soaking tub",
+    "image": "assets/residences/b2.jpg",
+    "doc_pages": [
+     13,
+     14
+    ],
+    "base_scenario": {
+     "adr": 552,
+     "occupancy": 0.84,
+     "purchase": "cash"
+    },
+    "monthly_revenue_flow": {
+     "gross_room_revenue": 14103.6,
+     "marriott_brand_fee_10pct": -1410.36,
+     "hotel_operations_40pct": -5641.44,
+     "owner_share_50pct": 7051.8,
+     "ffe_reserve_4pct": -564.14,
+     "ota_commissions_2_5pct": -352.59,
+     "card_processing_2_41pct": -339.9,
+     "fixed_owner_costs": -1548.47,
+     "owner_net_before_financing": 4246.7
+    },
+    "fixed_owner_costs_monthly": {
+     "hoa_condo": 798.26,
+     "property_tax": 514.62,
+     "insurance_estimate": 100.17,
+     "utilities_estimate": 135.42,
+     "total": 1548.47
+    },
+    "property_tax_annual": 6175.44,
+    "net_per_month": 4247,
+    "net_per_year": 50960,
+    "cap_rate_pct": 7.88,
+    "reference_list_price": 646900,
+    "note": null
+   },
+   {
+    "id": "b3",
+    "layout": "B3",
+    "name": "2 Bedroom",
+    "unit_type": "2br",
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "max_guests": 6,
+    "sqft": 1033,
+    "sqm": 96,
+    "terrace_sqft": 74,
+    "details": "East corner exposure · Two full baths · Open dining",
+    "image": "assets/residences/b3.jpg",
+    "doc_pages": [
+     15,
+     16
+    ],
+    "base_scenario": {
+     "adr": 552,
+     "occupancy": 0.84,
+     "purchase": "cash"
+    },
+    "monthly_revenue_flow": {
+     "gross_room_revenue": 14103.6,
+     "marriott_brand_fee_10pct": -1410.36,
+     "hotel_operations_40pct": -5641.44,
+     "owner_share_50pct": 7051.8,
+     "ffe_reserve_4pct": -564.14,
+     "ota_commissions_2_5pct": -352.59,
+     "card_processing_2_41pct": -339.9,
+     "fixed_owner_costs": -1548.47,
+     "owner_net_before_financing": 4246.7
+    },
+    "fixed_owner_costs_monthly": {
+     "hoa_condo": 798.26,
+     "property_tax": 514.62,
+     "insurance_estimate": 100.17,
+     "utilities_estimate": 135.42,
+     "total": 1548.47
+    },
+    "property_tax_annual": 6175.44,
+    "net_per_month": 4247,
+    "net_per_year": 50960,
+    "cap_rate_pct": 7.88,
+    "reference_list_price": 646900,
+    "note": "B3 uses the same cost assumptions as B2 (per the document)."
+   },
+   {
+    "id": "c1",
+    "layout": "C1",
+    "name": "3 Bedroom Corner",
+    "unit_type": "3br",
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "max_guests": 10,
+    "sqft": 1185,
+    "sqm": 110,
+    "terrace_sqft": 135,
+    "details": "Sleeps ten · Wraparound terrace · Corner of the curve",
+    "image": "assets/residences/c1.jpg",
+    "doc_pages": [
+     17,
+     18
+    ],
+    "base_scenario": {
+     "adr": 658,
+     "occupancy": 0.83,
+     "purchase": "cash"
+    },
+    "monthly_revenue_flow": {
+     "gross_room_revenue": 16611.76,
+     "marriott_brand_fee_10pct": -1661.18,
+     "hotel_operations_40pct": -6644.7,
+     "owner_share_50pct": 8305.88,
+     "ffe_reserve_4pct": -664.47,
+     "ota_commissions_2_5pct": -415.29,
+     "card_processing_2_41pct": -400.34,
+     "fixed_owner_costs": -1775.76,
+     "owner_net_before_financing": 5050.01
+    },
+    "fixed_owner_costs_monthly": {
+     "hoa_condo": 900.9,
+     "property_tax": 615.09,
+     "insurance_estimate": 104.72,
+     "utilities_estimate": 155.05,
+     "total": 1775.76
+    },
+    "property_tax_annual": 7381.08,
+    "net_per_month": 5050,
+    "net_per_year": 60600,
+    "cap_rate_pct": 7.93,
+    "reference_list_price": 764400,
+    "note": null
+   }
+  ]
+ }
+}

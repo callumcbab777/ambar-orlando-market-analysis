@@ -1,0 +1,45 @@
+{
+  "_readme": "All tunable inputs for the Week Ahead engine live here. Every value marked NEEDS_INPUT is a neutral placeholder or a default taken from the AMBAR Residence Cards document and should be confirmed by Callum before the section is relied on. See README > 'Week ahead by residence'.",
+  "version": "2026-10-21",
+  "pipeline": {
+    "stale_days": 14,
+    "_stale_days": "Comp records whose observation date is more than this many days before as_of (or after it) are dropped as stale.",
+    "iqr_trim": true,
+    "iqr_k": 1.5,
+    "_iqr": "Records outside [Q1 - k*IQR, Q3 + k*IQR] are trimmed per unit type. Only applied when a type has at least iqr_min_n clean comps.",
+    "iqr_min_n": 5,
+    "median_min_n": 5,
+    "_median_min_n": "With this many clean comps or more, the point estimate is the median. Below it (but at least gap_fill_min_n) it is a trimmed mean that drops the single highest and lowest comp.",
+    "gap_fill_min_n": 4,
+    "_gap_fill_min_n": "Below this many clean comps, the type is derived from the best-supported type (label 'Derived').",
+    "mean_median_flag_pct": 10,
+    "_flag": "Flag the week when |mean - median| / median exceeds this %, computed on the de-duplicated, non-stale set before IQR trimming (so outliers show up in the diagnostic).",
+    "high_confidence_min_n": 8
+  },
+  "unit_types": {
+    "studio": {"label": "Studio", "plural": "studios", "realization": 1.00, "position_index": 1.00, "reference_layout": "s1"},
+    "1br":    {"label": "1 Bedroom", "plural": "one-bedrooms", "realization": 1.00, "position_index": 1.00, "reference_layout": "a1"},
+    "2br":    {"label": "2 Bedroom", "plural": "two-bedrooms", "realization": 1.00, "position_index": 1.00, "reference_layout": "b3"},
+    "3br":    {"label": "3 Bedroom", "plural": "three-bedrooms", "realization": 1.00, "position_index": 1.00, "reference_layout": "c1"}
+  },
+  "_unit_types": "realization (NEEDS_INPUT): multiplier applied to LISTED (is_booked=false) comp rates to convert asking prices to realised ADR; booked records are used as-is. 1.00 = no haircut. position_index (NEEDS_INPUT): AMBAR premium/discount vs the comp set for that type (spec example: 1.05 = 5% premium). 1.00 = parity.",
+  "layouts": {
+    "s1": {"occupancy": 0.79, "layout_index": 1.0000},
+    "a1": {"occupancy": 0.79, "layout_index": 1.0000},
+    "a2": {"occupancy": 0.82, "layout_index": 1.0978},
+    "a3": {"occupancy": 0.82, "layout_index": 1.2323},
+    "a4": {"occupancy": 0.82, "layout_index": 1.2469},
+    "b1": {"occupancy": 0.84, "layout_index": 1.0670},
+    "b2": {"occupancy": 0.84, "layout_index": 1.0000},
+    "b3": {"occupancy": 0.84, "layout_index": 1.0000},
+    "c1": {"occupancy": 0.83, "layout_index": 1.0000}
+  },
+  "_layouts": "occupancy (NEEDS_INPUT): per-layout occupancy, defaulted to the base-scenario occupancy in the AMBAR Residence Cards (S1/A1 79%, A2-A4 82%, B1-B3 84%, C1 83%). layout_index: premium of a layout over its type's reference layout, defaulted to the ratio of base-scenario ADRs in the same document (e.g. A2 $449 / A1 $409 = 1.0978; B1 $589 / B3 $552 = 1.0670).",
+  "gap_fill": {
+    "method": "ratio",
+    "ratios_to_studio": {"studio": 1.0, "1br": 1.2101, "2br": 1.6331, "3br": 1.9467},
+    "_ratios": "Size ratios vs Studio, defaulted from the document's base-scenario ADRs of each type's reference layout (A1 $409, B3 $552, C1 $658 vs S1 $338). The spec's 1.80 Studio-to-2BR ratio was illustrative. NEEDS_INPUT.",
+    "power_beta": null,
+    "_power": "If method = 'power', ADR_t = ADR_anchor * (sqft_t / sqft_anchor) ** power_beta using reference-layout sqft. power_beta must be set (no default)."
+  }
+}
