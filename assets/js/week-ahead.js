@@ -28,8 +28,7 @@
       ["Card processing · 2.41%", f.card_processing_2_41pct], ["Fixed owner costs", f.fixed_owner_costs]
     ];
     const fixed = [["HOA / condo", fx.hoa_condo], ["Property tax", fx.property_tax], ["Insurance (estimate)", fx.insurance_estimate], ["Utilities (estimate)", fx.utilities_estimate]];
-    return `<details><summary>Costs &amp; owner economics</summary>
-      <p class="c-h">Fixed owner costs</p>
+    return `<p class="c-h">Fixed owner costs</p>
       <table class="ctab"><thead><tr><th></th><th>Monthly</th><th>Annual</th></tr></thead><tbody>
       ${fixed.map(([k, v]) => `<tr><td>${k}</td><td>${usd2(v)}</td><td>${usd2(v * 12)}</td></tr>`).join("")}
       <tr class="tot"><td>Total fixed costs</td><td>${usd2(fx.total)}</td><td>${usd2(fx.total * 12)}</td></tr></tbody></table>
@@ -41,8 +40,7 @@
       <tr class="tot"><td>Owner net before financing</td><td>${usd2(f.owner_net_before_financing)}</td></tr></tbody></table>
       <p class="c-note">Reference list price ${usd(u.reference_list_price)} (per floor plan, not a quote for an individual residence). Cap rate = annual owner net ÷ reference price, before financing; no mortgage or closing costs. Insurance and utilities are estimates, not quotes. The 40% hotel operations allocation (Coury Hospitality) is included above, not an additional deduction.</p>
       <p class="c-note"><b>Note:</b> these net, cap-rate and revenue-flow figures are the document’s own, modeled at the document’s original ${pct(b.occupancy)} occupancy. They are shown unchanged and are not recalculated at the historical base occupancy (73% with size step-down) or this week’s estimate.</p>
-      <p class="c-note">Source: AMBAR Rental Program Cost Breakdown — Owner Economics, Oct 12, 2026; Building 1 HOA budget updated Oct 9, 2026 (AMBAR Residence Cards, pp. ${u.doc_pages.join("–")}). Illustrative only; not financial advice.</p>
-    </details>`;
+      <p class="c-note">Source: AMBAR Rental Program Cost Breakdown — Owner Economics, Oct 12, 2026; Building 1 HOA budget updated Oct 9, 2026 (AMBAR Residence Cards, pp. ${u.doc_pages.join("–")}). Illustrative only; not financial advice.</p>`;
   }
 
 
@@ -87,12 +85,11 @@
   function cards(A, R, W) {
     const byId = Object.fromEntries(W.units.map((u) => [u.id, u]));
     const asOf = fLong(W.as_of);
-    const open = new Set([...document.querySelectorAll(".rcard details[open]")].map((d) => d.closest(".rcard").id));
     $("#rwGrid").innerHTML = R.units.map((u) => {
       const e = byId[u.id], scaled = e.basis === "scaled";
       const spec = [u.bedrooms ? `${u.bedrooms} bed` : "Studio", `${u.bathrooms} bath`, `${u.sqft.toLocaleString("en-US")} sq ft`, u.terrace_sqft ? `${u.terrace_sqft} sq ft terrace` : null, `up to ${u.max_guests} guests`].filter(Boolean).join(" · ");
       const basis = scaled ? `<b>Scaled from the comp median</b> using AMBAR floor-plan ratios (×${e.ratio_to_s1.toFixed(2)} vs S1)` : `Based on <b>${e.comp_count} comparable Orlando hotels</b> (${e.method === "median" ? "median" : "trimmed mean"})`;
-      return `<article class="rcard" data-type="${u.unit_type}" id="res-${u.id}">
+      return `<article class="rcard is-clickable" data-type="${u.unit_type}" data-id="${u.id}" id="res-${u.id}" role="button" tabindex="0" aria-haspopup="dialog" aria-label="${esc(u.layout)} ${esc(u.name)}: open full details, costs and estimates">
         <div class="r-img"><img src="${esc(u.image)}" alt="Overhead rendering of the ${esc(u.layout)} ${esc(u.name)} (artist’s impression)" loading="lazy"></div>
         <div class="r-body">
           <div class="r-top"><div><p class="r-code">${esc(u.layout)} · ${esc(A.unit_types[u.unit_type].label)}</p><h3>${esc(u.name)}</h3></div><span class="conf ${e.confidence}" title="${scaled ? "Confidence reduced one step because this plan is scaled, not benchmarked directly" : "Confidence reflects the number of comparables"}">${e.confidence}${scaled ? " · scaled" : ""}</span></div>
@@ -107,12 +104,110 @@
             <div class="${e.vs_base_revpau_pct >= 0 ? "up" : "down"}"><span>RevPAU vs base</span><b>${sgn(e.vs_base_revpau_pct)}</b><small>${usd(e.revpau)} vs ${usd(e.base_revpau)} at ${pct1(e.base_occupancy)}</small></div>
           </div>
           <p class="r-meta">${esc(A.occupancy_model.label)} = <b>${pct1(e.occupancy)}</b><br>${esc(A.base_occupancy.label)} = <b>${pct1(e.base_occupancy)}</b><br>Estimated · as of ${asOf} · ${basis}</p>
-          <p class="r-vsnote">ADR vs base reflects rates only; RevPAU vs base also reflects the estimated occupancy (${pct(A.occupancy_model.occ_studio)} anchor) vs the historical base (${pct(A.base_occupancy.anchor)} anchor).</p>
-          ${costBlock(u)}
+          <p class="r-open" aria-hidden="true">View full details &amp; costs <span>→</span></p>
         </div></article>`;
     }).join("");
-    open.forEach((id) => { const d = document.querySelector(`#${id} details`); if (d) d.open = true; });
     applyFilter();
+  }
+
+  /* ---------- expanded view (modal / full-screen sheet on mobile) ---------- */
+  let MODAL_ID = null, LAST_FOCUS = null;
+  function modalHTML(u, e, W, A) {
+    const asOf = fLong(W.as_of), scaled = e.basis === "scaled";
+    const b = u.base_scenario;
+    const facts = [["Type", A.unit_types[u.unit_type].label], ["Interior", `${u.sqft.toLocaleString("en-US")} sq ft / ${u.sqm} sq m`],
+      ["Bedrooms", u.bedrooms ? u.bedrooms : "Studio"], ["Bathrooms", u.bathrooms], ["Guests", `Up to ${u.max_guests}`],
+      ["Terrace", u.terrace_sqft ? `${u.terrace_sqft} sq ft` : "Not listed"]];
+    const weeks = STATE.market.weeks.slice().sort((a, c) => (a.week < c.week ? -1 : 1)).map((w) =>
+      `<button type="button" class="seg-btn" data-week="${w.week}" aria-pressed="${w.week === W.week_start}"${w.status !== "collected" ? " disabled" : ""}>${fMD(w.week)}${w.status !== "collected" ? " · n/c" : ""}</button>`).join("");
+    const f = (k, v, sm) => `<div><dt>${k}</dt><dd>${v}${sm ? `<small>${sm}</small>` : ""}</dd></div>`;
+    return `<div class="m-head">
+        <div><p class="r-code">${esc(u.layout)} · ${esc(A.unit_types[u.unit_type].label)}</p><h2 id="rwModalTitle">${esc(u.name)}</h2>
+        <p class="m-asof">Estimated · as of ${asOf}</p></div>
+        <button type="button" class="m-close" data-close aria-label="Close">×</button>
+      </div>
+      <div class="m-scroll">
+      <div class="m-grid">
+        <figure class="m-img"><img src="${esc(u.image)}" alt="Overhead rendering of the ${esc(u.layout)} ${esc(u.name)} (artist’s impression)"><figcaption>Artist’s impression · furniture and finishes are illustrative.</figcaption></figure>
+        <div class="m-side">
+          <dl class="m-facts">${facts.map(([k, v]) => `<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+          <p class="r-spec">${esc(u.details)}</p>
+          <div class="m-weekbar"><span>Comp week</span><div class="seg" role="group" aria-label="Choose the comp week">${weeks}</div></div>
+          <span class="conf ${e.confidence}">${e.confidence}${scaled ? " · scaled" : ""}</span>
+          <span class="m-comps">${e.comp_count} comparable hotels${e.method === "median" ? " · median" : " · trimmed mean"}</span>
+        </div>
+      </div>
+      <section class="m-sec" aria-label="This week’s estimates">
+        <h3>Estimates for the week of ${fLong(W.week_start)}</h3>
+        <dl class="m-kpis">
+          ${f("Estimated ADR / night", usd(e.adr), `range ${usd(e.adr_p25)}–${usd(e.adr_p75)}`)}
+          ${f("Estimated occupancy", pct1(e.occupancy), esc(A.occupancy_model.label))}
+          ${f("Estimated RevPAU / night", usd(e.revpau), `range ${usd(e.revpau_p25)}–${usd(e.revpau_p75)}`)}
+        </dl>
+        <p class="r-cap">${esc(compCaption(W))}.</p>
+        <h4>Historical base</h4>
+        <dl class="m-kpis m-kpis-base">
+          ${f("Base ADR", usd(e.base_adr), "document base ADR")}
+          ${f("Base occupancy", pct1(e.base_occupancy), esc(A.base_occupancy.label))}
+          ${f("Base RevPAU", usd2(e.base_revpau), "base ADR × base occupancy")}
+        </dl>
+        <div class="r-vs2 m-vs">
+          <div class="${e.vs_base_adr_pct >= 0 ? "up" : "down"}"><span>ADR vs base</span><b>${sgn(e.vs_base_adr_pct)}</b><small>${usd(e.adr)} vs ${usd(e.base_adr)}</small></div>
+          <div class="${e.vs_base_revpau_pct >= 0 ? "up" : "down"}"><span>RevPAU vs base</span><b>${sgn(e.vs_base_revpau_pct)}</b><small>${usd(e.revpau)} vs ${usd(e.base_revpau)} at ${pct1(e.base_occupancy)}</small></div>
+        </div>
+        <p class="c-note">ADR vs base reflects rates only; RevPAU vs base also reflects the estimated occupancy (${pct(A.occupancy_model.occ_studio)} anchor) vs the historical base (${pct(A.base_occupancy.anchor)} anchor). ${scaled ? `This plan is scaled from the comp median using AMBAR floor-plan ratios (×${e.ratio_to_s1.toFixed(2)} vs S1).` : ""}</p>
+      </section>
+      <section class="m-sec m-costs" aria-label="Costs and owner economics">
+        <h3>Costs &amp; owner economics</h3>
+        <dl class="m-kpis m-kpis-doc">
+          ${f("Net / year (document)", usd(u.net_per_year), `${usd(u.net_per_month)} / month`)}
+          ${f("Cap rate (document)", u.cap_rate_pct.toFixed(2) + "%", "before financing")}
+          ${f("Reference list price", usd(u.reference_list_price), "per floor plan")}
+        </dl>
+        <p class="c-h">Fee structure</p>
+        <p class="c-note">Marriott brand fee 10% · Hotel operations 40% (Coury Hospitality) · Owner share 50% · FF&amp;E reserve 4% · OTA commissions 2.5% · Card processing 2.41% (all % of gross room revenue).</p>
+        ${costBlock(u)}
+      </section>
+      <p class="m-disc"><b>Estimates, not a promise of returns.</b> Illustration only, as of ${asOf}; comparables are Orlando hotel rates, not AMBAR residences. Actual rates, occupancy, costs and owner income will differ. Not an offer or investment advice; subject to review by securities counsel.</p>
+      </div>`;
+  }
+  function renderModal() {
+    const dlg = $("#rwModal"); if (!dlg || !MODAL_ID || !STATE.out) return;
+    const u = STATE.R.units.find((x) => x.id === MODAL_ID), e = STATE.out.units.find((x) => x.id === MODAL_ID);
+    const sc = dlg.querySelector(".m-scroll"), top = sc ? sc.scrollTop : 0;
+    dlg.querySelector(".m-body").innerHTML = modalHTML(u, e, STATE.out, STATE.A);
+    const ns = dlg.querySelector(".m-scroll"); if (ns) ns.scrollTop = top;
+  }
+  function openModal(id, opener) {
+    const dlg = $("#rwModal"); MODAL_ID = id; LAST_FOCUS = opener || document.activeElement;
+    renderModal();
+    if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+    document.documentElement.classList.add("wa-modal-open");
+    dlg.querySelector(".m-close").focus();
+  }
+  function closeModal() {
+    const dlg = $("#rwModal"); if (!dlg.open && !dlg.hasAttribute("open")) return;
+    if (typeof dlg.close === "function") dlg.close(); else dlg.removeAttribute("open");
+  }
+  function initModal() {
+    const dlg = $("#rwModal");
+    dlg.addEventListener("click", (ev) => {
+      if (ev.target === dlg || ev.target.closest("[data-close]")) { closeModal(); return; }   // backdrop or X
+      const wb = ev.target.closest(".m-weekbar [data-week]");
+      if (wb && !wb.disabled) selectWeek(wb.dataset.week);
+    });
+    dlg.addEventListener("close", () => {
+      MODAL_ID = null; document.documentElement.classList.remove("wa-modal-open");
+      if (LAST_FOCUS && document.contains(LAST_FOCUS)) LAST_FOCUS.focus();
+      else { const c = LAST_FOCUS && LAST_FOCUS.dataset && document.querySelector(`#res-${LAST_FOCUS.dataset.id}`); if (c) c.focus(); }
+    });
+    dlg.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !dlg.showModal) closeModal(); });
+    const grid = $("#rwGrid");
+    grid.addEventListener("click", (ev) => { const c = ev.target.closest(".rcard"); if (c) openModal(c.dataset.id, c); });
+    grid.addEventListener("keydown", (ev) => {
+      const c = ev.target.closest(".rcard");
+      if (c && ev.target === c && (ev.key === "Enter" || ev.key === " " || ev.key === "Spacebar")) { ev.preventDefault(); openModal(c.dataset.id, c); }
+    });
   }
 
   function applyFilter() {
@@ -154,7 +249,9 @@
     note.textContent = "";
     S.week = wk;
     document.querySelectorAll("#rwWeeks button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.week === wk)));
+    S.out = out;
     header(S.A, { out }, S.market); cards(S.A, S.R, out); method(S.A, S.R, out);
+    if (MODAL_ID) { renderModal(); const wb = $(`#rwModal .m-weekbar [data-week="${wk}"]`); if (wb) wb.focus(); }
     if (!fromTabs) { const t = document.querySelector(`#weekTabs [data-week="${wk}"]`); if (t && t.getAttribute("aria-selected") !== "true") t.click(); }
   }
 
@@ -176,6 +273,7 @@
       const b = e.target.closest("button"); if (!b) return;
       seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b)); applyFilter();
     });
+    initModal();
     selectWeek(STATE.latest, true);
   }
 

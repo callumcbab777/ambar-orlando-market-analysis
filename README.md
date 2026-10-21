@@ -22,7 +22,9 @@ Status values: `OK` (rate shown), `UNAVAILABLE` (no offer for a one-night search
 
 ## Residences · The week ahead (estimates engine)
 
-For each AMBAR floor plan (S1 Studio, A1–A4 1 Bedroom, B1–B3 2 Bedroom, C1 3 Bedroom), this section shows an **estimated** ADR and RevPAU for the current comp week, with the range, the comp count, a confidence label, an "as of" date, a **vs. document base scenario** comparison, and an expandable cost breakdown and rendering taken from the AMBAR Residence Cards.
+For each AMBAR floor plan (S1 Studio, A1–A4 1 Bedroom, B1–B3 2 Bedroom, C1 3 Bedroom), this section shows an **estimated** ADR and RevPAU for the current comp week, with the range, the comp count, a confidence label, an "as of" date, ADR vs base and RevPAU vs base comparisons, and a rendering taken from the AMBAR Residence Cards.
+
+**Expanded view.** Each residence card is clickable (or Enter/Space when focused) and opens a full-detail view (`<dialog id="rwModal">`): large rendering, plan facts (type, size, beds/baths, guests, terrace), the selected week's estimated ADR, occupancy and RevPAU with ranges, the historical base figures, ADR/RevPAU vs base, comp count and confidence, the median caption, the full cost breakdown and the document's net, cap rate, list price and fee structure, the 'Estimated · as of' date and a short disclaimer. It has its own comp-week buttons and re-renders whenever the week changes (in the modal or the section). It closes on ×, Esc or a backdrop click and becomes a full-screen sheet below 760px. The cost breakdown lives only in this view; the cards stay compact.
 
 ### Data source and mapping (mode `hotel_median`, live)
 The comparables are the site's own weekly comparable hotel rates in `data/comps.json`, the same data as the Week ahead grid. Those are lowest public standard-room rates with unspecified room types, so:
