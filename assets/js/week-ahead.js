@@ -9,7 +9,6 @@
   const pct = (v) => Math.round(v * 100) + "%";
   const pct1 = (v) => (v * 100).toFixed(1) + "%";
   const sgn = (v) => (v > 0 ? "+" : v < 0 ? "−" : "±") + Math.abs(v).toFixed(1) + "%";
-  let BASE_OCC = () => 0.73;
   const fLong = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   function getJSON(url, globalName, mirror) {
@@ -41,7 +40,7 @@
       ${rowsFlow.map(([k, v, bold]) => `<tr${bold ? ' class="tot"' : ""}><td>${k}</td><td class="${v < 0 ? "neg" : ""}">${usd2(v)}</td></tr>`).join("")}
       <tr class="tot"><td>Owner net before financing</td><td>${usd2(f.owner_net_before_financing)}</td></tr></tbody></table>
       <p class="c-note">Reference list price ${usd(u.reference_list_price)} (per floor plan, not a quote for an individual residence). Cap rate = annual owner net ÷ reference price, before financing; no mortgage or closing costs. Insurance and utilities are estimates, not quotes. The 40% hotel operations allocation (Coury Hospitality) is included above, not an additional deduction.</p>
-      <p class="c-note"><b>Note:</b> these net, cap-rate and revenue-flow figures are the document’s own, modeled at the document’s original ${pct(b.occupancy)} occupancy. They are shown unchanged and are not recalculated at the ${pct(BASE_OCC())} historical base occupancy or this week’s estimate.</p>
+      <p class="c-note"><b>Note:</b> these net, cap-rate and revenue-flow figures are the document’s own, modeled at the document’s original ${pct(b.occupancy)} occupancy. They are shown unchanged and are not recalculated at the historical base occupancy (73% with size step-down) or this week’s estimate.</p>
       <p class="c-note">Source: AMBAR Rental Program Cost Breakdown — Owner Economics, Oct 12, 2026; Building 1 HOA budget updated Oct 9, 2026 (AMBAR Residence Cards, pp. ${u.doc_pages.join("–")}). Illustrative only; not financial advice.</p>
     </details>`;
   }
@@ -49,13 +48,26 @@
 
   const fMD = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
   let STATE = null;
+  const statWord = (B) => (B.method === "median" ? "median rate" : "trimmed-mean rate");
+  function compCaption(W) {
+    const B = W.baseline, T = W.pipeline.hotels_in_landscape, N = B.comp_count, R = B.raw_count, wk = fMD(W.week_start);
+    if (N === T) return `Based on the ${statWord(B)} of the ${T} hotels in our Orlando comparable set (week of ${wk})`;
+    const why = [R < T ? `${R} had rates that week` : null, B.trimmed_out ? `${B.trimmed_out} outlier trimmed` : null].filter(Boolean).join("; ");
+    return `Based on the ${statWord(B)} of ${N} of the ${T} hotels in our Orlando comparable set${why ? ` (${why})` : ""} (week of ${wk})`;
+  }
 
   function header(A, sel, M) {
     const W = sel.out;
     const asOf = fLong(W.as_of), B = W.baseline;
-    $("#rwSub").textContent = `What each AMBAR floor plan looks like for the week of ${fLong(W.week_start)}, framed against the median of the comparable Orlando hotels tracked on this page. The comp-set median is treated as a Studio-equivalent nightly rate; every other plan is scaled from it with AMBAR’s floor-plan ratios.`;
+    $("#rwSub").textContent = `What each AMBAR floor plan ${W.week_start === STATE.latest ? "looks" : "looked"} like for the week of ${fLong(W.week_start)}, framed against the median of the comparable Orlando hotels tracked on this page. The comp-set median is treated as a Studio-equivalent nightly rate; every other plan is scaled from it with AMBAR’s floor-plan ratios.`;
     const isLatest = W.week_start === STATE.latest;
-    $("#rwBadges").innerHTML = `<span class="wa-badge live">${isLatest ? "Current snapshot" : "Past week"} · Estimated · as of ${asOf}</span><span class="wa-badge">Comp median of ${B.comp_count} Orlando hotels</span><span class="wa-badge">Historical base occupancy ${pct(A.base_occupancy.value)}</span>`;
+    $("#rwTitle").textContent = isLatest ? "What each AMBAR residence looks like this week" : `Week of ${fLong(W.week_start)}: what each AMBAR residence looked like`;
+    const names = W.comps.map((c) => `<span class="${c.status === "used" ? "in" : "out"}" title="${esc(c.status === "used" ? "Used this week" : c.status)}">${esc(c.name)}</span>`).join("");
+    $("#rwMedianLine").innerHTML = `<b>Estimated nightly rate (ADR) and RevPAU come from the median pricing of our comparable hotel set.</b> ${esc(compCaption(W))}.
+      <span class="wa-names" aria-label="Hotels in the comparable set">${names}</span>
+      <a href="#rwSummary" class="wa-complink" id="rwCompLink">See each hotel’s rate for this week ↓</a>`;
+    $("#rwCompLink").addEventListener("click", () => { const d = $("#rwSummary .wa-comps"); if (d) d.open = true; });
+    $("#rwBadges").innerHTML = `<span class="wa-badge live">${isLatest ? "Current snapshot" : "Past week"} · Estimated · as of ${asOf}</span><span class="wa-badge">Comp median of ${B.comp_count} Orlando hotels</span><span class="wa-badge">${esc(A.base_occupancy.label)}</span>`;
     $("#rwDisclaimer").innerHTML = `<b>Estimates, not a promise of returns.</b> Every figure in this section is an estimate for illustration only, as of ${asOf}. The comparables are lowest public nightly rates at Orlando hotels (standard rooms, room types unspecified), not AMBAR residences, and only the Studio is benchmarked to them directly; all other plans are scaled. Actual rates, occupancy, costs and owner income will differ. Nothing here is an offer, investment advice or a statement about any fund or tokenized structure; the wording is subject to review by securities counsel and should not be reused in broker or investor materials.`;
     const wasOpen = $("#rwSummary .wa-comps")?.open;
     const comps = W.comps.map((c) => `<tr><td>${esc(c.name)}${c.non_marriott ? " <small>non-Marriott</small>" : ""}</td><td class="num">${c.weekly_median != null ? usd(c.weekly_median) : "—"}</td><td>${c.priced_nights} of ${c.nights}</td><td>${c.status === "used" ? "Used" : esc(c.status[0].toUpperCase() + c.status.slice(1))}</td></tr>`).join("");
@@ -74,7 +86,7 @@
 
   function cards(A, R, W) {
     const byId = Object.fromEntries(W.units.map((u) => [u.id, u]));
-    const asOf = fLong(W.as_of), baseOcc = A.base_occupancy.value;
+    const asOf = fLong(W.as_of);
     const open = new Set([...document.querySelectorAll(".rcard details[open]")].map((d) => d.closest(".rcard").id));
     $("#rwGrid").innerHTML = R.units.map((u) => {
       const e = byId[u.id], scaled = e.basis === "scaled";
@@ -89,11 +101,13 @@
             <div><dt>Estimated ADR / night</dt><dd>${usd(e.adr)}<small>range ${usd(e.adr_p25)}–${usd(e.adr_p75)}</small></dd></div>
             <div><dt>Estimated RevPAU / night</dt><dd>${usd(e.revpau)}<small>range ${usd(e.revpau_p25)}–${usd(e.revpau_p75)}</small></dd></div>
           </dl>
+          <p class="r-cap">${scaled ? `Studio-equivalent from our comp median, scaled ×${e.ratio_to_s1.toFixed(2)} for this floor plan. ` : ""}${esc(compCaption(W))}.</p>
           <div class="r-vs2">
             <div class="${e.vs_base_adr_pct >= 0 ? "up" : "down"}"><span>ADR vs base</span><b>${sgn(e.vs_base_adr_pct)}</b><small>${usd(e.adr)} vs ${usd(e.base_adr)}</small></div>
-            <div class="${e.vs_base_revpau_pct >= 0 ? "up" : "down"}"><span>RevPAU vs base</span><b>${sgn(e.vs_base_revpau_pct)}</b><small>${usd(e.revpau)} vs ${usd(e.base_revpau)} at ${pct(baseOcc)}</small></div>
+            <div class="${e.vs_base_revpau_pct >= 0 ? "up" : "down"}"><span>RevPAU vs base</span><b>${sgn(e.vs_base_revpau_pct)}</b><small>${usd(e.revpau)} vs ${usd(e.base_revpau)} at ${pct1(e.base_occupancy)}</small></div>
           </div>
-          <p class="r-meta">Occupancy <b>${pct1(e.occupancy)}</b> (step-down from Studio) · historical base occupancy ${pct(baseOcc)}<br>Estimated · as of ${asOf} · ${basis}</p>
+          <p class="r-meta">Occupancy <b>${pct1(e.occupancy)}</b> (step-down from Studio) · Historical base: ${pct(A.base_occupancy.historical_value)} with size step-down = <b>${pct1(e.base_occupancy)}</b><br>Estimated · as of ${asOf} · ${basis}</p>
+          <p class="r-vsnote">Base occupancy steps down the same way, so RevPAU vs base equals ADR vs base: the difference reflects rates only.</p>
           ${costBlock(u)}
         </div></article>`;
     }).join("");
@@ -115,14 +129,14 @@
         <li><b>Comparables.</b> The same weekly comparable hotel rates shown elsewhere on this page (lowest public nightly rates; standard rooms, room types unspecified), for the week selected above. Each hotel contributes the median of its priced nights for the week. Records are de-duplicated, anything older than ${A.pipeline.stale_days} days is dropped, and outliers are trimmed with the interquartile-range rule (k = ${A.pipeline.iqr_k}).</li>
         <li><b>Baseline.</b> The comp-set <b>median</b> is the Studio-equivalent baseline (a trimmed mean if fewer than ${A.pipeline.median_min_n} hotels). The range is the 25th–75th percentile. The mean is kept as a diagnostic; the week is flagged when mean and median differ by more than ${A.pipeline.mean_median_flag_pct}%.</li>
         <li><b>Per plan.</b> <code>ADR = comp median × realization × position index × plan ratio to S1</code>, with the same factors applied to the range. Plan ratios are the document base ADRs divided by the S1 base ADR ($338). <code>RevPAU = ADR × occupancy</code>. No seasonality adjustment is added; the weekly rates already reflect demand.</li>
-        <li><b>Occupancy.</b> ${esc(BO.label)} is ${pct(BO.value)} for every plan. This week’s occupancy starts from the Studio at ${pct1(OM.occ_studio)} and steps down ${pct1(OM.d)} for each bedroom, with a den counting as ${OM.den_weight} of a bedroom (<code>Occ = ${pct1(OM.occ_studio)} × (1 − ${OM.d}) ^ size</code>); the step and den weight are proposed and adjustable.</li>
-        <li><b>Vs. base.</b> Each plan’s base is the document’s base ADR at the ${pct(BO.value)} historical base occupancy (base RevPAU = base ADR × ${pct(BO.value)}). The cards compare this week’s estimated ADR and RevPAU with it. Because plans are scaled with ratios from the same document, ADR vs base is the same for every plan; RevPAU vs base differs because larger plans step down in occupancy.</li>
+        <li><b>Occupancy.</b> Occupancy starts from the Studio at ${pct1(OM.occ_studio)} (Callum’s historical figure) and steps down ${pct1(OM.d)} for each bedroom, with a den counting as ${OM.den_weight} of a bedroom (<code>Occ = ${pct1(OM.occ_studio)} × (1 − ${OM.d}) ^ size</code>); the step and den weight are proposed and adjustable. The same formula and settings give both this week’s occupancy and the ${esc(BO.label)}, so changing them moves both together.</li>
+        <li><b>Vs. base.</b> Each plan’s base is the document’s base ADR at its historical base occupancy (base RevPAU = base ADR × base occupancy). Because base and estimate use the same occupancy, RevPAU vs base equals ADR vs base: the difference reflects rates only. Because plans are scaled with ratios from the same document, it is also the same for every plan in a given week.</li>
         <li><b>Confidence.</b> High = ${A.pipeline.high_confidence_min_n}+ comparables and not flagged; Medium = fewer comparables or a flagged week; Low = trimmed mean. Plans other than the Studio are scaled, not observed, so their confidence is one step lower.</li>
       </ul>
-      <table><thead><tr><th>Plan</th><th>Base ADR</th><th>Ratio to S1</th><th>Size units</th><th>Occupancy (step-down)</th><th>Base occupancy</th><th>Base RevPAU</th><th>Realization</th><th>Position index</th></tr></thead><tbody>
-      ${R.units.map((u) => { const e = byId[u.id], t = ut[u.unit_type]; return `<tr><td>${esc(u.layout)}</td><td>${usd(u.base_scenario.adr)}</td><td>${e.ratio_to_s1.toFixed(3)}</td><td>${e.size_units}</td><td>${pct1(e.occupancy)}</td><td>${pct(e.base_occupancy)}</td><td>${usd2(e.base_revpau)}</td><td>${t.realization.toFixed(2)}${t.realization_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td><td>${t.position_index.toFixed(2)}${t.position_index_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td></tr>`; }).join("")}
+      <table><thead><tr><th>Plan</th><th>Base ADR</th><th>Ratio to S1</th><th>Size units</th><th>Occupancy (step-down)</th><th>Historical base occ.</th><th>Base RevPAU</th><th>Realization</th><th>Position index</th></tr></thead><tbody>
+      ${R.units.map((u) => { const e = byId[u.id], t = ut[u.unit_type]; return `<tr><td>${esc(u.layout)}</td><td>${usd(u.base_scenario.adr)}</td><td>${e.ratio_to_s1.toFixed(3)}</td><td>${e.size_units}</td><td>${pct1(e.occupancy)}</td><td>${pct1(e.base_occupancy)}</td><td>${usd2(e.base_revpau)}</td><td>${t.realization.toFixed(2)}${t.realization_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td><td>${t.position_index.toFixed(2)}${t.position_index_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td></tr>`; }).join("")}
       </tbody></table>
-      <p class="fineprint">Settings live in data/week_ahead/assumptions.json: historical base occupancy ${pct(BO.value)}; step-down anchor ${pct1(OM.occ_studio)} (a separate setting, currently equal to the base); step d = ${pct1(OM.d)} and den weight = ${OM.den_weight} (proposed, adjustable). The document’s own net and cap-rate figures in each cost breakdown were modeled at its original per-plan occupancy and are not recomputed. Every figure is computed in your browser from data/comps.json for the selected week, so a new weekly rate update flows straight into the cards.</p>
+      <p class="fineprint">Settings live in data/week_ahead/assumptions.json: step-down anchor ${pct1(OM.occ_studio)} (= the ${pct(BO.historical_value)} historical figure); step d = ${pct1(OM.d)} and den weight = ${OM.den_weight} (proposed, adjustable). The document’s own net and cap-rate figures in each cost breakdown were modeled at its original per-plan occupancy and are not recomputed. Every figure is computed in your browser from data/comps.json for the selected week, so a new weekly rate update flows straight into the cards.</p>
     </details>`;
   }
 
@@ -146,7 +160,6 @@
 
   function boot(cfgData, market, E) {
     const A = cfgData.assumptions, R = cfgData.residences;
-    BASE_OCC = () => A.base_occupancy.value;
     const collected = E.collectedWeeks(market);
     STATE = { A, R, market, E, latest: collected[collected.length - 1], week: null };
     $("#rwWeeks").innerHTML = market.weeks.slice().sort((a, b) => (a.week < b.week ? -1 : 1)).map((w) =>

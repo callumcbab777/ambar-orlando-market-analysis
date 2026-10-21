@@ -5,19 +5,20 @@
  "latest_week": "2026-10-19",
  "assumptions": {
   "_readme": "All tunable inputs for the Week Ahead engine. Mode 'hotel_median' (live): the comp-set median of the site's weekly comparable hotel rates (data/comps.json) is the Studio-equivalent baseline; each plan = baseline x realization x position index x plan ratio to S1 (document base ADRs). Values marked NEEDS_INPUT still need Callum's confirmation. See README.",
-  "version": "2026-10-21d",
+  "version": "2026-10-21e",
   "mode": "hotel_median",
   "base_occupancy": {
-   "value": 0.73,
-   "label": "Historical base occupancy",
-   "source": "Callum's historical occupancy figure (Oct 21, 2026); replaces the document's per-plan 79-84% as the base for every plan",
-   "_note": "Base scenario per plan: base ADR = document base ADR; base occupancy = this flat value; base RevPAU = base ADR x base occupancy. Cards compare this week's ADR and RevPAU against it."
+   "label": "Historical base: 73% with size step-down",
+   "historical_value": 0.73,
+   "method": "same as occupancy_model (anchor occ_studio, step d, den_weight)",
+   "source": "Callum's historical occupancy figure (Oct 21, 2026); replaces the document's per-plan 79-84%",
+   "_note": "Base occupancy(plan) = occupancy_model.occ_studio x (1 - d) ^ size_units, i.e. the SAME settings as the live estimate, so changing them moves both together. occ_studio must equal historical_value (tested). Base RevPAU = document base ADR x base occupancy(plan). Consequence: RevPAU vs base = ADR vs base for every plan (the difference reflects rates only)."
   },
   "occupancy_model": {
    "method": "size_step_down",
    "formula": "Occ(plan) = occ_studio x (1 - d) ^ size_units;  size_units = bedrooms + den_weight x has_den",
    "occ_studio": 0.73,
-   "occ_studio_status": "anchor for the step-down; currently set equal to base_occupancy (historical 73%). Separate setting so it can be decoupled later.",
+   "occ_studio_status": "anchor for both the live estimate and the historical base (73%); separate setting so the live anchor could be decoupled later",
    "d": 0.04,
    "d_status": "proposed, adjustable",
    "den_weight": 0.5,
@@ -789,10 +790,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 409,
-     "base_occupancy": 0.73,
-     "base_revpau": 298.57,
+     "base_occupancy": 0.7008,
+     "base_revpau": 286.63,
      "vs_base_adr_pct": -3.0,
-     "vs_base_revpau_pct": -6.8,
+     "vs_base_revpau_pct": -3.0,
      "doc_occupancy": 0.79
     },
     {
@@ -815,10 +816,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 449,
-     "base_occupancy": 0.73,
-     "base_revpau": 327.77,
+     "base_occupancy": 0.686641,
+     "base_revpau": 308.3,
      "vs_base_adr_pct": -3.0,
-     "vs_base_revpau_pct": -8.7,
+     "vs_base_revpau_pct": -3.0,
      "doc_occupancy": 0.82
     },
     {
@@ -841,10 +842,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 504,
-     "base_occupancy": 0.73,
-     "base_revpau": 367.92,
+     "base_occupancy": 0.686641,
+     "base_revpau": 346.07,
      "vs_base_adr_pct": -3.0,
-     "vs_base_revpau_pct": -8.7,
+     "vs_base_revpau_pct": -3.0,
      "doc_occupancy": 0.82
     },
     {
@@ -867,10 +868,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 510,
-     "base_occupancy": 0.73,
-     "base_revpau": 372.3,
+     "base_occupancy": 0.686641,
+     "base_revpau": 350.19,
      "vs_base_adr_pct": -3.0,
-     "vs_base_revpau_pct": -8.7,
+     "vs_base_revpau_pct": -3.0,
      "doc_occupancy": 0.82
     },
     {
@@ -893,10 +894,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 589,
-     "base_occupancy": 0.73,
-     "base_revpau": 429.97,
+     "base_occupancy": 0.659175,
+     "base_revpau": 388.25,
      "vs_base_adr_pct": -3.0,
-     "vs_base_revpau_pct": -12.4,
+     "vs_base_revpau_pct": -3.0,
      "doc_occupancy": 0.84
     },
     {
@@ -919,10 +920,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 552,
-     "base_occupancy": 0.73,
-     "base_revpau": 402.96,
+     "base_occupancy": 0.672768,
+     "base_revpau": 371.37,
      "vs_base_adr_pct": -3.0,
-     "vs_base_revpau_pct": -10.6,
+     "vs_base_revpau_pct": -3.0,
      "doc_occupancy": 0.84
     },
     {
@@ -945,10 +946,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 552,
-     "base_occupancy": 0.73,
-     "base_revpau": 402.96,
+     "base_occupancy": 0.672768,
+     "base_revpau": 371.37,
      "vs_base_adr_pct": -3.0,
-     "vs_base_revpau_pct": -10.6,
+     "vs_base_revpau_pct": -3.0,
      "doc_occupancy": 0.84
     },
     {
@@ -971,10 +972,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 658,
-     "base_occupancy": 0.73,
-     "base_revpau": 480.34,
+     "base_occupancy": 0.645857,
+     "base_revpau": 424.97,
      "vs_base_adr_pct": -3.0,
-     "vs_base_revpau_pct": -14.1,
+     "vs_base_revpau_pct": -3.0,
      "doc_occupancy": 0.83
     }
    ]
@@ -1170,10 +1171,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 409,
-     "base_occupancy": 0.73,
-     "base_revpau": 298.57,
+     "base_occupancy": 0.7008,
+     "base_revpau": 286.63,
      "vs_base_adr_pct": 4.4,
-     "vs_base_revpau_pct": 0.3,
+     "vs_base_revpau_pct": 4.4,
      "doc_occupancy": 0.79
     },
     {
@@ -1196,10 +1197,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 449,
-     "base_occupancy": 0.73,
-     "base_revpau": 327.77,
+     "base_occupancy": 0.686641,
+     "base_revpau": 308.3,
      "vs_base_adr_pct": 4.4,
-     "vs_base_revpau_pct": -1.8,
+     "vs_base_revpau_pct": 4.4,
      "doc_occupancy": 0.82
     },
     {
@@ -1222,10 +1223,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 504,
-     "base_occupancy": 0.73,
-     "base_revpau": 367.92,
+     "base_occupancy": 0.686641,
+     "base_revpau": 346.07,
      "vs_base_adr_pct": 4.4,
-     "vs_base_revpau_pct": -1.8,
+     "vs_base_revpau_pct": 4.4,
      "doc_occupancy": 0.82
     },
     {
@@ -1248,10 +1249,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 510,
-     "base_occupancy": 0.73,
-     "base_revpau": 372.3,
+     "base_occupancy": 0.686641,
+     "base_revpau": 350.19,
      "vs_base_adr_pct": 4.4,
-     "vs_base_revpau_pct": -1.8,
+     "vs_base_revpau_pct": 4.4,
      "doc_occupancy": 0.82
     },
     {
@@ -1274,10 +1275,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 589,
-     "base_occupancy": 0.73,
-     "base_revpau": 429.97,
+     "base_occupancy": 0.659175,
+     "base_revpau": 388.25,
      "vs_base_adr_pct": 4.4,
-     "vs_base_revpau_pct": -5.7,
+     "vs_base_revpau_pct": 4.4,
      "doc_occupancy": 0.84
     },
     {
@@ -1300,10 +1301,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 552,
-     "base_occupancy": 0.73,
-     "base_revpau": 402.96,
+     "base_occupancy": 0.672768,
+     "base_revpau": 371.37,
      "vs_base_adr_pct": 4.4,
-     "vs_base_revpau_pct": -3.8,
+     "vs_base_revpau_pct": 4.4,
      "doc_occupancy": 0.84
     },
     {
@@ -1326,10 +1327,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 552,
-     "base_occupancy": 0.73,
-     "base_revpau": 402.96,
+     "base_occupancy": 0.672768,
+     "base_revpau": 371.37,
      "vs_base_adr_pct": 4.4,
-     "vs_base_revpau_pct": -3.8,
+     "vs_base_revpau_pct": 4.4,
      "doc_occupancy": 0.84
     },
     {
@@ -1352,10 +1353,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 658,
-     "base_occupancy": 0.73,
-     "base_revpau": 480.34,
+     "base_occupancy": 0.645857,
+     "base_revpau": 424.97,
      "vs_base_adr_pct": 4.4,
-     "vs_base_revpau_pct": -7.6,
+     "vs_base_revpau_pct": 4.4,
      "doc_occupancy": 0.83
     }
    ]
@@ -1551,10 +1552,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 409,
-     "base_occupancy": 0.73,
-     "base_revpau": 298.57,
+     "base_occupancy": 0.7008,
+     "base_revpau": 286.63,
      "vs_base_adr_pct": 9.6,
-     "vs_base_revpau_pct": 5.2,
+     "vs_base_revpau_pct": 9.6,
      "doc_occupancy": 0.79
     },
     {
@@ -1577,10 +1578,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 449,
-     "base_occupancy": 0.73,
-     "base_revpau": 327.77,
+     "base_occupancy": 0.686641,
+     "base_revpau": 308.3,
      "vs_base_adr_pct": 9.6,
-     "vs_base_revpau_pct": 3.1,
+     "vs_base_revpau_pct": 9.6,
      "doc_occupancy": 0.82
     },
     {
@@ -1603,10 +1604,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 504,
-     "base_occupancy": 0.73,
-     "base_revpau": 367.92,
+     "base_occupancy": 0.686641,
+     "base_revpau": 346.07,
      "vs_base_adr_pct": 9.6,
-     "vs_base_revpau_pct": 3.1,
+     "vs_base_revpau_pct": 9.6,
      "doc_occupancy": 0.82
     },
     {
@@ -1629,10 +1630,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 510,
-     "base_occupancy": 0.73,
-     "base_revpau": 372.3,
+     "base_occupancy": 0.686641,
+     "base_revpau": 350.19,
      "vs_base_adr_pct": 9.6,
-     "vs_base_revpau_pct": 3.1,
+     "vs_base_revpau_pct": 9.6,
      "doc_occupancy": 0.82
     },
     {
@@ -1655,10 +1656,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 589,
-     "base_occupancy": 0.73,
-     "base_revpau": 429.97,
+     "base_occupancy": 0.659175,
+     "base_revpau": 388.25,
      "vs_base_adr_pct": 9.6,
-     "vs_base_revpau_pct": -1.0,
+     "vs_base_revpau_pct": 9.6,
      "doc_occupancy": 0.84
     },
     {
@@ -1681,10 +1682,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 552,
-     "base_occupancy": 0.73,
-     "base_revpau": 402.96,
+     "base_occupancy": 0.672768,
+     "base_revpau": 371.37,
      "vs_base_adr_pct": 9.6,
-     "vs_base_revpau_pct": 1.0,
+     "vs_base_revpau_pct": 9.6,
      "doc_occupancy": 0.84
     },
     {
@@ -1707,10 +1708,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 552,
-     "base_occupancy": 0.73,
-     "base_revpau": 402.96,
+     "base_occupancy": 0.672768,
+     "base_revpau": 371.37,
      "vs_base_adr_pct": 9.6,
-     "vs_base_revpau_pct": 1.0,
+     "vs_base_revpau_pct": 9.6,
      "doc_occupancy": 0.84
     },
     {
@@ -1733,10 +1734,10 @@
      "basis": "scaled",
      "confidence": "Low",
      "base_adr": 658,
-     "base_occupancy": 0.73,
-     "base_revpau": 480.34,
+     "base_occupancy": 0.645857,
+     "base_revpau": 424.97,
      "vs_base_adr_pct": 9.6,
-     "vs_base_revpau_pct": -3.0,
+     "vs_base_revpau_pct": 9.6,
      "doc_occupancy": 0.83
     }
    ]
@@ -1932,10 +1933,10 @@
      "basis": "scaled",
      "confidence": "Medium",
      "base_adr": 409,
-     "base_occupancy": 0.73,
-     "base_revpau": 298.57,
+     "base_occupancy": 0.7008,
+     "base_revpau": 286.63,
      "vs_base_adr_pct": 13.3,
-     "vs_base_revpau_pct": 8.8,
+     "vs_base_revpau_pct": 13.3,
      "doc_occupancy": 0.79
     },
     {
@@ -1958,10 +1959,10 @@
      "basis": "scaled",
      "confidence": "Medium",
      "base_adr": 449,
-     "base_occupancy": 0.73,
-     "base_revpau": 327.77,
+     "base_occupancy": 0.686641,
+     "base_revpau": 308.3,
      "vs_base_adr_pct": 13.3,
-     "vs_base_revpau_pct": 6.6,
+     "vs_base_revpau_pct": 13.3,
      "doc_occupancy": 0.82
     },
     {
@@ -1984,10 +1985,10 @@
      "basis": "scaled",
      "confidence": "Medium",
      "base_adr": 504,
-     "base_occupancy": 0.73,
-     "base_revpau": 367.92,
+     "base_occupancy": 0.686641,
+     "base_revpau": 346.07,
      "vs_base_adr_pct": 13.3,
-     "vs_base_revpau_pct": 6.6,
+     "vs_base_revpau_pct": 13.3,
      "doc_occupancy": 0.82
     },
     {
@@ -2010,10 +2011,10 @@
      "basis": "scaled",
      "confidence": "Medium",
      "base_adr": 510,
-     "base_occupancy": 0.73,
-     "base_revpau": 372.3,
+     "base_occupancy": 0.686641,
+     "base_revpau": 350.19,
      "vs_base_adr_pct": 13.3,
-     "vs_base_revpau_pct": 6.6,
+     "vs_base_revpau_pct": 13.3,
      "doc_occupancy": 0.82
     },
     {
@@ -2036,10 +2037,10 @@
      "basis": "scaled",
      "confidence": "Medium",
      "base_adr": 589,
-     "base_occupancy": 0.73,
-     "base_revpau": 429.97,
+     "base_occupancy": 0.659175,
+     "base_revpau": 388.25,
      "vs_base_adr_pct": 13.3,
-     "vs_base_revpau_pct": 2.3,
+     "vs_base_revpau_pct": 13.3,
      "doc_occupancy": 0.84
     },
     {
@@ -2062,10 +2063,10 @@
      "basis": "scaled",
      "confidence": "Medium",
      "base_adr": 552,
-     "base_occupancy": 0.73,
-     "base_revpau": 402.96,
+     "base_occupancy": 0.672768,
+     "base_revpau": 371.37,
      "vs_base_adr_pct": 13.3,
-     "vs_base_revpau_pct": 4.4,
+     "vs_base_revpau_pct": 13.3,
      "doc_occupancy": 0.84
     },
     {
@@ -2088,10 +2089,10 @@
      "basis": "scaled",
      "confidence": "Medium",
      "base_adr": 552,
-     "base_occupancy": 0.73,
-     "base_revpau": 402.96,
+     "base_occupancy": 0.672768,
+     "base_revpau": 371.37,
      "vs_base_adr_pct": 13.3,
-     "vs_base_revpau_pct": 4.4,
+     "vs_base_revpau_pct": 13.3,
      "doc_occupancy": 0.84
     },
     {
@@ -2114,10 +2115,10 @@
      "basis": "scaled",
      "confidence": "Medium",
      "base_adr": 658,
-     "base_occupancy": 0.73,
-     "base_revpau": 480.34,
+     "base_occupancy": 0.645857,
+     "base_revpau": 424.97,
      "vs_base_adr_pct": 13.3,
-     "vs_base_revpau_pct": 0.3,
+     "vs_base_revpau_pct": 13.3,
      "doc_occupancy": 0.83
     }
    ]

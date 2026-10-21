@@ -432,7 +432,7 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
         su = size_units(u["bedrooms"], u.get("has_den", False), cfg["occupancy_model"]["den_weight"])
         scaled = u["id"] != hm["baseline_layout"]
         base_adr = u["base_scenario"]["adr"]
-        base_occ = cfg["base_occupancy"]["value"]
+        base_occ = occ  # historical base: same anchor / step / den weight as the live estimate
         base_rp = base_adr * base_occ
         rp = revpau(adr, occ)
         out_units.append({
@@ -445,7 +445,7 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
             "comp_count": n, "method": method,
             "basis": "scaled" if scaled else "comp_median",
             "confidence": downgrade(conf) if scaled else conf,
-            "base_adr": base_adr, "base_occupancy": base_occ, "base_revpau": _r(base_rp, 2),
+            "base_adr": base_adr, "base_occupancy": _r(base_occ, 6), "base_revpau": _r(base_rp, 2),
             "vs_base_adr_pct": _r((adr / base_adr - 1) * 100, 1),
             "vs_base_revpau_pct": _r((rp / base_rp - 1) * 100, 1),
             "doc_occupancy": u["base_scenario"]["occupancy"],

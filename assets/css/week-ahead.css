@@ -91,3 +91,11 @@
 .rcard .r-vs2 .up b{color:var(--forest)}
 .rcard .r-vs2 .down b{color:#9a3b1c}
 .rcard .r-vs2 small{display:block;font-size:.72rem;color:var(--muted)}
+.wa-median-line{background:var(--forest);color:var(--cream);border-radius:var(--r);padding:16px 20px;margin:-8px 0 20px;max-width:980px;font-size:.98rem;line-height:1.55;box-shadow:var(--shadow)}
+.wa-median-line b{color:var(--gold-2);font-weight:600}
+.wa-names{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 8px}
+.wa-names span{font-size:.74rem;padding:3px 10px;border-radius:999px;border:1px solid rgba(227,198,138,.45);color:var(--cream)}
+.wa-names span.out{opacity:.5;text-decoration:line-through}
+.wa-complink{color:var(--gold-2);font-size:.86rem}
+.rcard .r-cap{font-size:.76rem;color:var(--forest);background:#eef1e8;border-radius:8px;padding:6px 10px;margin:-2px 0 0;line-height:1.4}
+.rcard .r-vsnote{font-size:.72rem;color:var(--muted);margin:-4px 0 0}

@@ -182,7 +182,7 @@ class HotelMedianScaling(unittest.TestCase):
             self.assertAlmostEqual(u["adr_p75"], round(420 * k, 2), places=2)
             self.assertAlmostEqual(u["revpau"], round(380 * k * occ[u["id"]], 2), places=1)
             self.assertAlmostEqual(u["vs_base_adr_pct"], round((380 / 338 - 1) * 100, 1))
-            base_rp = self.DOC_ADR[u["id"]] * 0.73
+            base_rp = self.DOC_ADR[u["id"]] * occ[u["id"]]
             self.assertAlmostEqual(u["base_revpau"], round(base_rp, 2), places=2)
             self.assertAlmostEqual(u["vs_base_revpau_pct"], round((380 * k * occ[u["id"]] / base_rp - 1) * 100, 1), places=1)
             self.assertEqual(u["basis"], "comp_median" if u["id"] == "s1" else "scaled")
@@ -232,17 +232,24 @@ class HotelMedianScaling(unittest.TestCase):
             self.assertEqual(round(E.plan_occupancy(u, CFG) * 100, 1), expected[u["id"]], u["id"])
         self.assertAlmostEqual(E.step_down_occupancy(0.73, 0.04, 2.5), 0.73 * 0.96 ** 2.5)
 
-    def test_historical_base_occupancy_is_separate_setting(self):
-        bo = CFG["base_occupancy"]
-        self.assertEqual((bo["value"], bo["label"]), (0.73, "Historical base occupancy"))
-        self.assertIn("occ_studio", CFG["occupancy_model"])           # anchor is its own setting
-        c = copy.deepcopy(CFG)
-        c["occupancy_model"]["occ_studio"] = 0.80                      # decoupled anchor
+    def test_base_occupancy_steps_down_with_same_settings(self):
+        bo, om = CFG["base_occupancy"], CFG["occupancy_model"]
+        self.assertEqual(bo["label"], "Historical base: 73% with size step-down")
+        self.assertEqual(om["occ_studio"], bo["historical_value"])        # anchor = historical 73%
         db = market({f"h{i}": [v, v] for i, v in enumerate([300, 320, 340, 360, 380])})
-        s1 = next(u for u in E.run_hotel_median(db, c, UNITS)["units"] if u["id"] == "s1")
-        self.assertAlmostEqual(s1["occupancy"], 0.80)
-        self.assertEqual(s1["base_occupancy"], 0.73)
-        self.assertAlmostEqual(s1["base_revpau"], 338 * 0.73, places=2)
+        expected = {"s1": 73.0, "a1": 70.1, "a2": 68.7, "a3": 68.7, "a4": 68.7, "b1": 65.9, "b2": 67.3, "b3": 67.3, "c1": 64.6}
+        for u in E.run_hotel_median(db, CFG, UNITS)["units"]:
+            self.assertEqual(round(u["base_occupancy"] * 100, 1), expected[u["id"]], u["id"])
+            self.assertEqual(u["base_occupancy"], u["occupancy"])
+            self.assertAlmostEqual(u["base_revpau"], round(self.DOC_ADR[u["id"]] * u["base_occupancy"], 2), places=2)
+            self.assertEqual(u["vs_base_revpau_pct"], u["vs_base_adr_pct"], u["id"])   # difference reflects rates only
+        # changing the settings moves live and base together
+        c = copy.deepcopy(CFG)
+        c["occupancy_model"].update(occ_studio=0.80, d=0.05)
+        for u in E.run_hotel_median(db, c, UNITS)["units"]:
+            self.assertEqual(u["base_occupancy"], u["occupancy"])
+        c1 = next(u for u in E.run_hotel_median(db, c, UNITS)["units"] if u["id"] == "c1")
+        self.assertAlmostEqual(c1["base_occupancy"], round(0.80 * 0.95 ** 3, 6))
 
     def test_revpau_vs_base_live_week(self):
         db = json.loads((ROOT / "data/comps.json").read_text())
@@ -255,7 +262,8 @@ class HotelMedianScaling(unittest.TestCase):
             self.assertEqual(u["base_adr"], doc[u["id"]]["base_scenario"]["adr"])
         c1 = next(u for u in out["units"] if u["id"] == "c1")
         self.assertAlmostEqual(c1["revpau"], 481.55, places=2)
-        self.assertEqual((c1["vs_base_adr_pct"], c1["vs_base_revpau_pct"]), (13.3, 0.3))
+        self.assertEqual((c1["vs_base_adr_pct"], c1["vs_base_revpau_pct"]), (13.3, 13.3))
+        self.assertAlmostEqual(c1["base_revpau"], round(658 * 0.73 * 0.96 ** 3, 2), places=2)
         # document's own net / cap-rate figures (modeled at its 83% occupancy) are untouched
         self.assertEqual((doc["c1"]["net_per_year"], doc["c1"]["cap_rate_pct"], doc["c1"]["base_scenario"]["occupancy"]), (60600, 7.93, 0.83))
 

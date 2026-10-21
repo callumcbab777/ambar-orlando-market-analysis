@@ -102,17 +102,17 @@
     const baseline = { method, median: r2(point), p25: r2(p25), p75: r2(p75), comp_count: n, raw_count: vals.length,
       trimmed_out: vals.length - n, diag_mean: r2(diagMean), diag_median: r2(diagMedian), gap_pct: r2(gap), flagged, confidence: conf };
     const ratios = planRatios(units, hm.baseline_layout);
-    const baseOcc = cfg.base_occupancy.value;
     const outUnits = units.map((u) => {
       const t = cfg.unit_types[u.unit_type], ratio = ratios[u.id];
       const k = t.realization * t.position_index * ratio, adr = point * k, occ = planOccupancy(u, cfg);
+      const baseOcc = occ; // historical base: same anchor / step / den weight as the live estimate
       const scaled = u.id !== hm.baseline_layout, baseAdr = u.base_scenario.adr, baseRp = baseAdr * baseOcc, rp = adr * occ;
       return { id: u.id, unit_type: u.unit_type, ratio_to_s1: Math.round(ratio * 1e4) / 1e4, realization: t.realization, position_index: t.position_index,
         adr: r2(adr), adr_p25: r2(p25 * k), adr_p75: r2(p75 * k),
         occupancy: Math.round(occ * 1e6) / 1e6, occupancy_method: "size_step_down", size_units: sizeUnits(u.bedrooms, !!u.has_den, cfg.occupancy_model.den_weight),
         revpau: r2(rp), revpau_p25: r2(p25 * k * occ), revpau_p75: r2(p75 * k * occ),
         comp_count: n, method, basis: scaled ? "scaled" : "comp_median", confidence: scaled ? downgrade(conf) : conf,
-        base_adr: baseAdr, base_occupancy: baseOcc, base_revpau: r2(baseRp),
+        base_adr: baseAdr, base_occupancy: Math.round(baseOcc * 1e6) / 1e6, base_revpau: r2(baseRp),
         vs_base_adr_pct: r1((adr / baseAdr - 1) * 100), vs_base_revpau_pct: r1((rp / baseRp - 1) * 100),
         doc_occupancy: u.base_scenario.occupancy };
     });

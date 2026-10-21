@@ -1,18 +1,19 @@
 {
   "_readme": "All tunable inputs for the Week Ahead engine. Mode 'hotel_median' (live): the comp-set median of the site's weekly comparable hotel rates (data/comps.json) is the Studio-equivalent baseline; each plan = baseline x realization x position index x plan ratio to S1 (document base ADRs). Values marked NEEDS_INPUT still need Callum's confirmation. See README.",
-  "version": "2026-10-21d",
+  "version": "2026-10-21e",
   "mode": "hotel_median",
   "base_occupancy": {
-    "value": 0.73,
-    "label": "Historical base occupancy",
-    "source": "Callum's historical occupancy figure (Oct 21, 2026); replaces the document's per-plan 79-84% as the base for every plan",
-    "_note": "Base scenario per plan: base ADR = document base ADR; base occupancy = this flat value; base RevPAU = base ADR x base occupancy. Cards compare this week's ADR and RevPAU against it."
+    "label": "Historical base: 73% with size step-down",
+    "historical_value": 0.73,
+    "method": "same as occupancy_model (anchor occ_studio, step d, den_weight)",
+    "source": "Callum's historical occupancy figure (Oct 21, 2026); replaces the document's per-plan 79-84%",
+    "_note": "Base occupancy(plan) = occupancy_model.occ_studio x (1 - d) ^ size_units, i.e. the SAME settings as the live estimate, so changing them moves both together. occ_studio must equal historical_value (tested). Base RevPAU = document base ADR x base occupancy(plan). Consequence: RevPAU vs base = ADR vs base for every plan (the difference reflects rates only)."
   },
   "occupancy_model": {
     "method": "size_step_down",
     "formula": "Occ(plan) = occ_studio x (1 - d) ^ size_units;  size_units = bedrooms + den_weight x has_den",
     "occ_studio": 0.73,
-    "occ_studio_status": "anchor for the step-down; currently set equal to base_occupancy (historical 73%). Separate setting so it can be decoupled later.",
+    "occ_studio_status": "anchor for both the live estimate and the historical base (73%); separate setting so the live anchor could be decoupled later",
     "d": 0.04,
     "d_status": "proposed, adjustable",
     "den_weight": 0.5,
