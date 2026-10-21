@@ -159,6 +159,40 @@ def market(rates_by_hotel, week="2026-10-19"):
             "weeks": [{"week": week, "week_end": "2026-10-25", "status": "collected", "generated": week}]}
 
 
+class OwnerEconomics(unittest.TestCase):
+    """Example of Owner Economics: the document's revenue-flow formula, recomputed at step-down occupancy."""
+
+    def test_reproduces_document_exactly_at_original_occupancy(self):
+        for u in UNITS:
+            with self.subTest(plan=u["id"]):
+                oe = E.owner_economics(u, CFG, occupancy=u["base_scenario"]["occupancy"])
+                self.assertEqual(oe["monthly_revenue_flow"], u["monthly_revenue_flow"])
+                self.assertEqual(oe["fixed_owner_costs_monthly"], u["fixed_owner_costs_monthly"])
+                self.assertEqual(oe["net_per_month"], u["net_per_month"])
+                self.assertEqual(oe["net_per_year"], u["net_per_year"])
+                self.assertEqual(oe["cap_rate_pct"], u["cap_rate_pct"])
+
+    def test_uses_step_down_occupancy_at_base_adr(self):
+        size = {"s1": 0, "a1": 1, "a2": 1.5, "a3": 1.5, "a4": 1.5, "b1": 2.5, "b2": 2, "b3": 2, "c1": 3}
+        expected_occ = {k: 0.83 * 0.96 ** v for k, v in size.items()}  # S1 83.0%, A1 79.7%, A2-A4 78.1%, B2/B3 76.5%, B1 74.9%, C1 73.4%
+        for u in UNITS:
+            with self.subTest(plan=u["id"]):
+                oe = E.owner_economics(u, CFG)
+                self.assertAlmostEqual(oe["occupancy"], expected_occ[u["id"]], places=5)
+                self.assertEqual(oe["adr"], u["base_scenario"]["adr"])
+                g = u["base_scenario"]["adr"] * oe["occupancy"] * 365 / 12
+                self.assertAlmostEqual(oe["monthly_revenue_flow"]["gross_room_revenue"], g, delta=0.01)
+                self.assertAlmostEqual(oe["cap_rate_pct"], oe["net_per_year"] / u["reference_list_price"] * 100, delta=0.005)
+
+    def test_follows_occupancy_settings_and_not_the_week(self):
+        cfg = json.loads(json.dumps(CFG)); cfg["occupancy_model"]["occ_studio"] = 0.79
+        s1 = next(u for u in UNITS if u["id"] == "s1")
+        self.assertEqual(E.owner_economics(s1, cfg)["net_per_year"], s1["net_per_year"])  # doc S1 is at 79%
+        db = json.loads((ROOT / "data/comps.json").read_text())
+        a, b = (E.run_hotel_median(db, CFG, UNITS, w) for w in ("2026-10-12", "2026-10-19"))
+        self.assertEqual([u["owner_economics"] for u in a["units"]], [u["owner_economics"] for u in b["units"]])
+
+
 class HotelMedianScaling(unittest.TestCase):
     DOC_ADR = {"s1": 338, "a1": 409, "a2": 449, "a3": 504, "a4": 510, "b1": 589, "b2": 552, "b3": 552, "c1": 658}
 

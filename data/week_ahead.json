@@ -4,15 +4,15 @@
  "comps_last_updated": "2026-10-19",
  "latest_week": "2026-10-19",
  "assumptions": {
-  "_readme": "All tunable inputs for the Week Ahead engine. Mode 'hotel_median' (live): the comp-set median of the site's weekly comparable hotel rates (data/comps.json) is the Studio-equivalent baseline; each plan = baseline x realization x position index x plan ratio to S1 (document base ADRs). Values marked NEEDS_INPUT still need Callum's confirmation. See README.",
-  "version": "2026-10-21f",
+  "_readme": "All tunable inputs for the Week Ahead engine. Mode 'hotel_median' (live): the comp-set median of the site's weekly comparable hotel rates (data/comps.json) is the Studio-equivalent baseline; each plan = baseline x realization x position index x plan ratio to S1 (base ADRs). Values marked NEEDS_INPUT still need Callum's confirmation. See README.",
+  "version": "2026-10-21g",
   "mode": "hotel_median",
   "base_occupancy": {
    "label": "Historical base: 73% with size step-down",
    "anchor": 0.73,
    "source": "Callum's historical occupancy figure (Oct 21, 2026)",
    "method": "base occupancy(plan) = anchor x (1 - occupancy_model.d) ^ size_units (same step and den weight as the estimate, its own anchor)",
-   "_note": "S1 73.0%, A1 70.1%, A2-A4 68.7%, B2/B3 67.3%, B1 65.9%, C1 64.6%. Base RevPAU = document base ADR x base occupancy(plan). Because both step down by the same factor, RevPAU vs base = (1 + ADR vs base) x (occ_studio / anchor) - 1, i.e. it reflects both rates and the higher estimated occupancy anchor."
+   "_note": "S1 73.0%, A1 70.1%, A2-A4 68.7%, B2/B3 67.3%, B1 65.9%, C1 64.6%. Base RevPAU = base ADR x base occupancy(plan). Because both step down by the same factor, RevPAU vs base = (1 + ADR vs base) x (occ_studio / anchor) - 1, i.e. it reflects both rates and the higher estimated occupancy anchor."
   },
   "occupancy_model": {
    "method": "size_step_down",
@@ -25,6 +25,22 @@
    "den_weight_status": "proposed, adjustable",
    "_note": "Estimated occupancy(plan) = occ_studio x (1 - d) ^ size_units; size_units: Studio 0, 1 Bed 1, 1 Bed + Den 1.5, 2 Bed 2, 2 Bed + Den 2.5, 3 Bed 3. With occ_studio 0.83: S1 83.0%, A1 79.7%, A2-A4 78.1%, B2/B3 76.5%, B1 74.9%, C1 73.4%. d and den_weight are shared with the historical base.",
    "label": "Estimated occupancy: 83% with size step-down"
+  },
+  "owner_economics": {
+   "label": "Example of Owner Economics",
+   "note": "Example at base ADR with size step-down occupancy; not a forecast.",
+   "adr_source": "base_adr",
+   "occupancy_source": "occupancy_model",
+   "_method": "Same formula as the AMBAR Rental Program Cost Breakdown: gross = base ADR x occupancy x days_per_year / 12; Marriott brand fee, hotel operations and owner share are % of gross; FF&E reserve, OTA commissions and card processing are % of gross deducted from the owner share; minus the fixed owner costs (HOA, property tax, insurance, utilities from units.json). Net/month = owner net before financing; net/year = owner net x 12 (rounded to $1); cap rate = net/year / reference list price. Occupancy = the estimate's size step-down (occupancy_model), so it follows those settings. Week-independent: always at base ADR.",
+   "days_per_year": 365,
+   "waterfall_pct": {
+    "marriott_brand_fee": 0.1,
+    "hotel_operations": 0.4,
+    "owner_share": 0.5,
+    "ffe_reserve": 0.04,
+    "ota_commissions": 0.025,
+    "card_processing": 0.0241
+   }
   },
   "pipeline": {
    "stale_days": 14,
@@ -109,7 +125,7 @@
     "layout_index": 1.0
    }
   },
-  "_layouts": "layout_index is only used by the per-unit-type feed mode (unit_type_feed); hotel_median mode uses the plan ratio to S1 (document base ADRs) instead. Occupancy is no longer set per plan here: see occupancy_model.",
+  "_layouts": "layout_index is only used by the per-unit-type feed mode (unit_type_feed); hotel_median mode uses the plan ratio to S1 (base ADRs) instead. Occupancy is no longer set per plan here: see occupancy_model.",
   "gap_fill": {
    "method": "ratio",
    "ratios_to_studio": {
@@ -769,7 +785,33 @@
      "base_revpau": 246.74,
      "vs_base_adr_pct": -3.0,
      "vs_base_revpau_pct": 10.3,
-     "doc_occupancy": 0.79
+     "doc_occupancy": 0.79,
+     "owner_economics": {
+      "adr": 338,
+      "occupancy": 0.83,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 8533.09,
+       "marriott_brand_fee_10pct": -853.31,
+       "hotel_operations_40pct": -3413.24,
+       "owner_share_50pct": 4266.54,
+       "ffe_reserve_4pct": -341.32,
+       "ota_commissions_2_5pct": -213.33,
+       "card_processing_2_41pct": -205.65,
+       "fixed_owner_costs": -841.57,
+       "owner_net_before_financing": 2664.68
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 402.93,
+       "property_tax": 286.95,
+       "insurance_estimate": 81.95,
+       "utilities_estimate": 69.74,
+       "total": 841.57
+      },
+      "net_per_month": 2665.0,
+      "net_per_year": 31976.0,
+      "cap_rate_pct": 8.4,
+      "reference_list_price": 380614
+     }
     },
     {
      "id": "a1",
@@ -795,7 +837,33 @@
      "base_revpau": 286.63,
      "vs_base_adr_pct": -3.0,
      "vs_base_revpau_pct": 10.3,
-     "doc_occupancy": 0.79
+     "doc_occupancy": 0.79,
+     "owner_economics": {
+      "adr": 409,
+      "occupancy": 0.7968,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 9912.52,
+       "marriott_brand_fee_10pct": -991.25,
+       "hotel_operations_40pct": -3965.01,
+       "owner_share_50pct": 4956.26,
+       "ffe_reserve_4pct": -396.5,
+       "ota_commissions_2_5pct": -247.81,
+       "card_processing_2_41pct": -238.89,
+       "fixed_owner_costs": -1025.33,
+       "owner_net_before_financing": 3047.73
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 498.73,
+       "property_tax": 354.26,
+       "insurance_estimate": 86.51,
+       "utilities_estimate": 85.83,
+       "total": 1025.33
+      },
+      "net_per_month": 3048.0,
+      "net_per_year": 36573.0,
+      "cap_rate_pct": 7.96,
+      "reference_list_price": 459344
+     }
     },
     {
      "id": "a2",
@@ -821,7 +889,33 @@
      "base_revpau": 308.3,
      "vs_base_adr_pct": -3.0,
      "vs_base_revpau_pct": 10.3,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 449,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 10662.1,
+       "marriott_brand_fee_10pct": -1066.21,
+       "hotel_operations_40pct": -4264.84,
+       "owner_share_50pct": 5331.05,
+       "ffe_reserve_4pct": -426.48,
+       "ota_commissions_2_5pct": -266.55,
+       "card_processing_2_41pct": -256.96,
+       "fixed_owner_costs": -1176.14,
+       "owner_net_before_financing": 3204.92
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 580.07,
+       "property_tax": 405.18,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 99.83,
+       "total": 1176.14
+      },
+      "net_per_month": 3205.0,
+      "net_per_year": 38459.0,
+      "cap_rate_pct": 7.41,
+      "reference_list_price": 518900
+     }
     },
     {
      "id": "a3",
@@ -847,7 +941,33 @@
      "base_revpau": 346.07,
      "vs_base_adr_pct": -3.0,
      "vs_base_revpau_pct": 10.3,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 504,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 11968.15,
+       "marriott_brand_fee_10pct": -1196.82,
+       "hotel_operations_40pct": -4787.26,
+       "owner_share_50pct": 5984.07,
+       "ffe_reserve_4pct": -478.73,
+       "ota_commissions_2_5pct": -299.2,
+       "card_processing_2_41pct": -288.43,
+       "fixed_owner_costs": -1315.37,
+       "owner_net_before_financing": 3602.34
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 654.58,
+       "property_tax": 457.34,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 112.39,
+       "total": 1315.37
+      },
+      "net_per_month": 3602.0,
+      "net_per_year": 43228.0,
+      "cap_rate_pct": 7.45,
+      "reference_list_price": 579900
+     }
     },
     {
      "id": "a4",
@@ -873,7 +993,33 @@
      "base_revpau": 350.19,
      "vs_base_adr_pct": -3.0,
      "vs_base_revpau_pct": 10.3,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 510,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12110.63,
+       "marriott_brand_fee_10pct": -1211.06,
+       "hotel_operations_40pct": -4844.25,
+       "owner_share_50pct": 6055.31,
+       "ffe_reserve_4pct": -484.43,
+       "ota_commissions_2_5pct": -302.77,
+       "card_processing_2_41pct": -291.87,
+       "fixed_owner_costs": -1299.0,
+       "owner_net_before_financing": 3677.26
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 624.93,
+       "property_tax": 475.72,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 107.29,
+       "total": 1299.0
+      },
+      "net_per_month": 3677.0,
+      "net_per_year": 44127.0,
+      "cap_rate_pct": 7.34,
+      "reference_list_price": 601400
+     }
     },
     {
      "id": "b1",
@@ -899,7 +1045,33 @@
      "base_revpau": 388.25,
      "vs_base_adr_pct": -3.0,
      "vs_base_revpau_pct": 10.3,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 589,
+      "occupancy": 0.749473,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 13427.13,
+       "marriott_brand_fee_10pct": -1342.71,
+       "hotel_operations_40pct": -5370.85,
+       "owner_share_50pct": 6713.56,
+       "ffe_reserve_4pct": -537.09,
+       "ota_commissions_2_5pct": -335.68,
+       "card_processing_2_41pct": -323.59,
+       "fixed_owner_costs": -1614.5,
+       "owner_net_before_financing": 3902.71
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 826.39,
+       "property_tax": 550.02,
+       "insurance_estimate": 95.61,
+       "utilities_estimate": 142.48,
+       "total": 1614.5
+      },
+      "net_per_month": 3903.0,
+      "net_per_year": 46832.0,
+      "cap_rate_pct": 6.8,
+      "reference_list_price": 688300
+     }
     },
     {
      "id": "b2",
@@ -925,7 +1097,33 @@
      "base_revpau": 371.37,
      "vs_base_adr_pct": -3.0,
      "vs_base_revpau_pct": 10.3,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 552,
+      "occupancy": 0.764928,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12843.14,
+       "marriott_brand_fee_10pct": -1284.31,
+       "hotel_operations_40pct": -5137.26,
+       "owner_share_50pct": 6421.57,
+       "ffe_reserve_4pct": -513.73,
+       "ota_commissions_2_5pct": -321.08,
+       "card_processing_2_41pct": -309.52,
+       "fixed_owner_costs": -1548.47,
+       "owner_net_before_financing": 3728.78
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 798.26,
+       "property_tax": 514.62,
+       "insurance_estimate": 100.17,
+       "utilities_estimate": 135.42,
+       "total": 1548.47
+      },
+      "net_per_month": 3729.0,
+      "net_per_year": 44745.0,
+      "cap_rate_pct": 6.92,
+      "reference_list_price": 646900
+     }
     },
     {
      "id": "b3",
@@ -951,7 +1149,33 @@
      "base_revpau": 371.37,
      "vs_base_adr_pct": -3.0,
      "vs_base_revpau_pct": 10.3,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 552,
+      "occupancy": 0.764928,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12843.14,
+       "marriott_brand_fee_10pct": -1284.31,
+       "hotel_operations_40pct": -5137.26,
+       "owner_share_50pct": 6421.57,
+       "ffe_reserve_4pct": -513.73,
+       "ota_commissions_2_5pct": -321.08,
+       "card_processing_2_41pct": -309.52,
+       "fixed_owner_costs": -1548.47,
+       "owner_net_before_financing": 3728.78
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 798.26,
+       "property_tax": 514.62,
+       "insurance_estimate": 100.17,
+       "utilities_estimate": 135.42,
+       "total": 1548.47
+      },
+      "net_per_month": 3729.0,
+      "net_per_year": 44745.0,
+      "cap_rate_pct": 6.92,
+      "reference_list_price": 646900
+     }
     },
     {
      "id": "c1",
@@ -977,7 +1201,33 @@
      "base_revpau": 424.97,
      "vs_base_adr_pct": -3.0,
      "vs_base_revpau_pct": 10.3,
-     "doc_occupancy": 0.83
+     "doc_occupancy": 0.83,
+     "owner_economics": {
+      "adr": 658,
+      "occupancy": 0.734331,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 14697.02,
+       "marriott_brand_fee_10pct": -1469.7,
+       "hotel_operations_40pct": -5878.81,
+       "owner_share_50pct": 7348.51,
+       "ffe_reserve_4pct": -587.88,
+       "ota_commissions_2_5pct": -367.43,
+       "card_processing_2_41pct": -354.2,
+       "fixed_owner_costs": -1775.76,
+       "owner_net_before_financing": 4263.25
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 900.9,
+       "property_tax": 615.09,
+       "insurance_estimate": 104.72,
+       "utilities_estimate": 155.05,
+       "total": 1775.76
+      },
+      "net_per_month": 4263.0,
+      "net_per_year": 51159.0,
+      "cap_rate_pct": 6.69,
+      "reference_list_price": 764400
+     }
     }
    ]
   },
@@ -1150,7 +1400,33 @@
      "base_revpau": 246.74,
      "vs_base_adr_pct": 4.4,
      "vs_base_revpau_pct": 18.7,
-     "doc_occupancy": 0.79
+     "doc_occupancy": 0.79,
+     "owner_economics": {
+      "adr": 338,
+      "occupancy": 0.83,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 8533.09,
+       "marriott_brand_fee_10pct": -853.31,
+       "hotel_operations_40pct": -3413.24,
+       "owner_share_50pct": 4266.54,
+       "ffe_reserve_4pct": -341.32,
+       "ota_commissions_2_5pct": -213.33,
+       "card_processing_2_41pct": -205.65,
+       "fixed_owner_costs": -841.57,
+       "owner_net_before_financing": 2664.68
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 402.93,
+       "property_tax": 286.95,
+       "insurance_estimate": 81.95,
+       "utilities_estimate": 69.74,
+       "total": 841.57
+      },
+      "net_per_month": 2665.0,
+      "net_per_year": 31976.0,
+      "cap_rate_pct": 8.4,
+      "reference_list_price": 380614
+     }
     },
     {
      "id": "a1",
@@ -1176,7 +1452,33 @@
      "base_revpau": 286.63,
      "vs_base_adr_pct": 4.4,
      "vs_base_revpau_pct": 18.7,
-     "doc_occupancy": 0.79
+     "doc_occupancy": 0.79,
+     "owner_economics": {
+      "adr": 409,
+      "occupancy": 0.7968,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 9912.52,
+       "marriott_brand_fee_10pct": -991.25,
+       "hotel_operations_40pct": -3965.01,
+       "owner_share_50pct": 4956.26,
+       "ffe_reserve_4pct": -396.5,
+       "ota_commissions_2_5pct": -247.81,
+       "card_processing_2_41pct": -238.89,
+       "fixed_owner_costs": -1025.33,
+       "owner_net_before_financing": 3047.73
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 498.73,
+       "property_tax": 354.26,
+       "insurance_estimate": 86.51,
+       "utilities_estimate": 85.83,
+       "total": 1025.33
+      },
+      "net_per_month": 3048.0,
+      "net_per_year": 36573.0,
+      "cap_rate_pct": 7.96,
+      "reference_list_price": 459344
+     }
     },
     {
      "id": "a2",
@@ -1202,7 +1504,33 @@
      "base_revpau": 308.3,
      "vs_base_adr_pct": 4.4,
      "vs_base_revpau_pct": 18.7,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 449,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 10662.1,
+       "marriott_brand_fee_10pct": -1066.21,
+       "hotel_operations_40pct": -4264.84,
+       "owner_share_50pct": 5331.05,
+       "ffe_reserve_4pct": -426.48,
+       "ota_commissions_2_5pct": -266.55,
+       "card_processing_2_41pct": -256.96,
+       "fixed_owner_costs": -1176.14,
+       "owner_net_before_financing": 3204.92
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 580.07,
+       "property_tax": 405.18,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 99.83,
+       "total": 1176.14
+      },
+      "net_per_month": 3205.0,
+      "net_per_year": 38459.0,
+      "cap_rate_pct": 7.41,
+      "reference_list_price": 518900
+     }
     },
     {
      "id": "a3",
@@ -1228,7 +1556,33 @@
      "base_revpau": 346.07,
      "vs_base_adr_pct": 4.4,
      "vs_base_revpau_pct": 18.7,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 504,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 11968.15,
+       "marriott_brand_fee_10pct": -1196.82,
+       "hotel_operations_40pct": -4787.26,
+       "owner_share_50pct": 5984.07,
+       "ffe_reserve_4pct": -478.73,
+       "ota_commissions_2_5pct": -299.2,
+       "card_processing_2_41pct": -288.43,
+       "fixed_owner_costs": -1315.37,
+       "owner_net_before_financing": 3602.34
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 654.58,
+       "property_tax": 457.34,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 112.39,
+       "total": 1315.37
+      },
+      "net_per_month": 3602.0,
+      "net_per_year": 43228.0,
+      "cap_rate_pct": 7.45,
+      "reference_list_price": 579900
+     }
     },
     {
      "id": "a4",
@@ -1254,7 +1608,33 @@
      "base_revpau": 350.19,
      "vs_base_adr_pct": 4.4,
      "vs_base_revpau_pct": 18.7,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 510,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12110.63,
+       "marriott_brand_fee_10pct": -1211.06,
+       "hotel_operations_40pct": -4844.25,
+       "owner_share_50pct": 6055.31,
+       "ffe_reserve_4pct": -484.43,
+       "ota_commissions_2_5pct": -302.77,
+       "card_processing_2_41pct": -291.87,
+       "fixed_owner_costs": -1299.0,
+       "owner_net_before_financing": 3677.26
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 624.93,
+       "property_tax": 475.72,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 107.29,
+       "total": 1299.0
+      },
+      "net_per_month": 3677.0,
+      "net_per_year": 44127.0,
+      "cap_rate_pct": 7.34,
+      "reference_list_price": 601400
+     }
     },
     {
      "id": "b1",
@@ -1280,7 +1660,33 @@
      "base_revpau": 388.25,
      "vs_base_adr_pct": 4.4,
      "vs_base_revpau_pct": 18.7,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 589,
+      "occupancy": 0.749473,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 13427.13,
+       "marriott_brand_fee_10pct": -1342.71,
+       "hotel_operations_40pct": -5370.85,
+       "owner_share_50pct": 6713.56,
+       "ffe_reserve_4pct": -537.09,
+       "ota_commissions_2_5pct": -335.68,
+       "card_processing_2_41pct": -323.59,
+       "fixed_owner_costs": -1614.5,
+       "owner_net_before_financing": 3902.71
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 826.39,
+       "property_tax": 550.02,
+       "insurance_estimate": 95.61,
+       "utilities_estimate": 142.48,
+       "total": 1614.5
+      },
+      "net_per_month": 3903.0,
+      "net_per_year": 46832.0,
+      "cap_rate_pct": 6.8,
+      "reference_list_price": 688300
+     }
     },
     {
      "id": "b2",
@@ -1306,7 +1712,33 @@
      "base_revpau": 371.37,
      "vs_base_adr_pct": 4.4,
      "vs_base_revpau_pct": 18.7,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 552,
+      "occupancy": 0.764928,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12843.14,
+       "marriott_brand_fee_10pct": -1284.31,
+       "hotel_operations_40pct": -5137.26,
+       "owner_share_50pct": 6421.57,
+       "ffe_reserve_4pct": -513.73,
+       "ota_commissions_2_5pct": -321.08,
+       "card_processing_2_41pct": -309.52,
+       "fixed_owner_costs": -1548.47,
+       "owner_net_before_financing": 3728.78
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 798.26,
+       "property_tax": 514.62,
+       "insurance_estimate": 100.17,
+       "utilities_estimate": 135.42,
+       "total": 1548.47
+      },
+      "net_per_month": 3729.0,
+      "net_per_year": 44745.0,
+      "cap_rate_pct": 6.92,
+      "reference_list_price": 646900
+     }
     },
     {
      "id": "b3",
@@ -1332,7 +1764,33 @@
      "base_revpau": 371.37,
      "vs_base_adr_pct": 4.4,
      "vs_base_revpau_pct": 18.7,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 552,
+      "occupancy": 0.764928,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12843.14,
+       "marriott_brand_fee_10pct": -1284.31,
+       "hotel_operations_40pct": -5137.26,
+       "owner_share_50pct": 6421.57,
+       "ffe_reserve_4pct": -513.73,
+       "ota_commissions_2_5pct": -321.08,
+       "card_processing_2_41pct": -309.52,
+       "fixed_owner_costs": -1548.47,
+       "owner_net_before_financing": 3728.78
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 798.26,
+       "property_tax": 514.62,
+       "insurance_estimate": 100.17,
+       "utilities_estimate": 135.42,
+       "total": 1548.47
+      },
+      "net_per_month": 3729.0,
+      "net_per_year": 44745.0,
+      "cap_rate_pct": 6.92,
+      "reference_list_price": 646900
+     }
     },
     {
      "id": "c1",
@@ -1358,7 +1816,33 @@
      "base_revpau": 424.97,
      "vs_base_adr_pct": 4.4,
      "vs_base_revpau_pct": 18.7,
-     "doc_occupancy": 0.83
+     "doc_occupancy": 0.83,
+     "owner_economics": {
+      "adr": 658,
+      "occupancy": 0.734331,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 14697.02,
+       "marriott_brand_fee_10pct": -1469.7,
+       "hotel_operations_40pct": -5878.81,
+       "owner_share_50pct": 7348.51,
+       "ffe_reserve_4pct": -587.88,
+       "ota_commissions_2_5pct": -367.43,
+       "card_processing_2_41pct": -354.2,
+       "fixed_owner_costs": -1775.76,
+       "owner_net_before_financing": 4263.25
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 900.9,
+       "property_tax": 615.09,
+       "insurance_estimate": 104.72,
+       "utilities_estimate": 155.05,
+       "total": 1775.76
+      },
+      "net_per_month": 4263.0,
+      "net_per_year": 51159.0,
+      "cap_rate_pct": 6.69,
+      "reference_list_price": 764400
+     }
     }
    ]
   },
@@ -1531,7 +2015,33 @@
      "base_revpau": 246.74,
      "vs_base_adr_pct": 9.6,
      "vs_base_revpau_pct": 24.6,
-     "doc_occupancy": 0.79
+     "doc_occupancy": 0.79,
+     "owner_economics": {
+      "adr": 338,
+      "occupancy": 0.83,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 8533.09,
+       "marriott_brand_fee_10pct": -853.31,
+       "hotel_operations_40pct": -3413.24,
+       "owner_share_50pct": 4266.54,
+       "ffe_reserve_4pct": -341.32,
+       "ota_commissions_2_5pct": -213.33,
+       "card_processing_2_41pct": -205.65,
+       "fixed_owner_costs": -841.57,
+       "owner_net_before_financing": 2664.68
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 402.93,
+       "property_tax": 286.95,
+       "insurance_estimate": 81.95,
+       "utilities_estimate": 69.74,
+       "total": 841.57
+      },
+      "net_per_month": 2665.0,
+      "net_per_year": 31976.0,
+      "cap_rate_pct": 8.4,
+      "reference_list_price": 380614
+     }
     },
     {
      "id": "a1",
@@ -1557,7 +2067,33 @@
      "base_revpau": 286.63,
      "vs_base_adr_pct": 9.6,
      "vs_base_revpau_pct": 24.6,
-     "doc_occupancy": 0.79
+     "doc_occupancy": 0.79,
+     "owner_economics": {
+      "adr": 409,
+      "occupancy": 0.7968,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 9912.52,
+       "marriott_brand_fee_10pct": -991.25,
+       "hotel_operations_40pct": -3965.01,
+       "owner_share_50pct": 4956.26,
+       "ffe_reserve_4pct": -396.5,
+       "ota_commissions_2_5pct": -247.81,
+       "card_processing_2_41pct": -238.89,
+       "fixed_owner_costs": -1025.33,
+       "owner_net_before_financing": 3047.73
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 498.73,
+       "property_tax": 354.26,
+       "insurance_estimate": 86.51,
+       "utilities_estimate": 85.83,
+       "total": 1025.33
+      },
+      "net_per_month": 3048.0,
+      "net_per_year": 36573.0,
+      "cap_rate_pct": 7.96,
+      "reference_list_price": 459344
+     }
     },
     {
      "id": "a2",
@@ -1583,7 +2119,33 @@
      "base_revpau": 308.3,
      "vs_base_adr_pct": 9.6,
      "vs_base_revpau_pct": 24.6,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 449,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 10662.1,
+       "marriott_brand_fee_10pct": -1066.21,
+       "hotel_operations_40pct": -4264.84,
+       "owner_share_50pct": 5331.05,
+       "ffe_reserve_4pct": -426.48,
+       "ota_commissions_2_5pct": -266.55,
+       "card_processing_2_41pct": -256.96,
+       "fixed_owner_costs": -1176.14,
+       "owner_net_before_financing": 3204.92
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 580.07,
+       "property_tax": 405.18,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 99.83,
+       "total": 1176.14
+      },
+      "net_per_month": 3205.0,
+      "net_per_year": 38459.0,
+      "cap_rate_pct": 7.41,
+      "reference_list_price": 518900
+     }
     },
     {
      "id": "a3",
@@ -1609,7 +2171,33 @@
      "base_revpau": 346.07,
      "vs_base_adr_pct": 9.6,
      "vs_base_revpau_pct": 24.6,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 504,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 11968.15,
+       "marriott_brand_fee_10pct": -1196.82,
+       "hotel_operations_40pct": -4787.26,
+       "owner_share_50pct": 5984.07,
+       "ffe_reserve_4pct": -478.73,
+       "ota_commissions_2_5pct": -299.2,
+       "card_processing_2_41pct": -288.43,
+       "fixed_owner_costs": -1315.37,
+       "owner_net_before_financing": 3602.34
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 654.58,
+       "property_tax": 457.34,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 112.39,
+       "total": 1315.37
+      },
+      "net_per_month": 3602.0,
+      "net_per_year": 43228.0,
+      "cap_rate_pct": 7.45,
+      "reference_list_price": 579900
+     }
     },
     {
      "id": "a4",
@@ -1635,7 +2223,33 @@
      "base_revpau": 350.19,
      "vs_base_adr_pct": 9.6,
      "vs_base_revpau_pct": 24.6,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 510,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12110.63,
+       "marriott_brand_fee_10pct": -1211.06,
+       "hotel_operations_40pct": -4844.25,
+       "owner_share_50pct": 6055.31,
+       "ffe_reserve_4pct": -484.43,
+       "ota_commissions_2_5pct": -302.77,
+       "card_processing_2_41pct": -291.87,
+       "fixed_owner_costs": -1299.0,
+       "owner_net_before_financing": 3677.26
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 624.93,
+       "property_tax": 475.72,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 107.29,
+       "total": 1299.0
+      },
+      "net_per_month": 3677.0,
+      "net_per_year": 44127.0,
+      "cap_rate_pct": 7.34,
+      "reference_list_price": 601400
+     }
     },
     {
      "id": "b1",
@@ -1661,7 +2275,33 @@
      "base_revpau": 388.25,
      "vs_base_adr_pct": 9.6,
      "vs_base_revpau_pct": 24.6,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 589,
+      "occupancy": 0.749473,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 13427.13,
+       "marriott_brand_fee_10pct": -1342.71,
+       "hotel_operations_40pct": -5370.85,
+       "owner_share_50pct": 6713.56,
+       "ffe_reserve_4pct": -537.09,
+       "ota_commissions_2_5pct": -335.68,
+       "card_processing_2_41pct": -323.59,
+       "fixed_owner_costs": -1614.5,
+       "owner_net_before_financing": 3902.71
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 826.39,
+       "property_tax": 550.02,
+       "insurance_estimate": 95.61,
+       "utilities_estimate": 142.48,
+       "total": 1614.5
+      },
+      "net_per_month": 3903.0,
+      "net_per_year": 46832.0,
+      "cap_rate_pct": 6.8,
+      "reference_list_price": 688300
+     }
     },
     {
      "id": "b2",
@@ -1687,7 +2327,33 @@
      "base_revpau": 371.37,
      "vs_base_adr_pct": 9.6,
      "vs_base_revpau_pct": 24.6,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 552,
+      "occupancy": 0.764928,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12843.14,
+       "marriott_brand_fee_10pct": -1284.31,
+       "hotel_operations_40pct": -5137.26,
+       "owner_share_50pct": 6421.57,
+       "ffe_reserve_4pct": -513.73,
+       "ota_commissions_2_5pct": -321.08,
+       "card_processing_2_41pct": -309.52,
+       "fixed_owner_costs": -1548.47,
+       "owner_net_before_financing": 3728.78
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 798.26,
+       "property_tax": 514.62,
+       "insurance_estimate": 100.17,
+       "utilities_estimate": 135.42,
+       "total": 1548.47
+      },
+      "net_per_month": 3729.0,
+      "net_per_year": 44745.0,
+      "cap_rate_pct": 6.92,
+      "reference_list_price": 646900
+     }
     },
     {
      "id": "b3",
@@ -1713,7 +2379,33 @@
      "base_revpau": 371.37,
      "vs_base_adr_pct": 9.6,
      "vs_base_revpau_pct": 24.6,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 552,
+      "occupancy": 0.764928,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12843.14,
+       "marriott_brand_fee_10pct": -1284.31,
+       "hotel_operations_40pct": -5137.26,
+       "owner_share_50pct": 6421.57,
+       "ffe_reserve_4pct": -513.73,
+       "ota_commissions_2_5pct": -321.08,
+       "card_processing_2_41pct": -309.52,
+       "fixed_owner_costs": -1548.47,
+       "owner_net_before_financing": 3728.78
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 798.26,
+       "property_tax": 514.62,
+       "insurance_estimate": 100.17,
+       "utilities_estimate": 135.42,
+       "total": 1548.47
+      },
+      "net_per_month": 3729.0,
+      "net_per_year": 44745.0,
+      "cap_rate_pct": 6.92,
+      "reference_list_price": 646900
+     }
     },
     {
      "id": "c1",
@@ -1739,7 +2431,33 @@
      "base_revpau": 424.97,
      "vs_base_adr_pct": 9.6,
      "vs_base_revpau_pct": 24.6,
-     "doc_occupancy": 0.83
+     "doc_occupancy": 0.83,
+     "owner_economics": {
+      "adr": 658,
+      "occupancy": 0.734331,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 14697.02,
+       "marriott_brand_fee_10pct": -1469.7,
+       "hotel_operations_40pct": -5878.81,
+       "owner_share_50pct": 7348.51,
+       "ffe_reserve_4pct": -587.88,
+       "ota_commissions_2_5pct": -367.43,
+       "card_processing_2_41pct": -354.2,
+       "fixed_owner_costs": -1775.76,
+       "owner_net_before_financing": 4263.25
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 900.9,
+       "property_tax": 615.09,
+       "insurance_estimate": 104.72,
+       "utilities_estimate": 155.05,
+       "total": 1775.76
+      },
+      "net_per_month": 4263.0,
+      "net_per_year": 51159.0,
+      "cap_rate_pct": 6.69,
+      "reference_list_price": 764400
+     }
     }
    ]
   },
@@ -1912,7 +2630,33 @@
      "base_revpau": 246.74,
      "vs_base_adr_pct": 13.3,
      "vs_base_revpau_pct": 28.8,
-     "doc_occupancy": 0.79
+     "doc_occupancy": 0.79,
+     "owner_economics": {
+      "adr": 338,
+      "occupancy": 0.83,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 8533.09,
+       "marriott_brand_fee_10pct": -853.31,
+       "hotel_operations_40pct": -3413.24,
+       "owner_share_50pct": 4266.54,
+       "ffe_reserve_4pct": -341.32,
+       "ota_commissions_2_5pct": -213.33,
+       "card_processing_2_41pct": -205.65,
+       "fixed_owner_costs": -841.57,
+       "owner_net_before_financing": 2664.68
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 402.93,
+       "property_tax": 286.95,
+       "insurance_estimate": 81.95,
+       "utilities_estimate": 69.74,
+       "total": 841.57
+      },
+      "net_per_month": 2665.0,
+      "net_per_year": 31976.0,
+      "cap_rate_pct": 8.4,
+      "reference_list_price": 380614
+     }
     },
     {
      "id": "a1",
@@ -1938,7 +2682,33 @@
      "base_revpau": 286.63,
      "vs_base_adr_pct": 13.3,
      "vs_base_revpau_pct": 28.8,
-     "doc_occupancy": 0.79
+     "doc_occupancy": 0.79,
+     "owner_economics": {
+      "adr": 409,
+      "occupancy": 0.7968,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 9912.52,
+       "marriott_brand_fee_10pct": -991.25,
+       "hotel_operations_40pct": -3965.01,
+       "owner_share_50pct": 4956.26,
+       "ffe_reserve_4pct": -396.5,
+       "ota_commissions_2_5pct": -247.81,
+       "card_processing_2_41pct": -238.89,
+       "fixed_owner_costs": -1025.33,
+       "owner_net_before_financing": 3047.73
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 498.73,
+       "property_tax": 354.26,
+       "insurance_estimate": 86.51,
+       "utilities_estimate": 85.83,
+       "total": 1025.33
+      },
+      "net_per_month": 3048.0,
+      "net_per_year": 36573.0,
+      "cap_rate_pct": 7.96,
+      "reference_list_price": 459344
+     }
     },
     {
      "id": "a2",
@@ -1964,7 +2734,33 @@
      "base_revpau": 308.3,
      "vs_base_adr_pct": 13.3,
      "vs_base_revpau_pct": 28.8,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 449,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 10662.1,
+       "marriott_brand_fee_10pct": -1066.21,
+       "hotel_operations_40pct": -4264.84,
+       "owner_share_50pct": 5331.05,
+       "ffe_reserve_4pct": -426.48,
+       "ota_commissions_2_5pct": -266.55,
+       "card_processing_2_41pct": -256.96,
+       "fixed_owner_costs": -1176.14,
+       "owner_net_before_financing": 3204.92
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 580.07,
+       "property_tax": 405.18,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 99.83,
+       "total": 1176.14
+      },
+      "net_per_month": 3205.0,
+      "net_per_year": 38459.0,
+      "cap_rate_pct": 7.41,
+      "reference_list_price": 518900
+     }
     },
     {
      "id": "a3",
@@ -1990,7 +2786,33 @@
      "base_revpau": 346.07,
      "vs_base_adr_pct": 13.3,
      "vs_base_revpau_pct": 28.8,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 504,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 11968.15,
+       "marriott_brand_fee_10pct": -1196.82,
+       "hotel_operations_40pct": -4787.26,
+       "owner_share_50pct": 5984.07,
+       "ffe_reserve_4pct": -478.73,
+       "ota_commissions_2_5pct": -299.2,
+       "card_processing_2_41pct": -288.43,
+       "fixed_owner_costs": -1315.37,
+       "owner_net_before_financing": 3602.34
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 654.58,
+       "property_tax": 457.34,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 112.39,
+       "total": 1315.37
+      },
+      "net_per_month": 3602.0,
+      "net_per_year": 43228.0,
+      "cap_rate_pct": 7.45,
+      "reference_list_price": 579900
+     }
     },
     {
      "id": "a4",
@@ -2016,7 +2838,33 @@
      "base_revpau": 350.19,
      "vs_base_adr_pct": 13.3,
      "vs_base_revpau_pct": 28.8,
-     "doc_occupancy": 0.82
+     "doc_occupancy": 0.82,
+     "owner_economics": {
+      "adr": 510,
+      "occupancy": 0.780701,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12110.63,
+       "marriott_brand_fee_10pct": -1211.06,
+       "hotel_operations_40pct": -4844.25,
+       "owner_share_50pct": 6055.31,
+       "ffe_reserve_4pct": -484.43,
+       "ota_commissions_2_5pct": -302.77,
+       "card_processing_2_41pct": -291.87,
+       "fixed_owner_costs": -1299.0,
+       "owner_net_before_financing": 3677.26
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 624.93,
+       "property_tax": 475.72,
+       "insurance_estimate": 91.06,
+       "utilities_estimate": 107.29,
+       "total": 1299.0
+      },
+      "net_per_month": 3677.0,
+      "net_per_year": 44127.0,
+      "cap_rate_pct": 7.34,
+      "reference_list_price": 601400
+     }
     },
     {
      "id": "b1",
@@ -2042,7 +2890,33 @@
      "base_revpau": 388.25,
      "vs_base_adr_pct": 13.3,
      "vs_base_revpau_pct": 28.8,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 589,
+      "occupancy": 0.749473,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 13427.13,
+       "marriott_brand_fee_10pct": -1342.71,
+       "hotel_operations_40pct": -5370.85,
+       "owner_share_50pct": 6713.56,
+       "ffe_reserve_4pct": -537.09,
+       "ota_commissions_2_5pct": -335.68,
+       "card_processing_2_41pct": -323.59,
+       "fixed_owner_costs": -1614.5,
+       "owner_net_before_financing": 3902.71
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 826.39,
+       "property_tax": 550.02,
+       "insurance_estimate": 95.61,
+       "utilities_estimate": 142.48,
+       "total": 1614.5
+      },
+      "net_per_month": 3903.0,
+      "net_per_year": 46832.0,
+      "cap_rate_pct": 6.8,
+      "reference_list_price": 688300
+     }
     },
     {
      "id": "b2",
@@ -2068,7 +2942,33 @@
      "base_revpau": 371.37,
      "vs_base_adr_pct": 13.3,
      "vs_base_revpau_pct": 28.8,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 552,
+      "occupancy": 0.764928,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12843.14,
+       "marriott_brand_fee_10pct": -1284.31,
+       "hotel_operations_40pct": -5137.26,
+       "owner_share_50pct": 6421.57,
+       "ffe_reserve_4pct": -513.73,
+       "ota_commissions_2_5pct": -321.08,
+       "card_processing_2_41pct": -309.52,
+       "fixed_owner_costs": -1548.47,
+       "owner_net_before_financing": 3728.78
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 798.26,
+       "property_tax": 514.62,
+       "insurance_estimate": 100.17,
+       "utilities_estimate": 135.42,
+       "total": 1548.47
+      },
+      "net_per_month": 3729.0,
+      "net_per_year": 44745.0,
+      "cap_rate_pct": 6.92,
+      "reference_list_price": 646900
+     }
     },
     {
      "id": "b3",
@@ -2094,7 +2994,33 @@
      "base_revpau": 371.37,
      "vs_base_adr_pct": 13.3,
      "vs_base_revpau_pct": 28.8,
-     "doc_occupancy": 0.84
+     "doc_occupancy": 0.84,
+     "owner_economics": {
+      "adr": 552,
+      "occupancy": 0.764928,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 12843.14,
+       "marriott_brand_fee_10pct": -1284.31,
+       "hotel_operations_40pct": -5137.26,
+       "owner_share_50pct": 6421.57,
+       "ffe_reserve_4pct": -513.73,
+       "ota_commissions_2_5pct": -321.08,
+       "card_processing_2_41pct": -309.52,
+       "fixed_owner_costs": -1548.47,
+       "owner_net_before_financing": 3728.78
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 798.26,
+       "property_tax": 514.62,
+       "insurance_estimate": 100.17,
+       "utilities_estimate": 135.42,
+       "total": 1548.47
+      },
+      "net_per_month": 3729.0,
+      "net_per_year": 44745.0,
+      "cap_rate_pct": 6.92,
+      "reference_list_price": 646900
+     }
     },
     {
      "id": "c1",
@@ -2120,7 +3046,33 @@
      "base_revpau": 424.97,
      "vs_base_adr_pct": 13.3,
      "vs_base_revpau_pct": 28.8,
-     "doc_occupancy": 0.83
+     "doc_occupancy": 0.83,
+     "owner_economics": {
+      "adr": 658,
+      "occupancy": 0.734331,
+      "monthly_revenue_flow": {
+       "gross_room_revenue": 14697.02,
+       "marriott_brand_fee_10pct": -1469.7,
+       "hotel_operations_40pct": -5878.81,
+       "owner_share_50pct": 7348.51,
+       "ffe_reserve_4pct": -587.88,
+       "ota_commissions_2_5pct": -367.43,
+       "card_processing_2_41pct": -354.2,
+       "fixed_owner_costs": -1775.76,
+       "owner_net_before_financing": 4263.25
+      },
+      "fixed_owner_costs_monthly": {
+       "hoa_condo": 900.9,
+       "property_tax": 615.09,
+       "insurance_estimate": 104.72,
+       "utilities_estimate": 155.05,
+       "total": 1775.76
+      },
+      "net_per_month": 4263.0,
+      "net_per_year": 51159.0,
+      "cap_rate_pct": 6.69,
+      "reference_list_price": 764400
+     }
     }
    ]
   }
