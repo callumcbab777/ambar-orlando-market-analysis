@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="assets/fonts/fonts.css">
 <link rel="stylesheet" href="assets/vendor/leaflet.css">
 <link rel="stylesheet" href="assets/css/styles.css">
+<link rel="stylesheet" href="assets/css/week-ahead.css">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -21,6 +22,7 @@
     </a>
     <nav class="site-nav" aria-label="Sections">
       <a href="#week-ahead">Week ahead</a>
+      <a href="#residences-week">Residences</a>
       <a href="#history">History</a>
       <a href="#brands">Brand matrix</a>
       <a href="#hotels">Hotels</a>
@@ -63,6 +65,26 @@
       </div>
       <div class="heat-wrap" id="heatWrap" tabindex="0" aria-label="Nightly rate grid, scrolls horizontally on small screens"></div>
       <p class="fineprint" id="heatFoot"></p>
+    </div>
+  </section>
+
+  <!-- 2b RESIDENCES · WEEK AHEAD (estimates engine: week_ahead/engine.py -> data/week_ahead.json) -->
+  <section class="section wa-section" id="residences-week" aria-labelledby="rwTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">Residences · The week ahead</p>
+        <h2 id="rwTitle">What each AMBAR residence looks like this week</h2>
+        <p class="section-sub" id="rwSub"></p>
+      </header>
+      <p class="wa-median-line" id="rwMedianLine"></p>
+      <div class="toolbar wa-weekbar"><div class="seg" role="group" aria-label="Choose the comp week for the residence estimates" id="rwWeeks"></div></div>
+      <p class="fineprint wa-weeknote" id="rwWeekNote" aria-live="polite"></p>
+      <div class="wa-badges" id="rwBadges"></div>
+      <p class="wa-disclaimer" id="rwDisclaimer" role="note"></p>
+      <div id="rwSummary"></div>
+      <div class="toolbar"><div class="seg" role="group" aria-label="Filter residences by type" id="rwFilter"></div></div>
+      <div class="wa-grid" id="rwGrid"></div>
+      <div class="wa-method" id="rwMethod"></div>
     </div>
   </section>
 
@@ -187,7 +209,7 @@
         <ul class="caveats" id="excluded"></ul>
       </div>
     </div>
-    <p class="disclaimer">Informational only. This page describes publicly observed prices at other hotels. It is not a forecast, projection or statement about rates, occupancy or returns at AMBAR Residences Orlando, and it is not an offer. Marriott, Hyatt, Wyndham, Hilton, Conrad, ette and other hotel brand names are trademarks of their owners and are shown as text for identification only.</p>
+    <p class="disclaimer">Informational only. Apart from the “Residences · The week ahead” section, this page describes publicly observed prices at other hotels and is not a forecast, projection or statement about rates, occupancy or returns at AMBAR Residences Orlando. That section shows clearly labelled estimates for illustration only, not a promise of returns, and its wording is subject to review by securities counsel. Nothing on this page is an offer. Marriott, Hyatt, Wyndham, Hilton, Conrad, ette and other hotel brand names are trademarks of their owners and are shown as text for identification only.</p>
     <p class="fineprint on-dark">Compiled by Callum Brown · Headings in Cormorant Garamond, body in DM Sans (SIL Open Font License) · Charts: Chart.js · Map: Leaflet &amp; OpenStreetMap</p>
   </div>
 </footer>
@@ -197,5 +219,7 @@
 <script src="assets/vendor/chart.umd.min.js"></script>
 <script src="assets/vendor/leaflet.js"></script>
 <script src="assets/js/app.js"></script>
+<script src="assets/js/week-ahead-engine.js"></script>
+<script src="assets/js/week-ahead.js"></script>
 </body>
 </html>

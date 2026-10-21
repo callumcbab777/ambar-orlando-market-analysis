@@ -166,6 +166,13 @@ def main(args):
     print(f"Wrote {DATA.relative_to(HERE)} and {JS.relative_to(HERE)}: {len(out)} weeks"
           + (f", gaps: {', '.join(gaps)}" if gaps else ""))
 
+    # Regenerate the 'Residences · The week ahead' estimates from the same comp data.
+    try:
+        import update_week_ahead
+        update_week_ahead.main([])
+    except Exception as e:  # never block the rate update; the GitHub Action will retry
+        print(f"WARNING: week-ahead estimates not regenerated ({e}). Run python3 update_week_ahead.py", file=sys.stderr)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
