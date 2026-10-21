@@ -182,7 +182,7 @@ class HotelMedianScaling(unittest.TestCase):
             self.assertAlmostEqual(u["adr_p75"], round(420 * k, 2), places=2)
             self.assertAlmostEqual(u["revpau"], round(380 * k * occ[u["id"]], 2), places=1)
             self.assertAlmostEqual(u["vs_base_adr_pct"], round((380 / 338 - 1) * 100, 1))
-            base_rp = self.DOC_ADR[u["id"]] * occ[u["id"]]
+            base_rp = self.DOC_ADR[u["id"]] * E.base_plan_occupancy(next(x for x in UNITS if x["id"] == u["id"]), CFG)
             self.assertAlmostEqual(u["base_revpau"], round(base_rp, 2), places=2)
             self.assertAlmostEqual(u["vs_base_revpau_pct"], round((380 * k * occ[u["id"]] / base_rp - 1) * 100, 1), places=1)
             self.assertEqual(u["basis"], "comp_median" if u["id"] == "s1" else "scaled")
@@ -221,35 +221,40 @@ class HotelMedianScaling(unittest.TestCase):
         self.assertAlmostEqual(b["p75"], 451.5)
 
     def test_step_down_occupancy_formula(self):
-        # Occ = 73% (historical base, Studio anchor) x (1 - 4%) ^ (bedrooms + 0.5 x den)
+        # Estimated: Occ = 83% x (1 - 4%) ^ (bedrooms + 0.5 x den)
         m = CFG["occupancy_model"]
-        self.assertEqual((m["occ_studio"], m["d"], m["den_weight"]), (0.73, 0.04, 0.5))
+        self.assertEqual((m["occ_studio"], m["d"], m["den_weight"]), (0.83, 0.04, 0.5))
+        self.assertEqual(m["label"], "Estimated occupancy: 83% with size step-down")
         self.assertEqual((m["d_status"], m["den_weight_status"]), ("proposed, adjustable", "proposed, adjustable"))
-        expected = {"s1": 73.0, "a1": 70.1, "a2": 68.7, "a3": 68.7, "a4": 68.7, "b1": 65.9, "b2": 67.3, "b3": 67.3, "c1": 64.6}
+        expected = {"s1": 83.0, "a1": 79.7, "a2": 78.1, "a3": 78.1, "a4": 78.1, "b1": 74.9, "b2": 76.5, "b3": 76.5, "c1": 73.4}
         units = {"s1": 0, "a1": 1, "a2": 1.5, "a3": 1.5, "a4": 1.5, "b1": 2.5, "b2": 2, "b3": 2, "c1": 3}
         for u in UNITS:
             self.assertEqual(E.size_units(u["bedrooms"], u["has_den"], 0.5), units[u["id"]], u["id"])
             self.assertEqual(round(E.plan_occupancy(u, CFG) * 100, 1), expected[u["id"]], u["id"])
-        self.assertAlmostEqual(E.step_down_occupancy(0.73, 0.04, 2.5), 0.73 * 0.96 ** 2.5)
+        self.assertAlmostEqual(E.step_down_occupancy(0.83, 0.04, 2.5), 0.83 * 0.96 ** 2.5)
 
-    def test_base_occupancy_steps_down_with_same_settings(self):
-        bo, om = CFG["base_occupancy"], CFG["occupancy_model"]
-        self.assertEqual(bo["label"], "Historical base: 73% with size step-down")
-        self.assertEqual(om["occ_studio"], bo["historical_value"])        # anchor = historical 73%
+    def test_historical_base_decoupled_anchor(self):
+        bo = CFG["base_occupancy"]
+        self.assertEqual((bo["label"], bo["anchor"]), ("Historical base: 73% with size step-down", 0.73))
         db = market({f"h{i}": [v, v] for i, v in enumerate([300, 320, 340, 360, 380])})
         expected = {"s1": 73.0, "a1": 70.1, "a2": 68.7, "a3": 68.7, "a4": 68.7, "b1": 65.9, "b2": 67.3, "b3": 67.3, "c1": 64.6}
         for u in E.run_hotel_median(db, CFG, UNITS)["units"]:
             self.assertEqual(round(u["base_occupancy"] * 100, 1), expected[u["id"]], u["id"])
-            self.assertEqual(u["base_occupancy"], u["occupancy"])
             self.assertAlmostEqual(u["base_revpau"], round(self.DOC_ADR[u["id"]] * u["base_occupancy"], 2), places=2)
-            self.assertEqual(u["vs_base_revpau_pct"], u["vs_base_adr_pct"], u["id"])   # difference reflects rates only
-        # changing the settings moves live and base together
+            # RevPAU vs base = (1 + ADR vs base) x (83 / 73) - 1: rates AND the occupancy anchor
+            adr_ratio = u["adr"] / u["base_adr"]
+            self.assertAlmostEqual(u["vs_base_revpau_pct"], round((adr_ratio * 0.83 / 0.73 - 1) * 100, 1), places=1)
+            self.assertNotEqual(u["vs_base_revpau_pct"], u["vs_base_adr_pct"])
+        # anchors are independent: moving the estimate anchor leaves the base alone
         c = copy.deepcopy(CFG)
-        c["occupancy_model"].update(occ_studio=0.80, d=0.05)
-        for u in E.run_hotel_median(db, c, UNITS)["units"]:
-            self.assertEqual(u["base_occupancy"], u["occupancy"])
+        c["occupancy_model"]["occ_studio"] = 0.90
         c1 = next(u for u in E.run_hotel_median(db, c, UNITS)["units"] if u["id"] == "c1")
-        self.assertAlmostEqual(c1["base_occupancy"], round(0.80 * 0.95 ** 3, 6))
+        self.assertAlmostEqual(c1["occupancy"], round(0.90 * 0.96 ** 3, 6))
+        self.assertAlmostEqual(c1["base_occupancy"], round(0.73 * 0.96 ** 3, 6))
+        # the shared step moves both
+        c["occupancy_model"]["d"] = 0.05
+        c1 = next(u for u in E.run_hotel_median(db, c, UNITS)["units"] if u["id"] == "c1")
+        self.assertAlmostEqual(c1["base_occupancy"], round(0.73 * 0.95 ** 3, 6))
 
     def test_revpau_vs_base_live_week(self):
         db = json.loads((ROOT / "data/comps.json").read_text())
@@ -260,9 +265,9 @@ class HotelMedianScaling(unittest.TestCase):
             self.assertAlmostEqual(u["revpau"], round(u["adr"] * occ, 2), places=1)
             self.assertAlmostEqual(u["revpau_p25"], round(u["adr_p25"] * occ, 2), places=1)
             self.assertEqual(u["base_adr"], doc[u["id"]]["base_scenario"]["adr"])
+            self.assertEqual((u["vs_base_adr_pct"], u["vs_base_revpau_pct"]), (13.3, 28.8), u["id"])
         c1 = next(u for u in out["units"] if u["id"] == "c1")
-        self.assertAlmostEqual(c1["revpau"], 481.55, places=2)
-        self.assertEqual((c1["vs_base_adr_pct"], c1["vs_base_revpau_pct"]), (13.3, 13.3))
+        self.assertAlmostEqual(c1["revpau"], round(745.60 * 0.83 * 0.96 ** 3, 2), places=1)
         self.assertAlmostEqual(c1["base_revpau"], round(658 * 0.73 * 0.96 ** 3, 2), places=2)
         # document's own net / cap-rate figures (modeled at its 83% occupancy) are untouched
         self.assertEqual((doc["c1"]["net_per_year"], doc["c1"]["cap_rate_pct"], doc["c1"]["base_scenario"]["occupancy"]), (60600, 7.93, 0.83))

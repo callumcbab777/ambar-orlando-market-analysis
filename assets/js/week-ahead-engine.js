@@ -40,6 +40,10 @@
     if (m.method !== "size_step_down") throw new Error("unknown occupancy_model.method " + m.method);
     return stepDownOccupancy(m.occ_studio, m.d, sizeUnits(u.bedrooms, !!u.has_den, m.den_weight));
   }
+  function basePlanOccupancy(u, cfg) {
+    const m = cfg.occupancy_model;
+    return stepDownOccupancy(cfg.base_occupancy.anchor, m.d, sizeUnits(u.bedrooms, !!u.has_den, m.den_weight));
+  }
   function planRatios(units, baselineLayout = "s1") {
     const base = units.find((u) => u.id === baselineLayout).base_scenario.adr;
     return Object.fromEntries(units.map((u) => [u.id, u.base_scenario.adr / base]));
@@ -105,7 +109,7 @@
     const outUnits = units.map((u) => {
       const t = cfg.unit_types[u.unit_type], ratio = ratios[u.id];
       const k = t.realization * t.position_index * ratio, adr = point * k, occ = planOccupancy(u, cfg);
-      const baseOcc = occ; // historical base: same anchor / step / den weight as the live estimate
+      const baseOcc = basePlanOccupancy(u, cfg); // historical base: own anchor, same step / den weight
       const scaled = u.id !== hm.baseline_layout, baseAdr = u.base_scenario.adr, baseRp = baseAdr * baseOcc, rp = adr * occ;
       return { id: u.id, unit_type: u.unit_type, ratio_to_s1: Math.round(ratio * 1e4) / 1e4, realization: t.realization, position_index: t.position_index,
         adr: r2(adr), adr_p25: r2(p25 * k), adr_p75: r2(p75 * k),
@@ -130,6 +134,6 @@
     }
     return out;
   }
-  return { median, mean, percentile, trimmedMean, iqrBounds, downgrade, sizeUnits, stepDownOccupancy, planOccupancy, planRatios,
+  return { median, mean, percentile, trimmedMean, iqrBounds, downgrade, sizeUnits, stepDownOccupancy, planOccupancy, basePlanOccupancy, planRatios,
     hotelCompsFromMarket, dedupe, dropStale, runHotelMedian, runAllWeeks, collectedWeeks };
 });

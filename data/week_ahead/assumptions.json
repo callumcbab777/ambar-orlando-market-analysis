@@ -1,24 +1,25 @@
 {
   "_readme": "All tunable inputs for the Week Ahead engine. Mode 'hotel_median' (live): the comp-set median of the site's weekly comparable hotel rates (data/comps.json) is the Studio-equivalent baseline; each plan = baseline x realization x position index x plan ratio to S1 (document base ADRs). Values marked NEEDS_INPUT still need Callum's confirmation. See README.",
-  "version": "2026-10-21e",
+  "version": "2026-10-21f",
   "mode": "hotel_median",
   "base_occupancy": {
     "label": "Historical base: 73% with size step-down",
-    "historical_value": 0.73,
-    "method": "same as occupancy_model (anchor occ_studio, step d, den_weight)",
-    "source": "Callum's historical occupancy figure (Oct 21, 2026); replaces the document's per-plan 79-84%",
-    "_note": "Base occupancy(plan) = occupancy_model.occ_studio x (1 - d) ^ size_units, i.e. the SAME settings as the live estimate, so changing them moves both together. occ_studio must equal historical_value (tested). Base RevPAU = document base ADR x base occupancy(plan). Consequence: RevPAU vs base = ADR vs base for every plan (the difference reflects rates only)."
+    "anchor": 0.73,
+    "source": "Callum's historical occupancy figure (Oct 21, 2026)",
+    "method": "base occupancy(plan) = anchor x (1 - occupancy_model.d) ^ size_units (same step and den weight as the estimate, its own anchor)",
+    "_note": "S1 73.0%, A1 70.1%, A2-A4 68.7%, B2/B3 67.3%, B1 65.9%, C1 64.6%. Base RevPAU = document base ADR x base occupancy(plan). Because both step down by the same factor, RevPAU vs base = (1 + ADR vs base) x (occ_studio / anchor) - 1, i.e. it reflects both rates and the higher estimated occupancy anchor."
   },
   "occupancy_model": {
     "method": "size_step_down",
     "formula": "Occ(plan) = occ_studio x (1 - d) ^ size_units;  size_units = bedrooms + den_weight x has_den",
-    "occ_studio": 0.73,
-    "occ_studio_status": "anchor for both the live estimate and the historical base (73%); separate setting so the live anchor could be decoupled later",
+    "occ_studio": 0.83,
+    "occ_studio_status": "anchor for the live estimate: 83%, the document's original occupancy (Callum, Oct 21, 2026). Decoupled from the historical base (base_occupancy.anchor).",
     "d": 0.04,
     "d_status": "proposed, adjustable",
     "den_weight": 0.5,
     "den_weight_status": "proposed, adjustable",
-    "_note": "Larger residences step down from the Studio anchor by d per bedroom step; a den counts as den_weight of a bedroom. size_units: Studio 0, 1 Bed 1, 1 Bed + Den 1.5, 2 Bed 2, 2 Bed + Den 2.5, 3 Bed 3. With occ_studio 0.73: S1 73.0%, A1 70.1%, A2-A4 68.7%, B2/B3 67.3%, B1 65.9%, C1 64.6%. The document's own per-plan occupancies (units.json base_scenario.occupancy, 79-84%) only underlie the document's own net / cap-rate figures, which are shown unchanged."
+    "_note": "Estimated occupancy(plan) = occ_studio x (1 - d) ^ size_units; size_units: Studio 0, 1 Bed 1, 1 Bed + Den 1.5, 2 Bed 2, 2 Bed + Den 2.5, 3 Bed 3. With occ_studio 0.83: S1 83.0%, A1 79.7%, A2-A4 78.1%, B2/B3 76.5%, B1 74.9%, C1 73.4%. d and den_weight are shared with the historical base.",
+    "label": "Estimated occupancy: 83% with size step-down"
   },
   "pipeline": {
     "stale_days": 14,
