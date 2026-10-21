@@ -109,6 +109,12 @@ def plan_occupancy(unit: dict, cfg: dict) -> float:
     return step_down_occupancy(m["occ_studio"], m["d"], size_units(unit["bedrooms"], unit.get("has_den", False), m["den_weight"]))
 
 
+def base_plan_occupancy(unit: dict, cfg: dict) -> float:
+    """Historical base occupancy: base_occupancy.anchor x (1 - d) ^ size_units (same d / den_weight as the estimate)."""
+    m = cfg["occupancy_model"]
+    return step_down_occupancy(cfg["base_occupancy"]["anchor"], m["d"], size_units(unit["bedrooms"], unit.get("has_den", False), m["den_weight"]))
+
+
 def revpau(adr: float, occupancy: float) -> float:
     """Revenue per available unit-night = ADR x occupancy."""
     return adr * occupancy
@@ -432,7 +438,7 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
         su = size_units(u["bedrooms"], u.get("has_den", False), cfg["occupancy_model"]["den_weight"])
         scaled = u["id"] != hm["baseline_layout"]
         base_adr = u["base_scenario"]["adr"]
-        base_occ = occ  # historical base: same anchor / step / den weight as the live estimate
+        base_occ = base_plan_occupancy(u, cfg)  # historical base: own anchor, same step / den weight
         base_rp = base_adr * base_occ
         rp = revpau(adr, occ)
         out_units.append({
