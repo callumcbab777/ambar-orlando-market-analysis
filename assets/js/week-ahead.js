@@ -7,6 +7,7 @@
   const usd = (v) => (v == null ? "—" : "$" + Math.round(v).toLocaleString("en-US"));
   const usd2 = (v) => (v == null ? "—" : (v < 0 ? "−$" : "$") + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
   const pct = (v) => Math.round(v * 100) + "%";
+  const pct1 = (v) => (v * 100).toFixed(1) + "%";
   const sgn = (v) => (v > 0 ? "+" : v < 0 ? "−" : "±") + Math.abs(v).toFixed(1) + "%";
   const fLong = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
@@ -39,7 +40,7 @@
       ${rowsFlow.map(([k, v, bold]) => `<tr${bold ? ' class="tot"' : ""}><td>${k}</td><td class="${v < 0 ? "neg" : ""}">${usd2(v)}</td></tr>`).join("")}
       <tr class="tot"><td>Owner net before financing</td><td>${usd2(f.owner_net_before_financing)}</td></tr></tbody></table>
       <p class="c-note">Reference list price ${usd(u.reference_list_price)} (per floor plan, not a quote for an individual residence). Cap rate = annual owner net ÷ reference price, before financing; no mortgage or closing costs. Insurance and utilities are estimates, not quotes. The 40% hotel operations allocation (Coury Hospitality) is included above, not an additional deduction.</p>
-      <p class="c-note">The base scenario is the document’s annual illustration; it is not recalculated from this week’s estimate (this week is ${sgn(est.vs)} vs its ADR).</p>
+      <p class="c-note">The base scenario is the document’s annual illustration at its own ${pct(b.occupancy)} occupancy; it is not recalculated from this week’s estimate or the step-down occupancy (this week is ${sgn(est.vs)} vs its ADR).</p>
       <p class="c-note">Source: AMBAR Rental Program Cost Breakdown — Owner Economics, Oct 12, 2026; Building 1 HOA budget updated Oct 9, 2026 (AMBAR Residence Cards, pp. ${u.doc_pages.join("–")}). Illustrative only; not financial advice.</p>
     </details>`;
   }
@@ -113,24 +114,25 @@
             <div><dt>Estimated RevPAU / night</dt><dd>${usd(e.revpau)}<small>range ${usd(e.revpau_p25)}–${usd(e.revpau_p75)}</small></dd></div>
           </dl>
           <div class="r-vs ${vs >= 0 ? "up" : "down"}"><span>vs. document base scenario</span><b>${sgn(vs)}</b><small>est. ${usd(e.adr)} vs ${usd(u.base_scenario.adr)} base ADR</small></div>
-          <p class="r-meta">Occupancy <b>${pct(e.occupancy)}</b>${e.occupancy_status === "confirmed" ? " (confirmed)" : ""} · Estimated · as of ${asOf}<br>${basis}</p>
+          <p class="r-meta">Occupancy <b>${pct1(e.occupancy)}</b> (size step-down from Studio) · document base ${pct(u.base_scenario.occupancy)}<br>Estimated · as of ${asOf} · ${basis}</p>
           ${costBlock(u, { vs })}
         </div></article>`;
     }).join("");
 
-    const ut = A.unit_types;
+    const ut = A.unit_types, OM = A.occupancy_model;
     $("#rwMethod").innerHTML = `<details><summary>How these estimates are calculated</summary>
       <ul>
         <li><b>Comparables.</b> The same weekly comparable hotel rates shown elsewhere on this page (lowest public nightly rates; standard rooms, room types unspecified). Each hotel contributes the median of its priced nights for the week. Records are de-duplicated, anything older than ${A.pipeline.stale_days} days is dropped, and outliers are trimmed with the interquartile-range rule (k = ${A.pipeline.iqr_k}).</li>
         <li><b>Baseline.</b> The comp-set <b>median</b> is the Studio-equivalent baseline (a trimmed mean if fewer than ${A.pipeline.median_min_n} hotels). The range is the 25th–75th percentile. The mean is kept as a diagnostic; the week is flagged when mean and median differ by more than ${A.pipeline.mean_median_flag_pct}%.</li>
         <li><b>Per plan.</b> <code>ADR = comp median × realization × position index × plan ratio to S1</code>, with the same factors applied to the range. Plan ratios are the document base ADRs divided by the S1 base ADR ($338). <code>RevPAU = ADR × occupancy</code>. No seasonality adjustment is added; the weekly rates already reflect demand.</li>
+        <li><b>Occupancy.</b> Larger residences are assumed to book slightly less often than the Studio: occupancy starts at the Studio’s ${pct1(OM.occ_studio)} and steps down ${pct1(OM.d)} for each bedroom, with a den counting as ${OM.den_weight} of a bedroom (<code>Occ = ${pct1(OM.occ_studio)} × (1 − ${OM.d}) ^ size</code>). The step and den weight are proposed and adjustable; the document’s own occupancy for each plan is shown alongside as “document base”.</li>
         <li><b>Confidence.</b> High = ${A.pipeline.high_confidence_min_n}+ comparables and not flagged; Medium = fewer comparables or a flagged week; Low = trimmed mean. Plans other than the Studio are scaled, not observed, so their confidence is one step lower.</li>
         <li><b>Vs. document base scenario</b> compares this week’s estimated ADR with the base-scenario ADR in the AMBAR Residence Cards. Because every plan is scaled with ratios from that same document, the percentage is the same for every plan at a given realization and position index.</li>
       </ul>
-      <table><thead><tr><th>Plan</th><th>Base ADR</th><th>Ratio to S1</th><th>Occupancy</th><th>Realization</th><th>Position index</th></tr></thead><tbody>
-      ${R.units.map((u) => { const e = byId[u.id], t = ut[u.unit_type]; return `<tr><td>${esc(u.layout)}</td><td>${usd(u.base_scenario.adr)}</td><td>${(e.ratio_to_s1 ?? 1).toFixed(3)}</td><td>${pct(e.occupancy)} ${e.occupancy_status === "confirmed" ? "(confirmed)" : ""}</td><td>${t.realization.toFixed(2)}${t.realization_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td><td>${t.position_index.toFixed(2)}${t.position_index_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td></tr>`; }).join("")}
+      <table><thead><tr><th>Plan</th><th>Base ADR</th><th>Ratio to S1</th><th>Size units</th><th>Occupancy (step-down)</th><th>Document base occ.</th><th>Realization</th><th>Position index</th></tr></thead><tbody>
+      ${R.units.map((u) => { const e = byId[u.id], t = ut[u.unit_type]; return `<tr><td>${esc(u.layout)}</td><td>${usd(u.base_scenario.adr)}</td><td>${(e.ratio_to_s1 ?? 1).toFixed(3)}</td><td>${e.size_units ?? "—"}</td><td>${pct1(e.occupancy)}</td><td>${pct(u.base_scenario.occupancy)}</td><td>${t.realization.toFixed(2)}${t.realization_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td><td>${t.position_index.toFixed(2)}${t.position_index_status === "NEEDS_INPUT" ? " (to confirm)" : ""}</td></tr>`; }).join("")}
       </tbody></table>
-      <p class="fineprint">Regenerated automatically from data/comps.json each time the weekly comparable rates are updated.</p>
+      <p class="fineprint">Occupancy step d = ${pct1(OM.d)} and den weight = ${OM.den_weight} are proposed, adjustable assumptions (data/week_ahead/assumptions.json); the Studio anchor is the document’s S1 figure. The document base-scenario net and cap-rate figures in each cost breakdown use the document’s own occupancy and are not recomputed. Regenerated automatically from data/comps.json each time the weekly comparable rates are updated.</p>
     </details>`;
   }
 

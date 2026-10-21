@@ -7,7 +7,7 @@ Per unit type, per week:
   4. point estimate = median (>= median_min_n comps) or trimmed mean (drop high & low)
   5. realization: listed (asking) rates x realization(type); booked rates used as-is
   6. x position_index(type)            -> type ADR
-  7. x layout_index(layout)            -> layout ADR;  x occupancy(layout) -> RevPAU
+  7. x layout_index(layout)            -> layout ADR;  x step-down occupancy(plan) -> RevPAU
   8. output point, P25-P75 range, comp count, confidence label, as_of date
 
   ADR(t, w) = Median(comp ADR, t, w) x Realization x PositionIndex(t)
@@ -78,6 +78,23 @@ def iqr_bounds(values: Iterable[float], k: float = 1.5) -> tuple[float, float]:
 def adr_from_median(comp_median: float, realization: float, position_index: float) -> float:
     """Spec formula: ADR = Median(comp ADR) x Realization x PositionIndex."""
     return comp_median * realization * position_index
+
+
+def size_units(bedrooms: int, has_den: bool, den_weight: float) -> float:
+    """Studio 0, 1 Bed 1, 1 Bed + Den 1.5, 2 Bed 2, 2 Bed + Den 2.5, 3 Bed 3 (with den_weight 0.5)."""
+    return bedrooms + (den_weight if has_den else 0.0)
+
+
+def step_down_occupancy(occ_studio: float, d: float, units_: float) -> float:
+    """Occ(plan) = Occ_Studio x (1 - d) ^ size_units."""
+    return occ_studio * (1.0 - d) ** units_
+
+
+def plan_occupancy(unit: dict, cfg: dict) -> float:
+    m = cfg["occupancy_model"]
+    if m.get("method") != "size_step_down":
+        raise ValueError(f"unknown occupancy_model.method {m.get('method')!r}")
+    return step_down_occupancy(m["occ_studio"], m["d"], size_units(unit["bedrooms"], unit.get("has_den", False), m["den_weight"]))
 
 
 def revpau(adr: float, occupancy: float) -> float:
@@ -266,12 +283,12 @@ def run(comps: list[Comp], cfg: dict, units: list[dict], as_of: date, data_statu
     for u in units:
         lc = cfg["layouts"][u["id"]]
         tr = types[u["unit_type"]]
-        li, occ = lc["layout_index"], lc["occupancy"]
+        li, occ = lc["layout_index"], plan_occupancy(u, cfg)
         adr = tr.adr * li
         out_units.append({
             "id": u["id"], "unit_type": u["unit_type"],
             "adr": round(adr, 2), "adr_p25": round(tr.adr_p25 * li, 2), "adr_p75": round(tr.adr_p75 * li, 2),
-            "occupancy": occ,
+            "occupancy": round(occ, 6), "doc_occupancy": u["base_scenario"]["occupancy"],
             "revpau": round(revpau(adr, occ), 2),
             "revpau_p25": round(revpau(tr.adr_p25 * li, occ), 2), "revpau_p75": round(revpau(tr.adr_p75 * li, occ), 2),
             "layout_index": li,
@@ -393,14 +410,16 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
         ratio = ratios[u["id"]]
         k = t["realization"] * t["position_index"] * ratio
         adr = point * k
-        occ = lc["occupancy"]
+        occ = plan_occupancy(u, cfg)
+        su = size_units(u["bedrooms"], u.get("has_den", False), cfg["occupancy_model"]["den_weight"])
         scaled = u["id"] != hm["baseline_layout"]
         base_adr = u["base_scenario"]["adr"]
         out_units.append({
             "id": u["id"], "unit_type": u["unit_type"], "ratio_to_s1": round(ratio, 4),
             "realization": t["realization"], "position_index": t["position_index"],
             "adr": round(adr, 2), "adr_p25": round(p25 * k, 2), "adr_p75": round(p75 * k, 2),
-            "occupancy": occ, "occupancy_status": lc.get("occupancy_status", "needs_input"),
+            "occupancy": round(occ, 6), "occupancy_method": "size_step_down", "size_units": su,
+            "doc_occupancy": u["base_scenario"]["occupancy"],
             "revpau": round(revpau(adr, occ), 2),
             "revpau_p25": round(revpau(p25 * k, occ), 2), "revpau_p75": round(revpau(p75 * k, occ), 2),
             "comp_count": n, "method": method,

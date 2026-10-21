@@ -48,6 +48,7 @@ def build(feed=None, as_of=None, live=False, week=None):
         "layouts": cfg["layouts"], "gap_fill": {k: v for k, v in cfg["gap_fill"].items() if not k.startswith("_")},
         "pipeline": {k: v for k, v in cfg["pipeline"].items() if not k.startswith("_")},
         "hotel_median": {k: v for k, v in cfg.get("hotel_median", {}).items() if not k.startswith("_")},
+        "occupancy_model": {k: v for k, v in cfg["occupancy_model"].items() if not k.startswith("_")},
     }
     res["residences"] = units_doc
     return res
@@ -70,7 +71,7 @@ def summary(res):
             print(f"   {c['status']:<10.40s} {c['name']:<48s} nights {c['priced_nights']}/{c['nights']}  median {c['weekly_median']}")
     for u in res["units"]:
         extra = f" vs doc {u['vs_doc_base_pct']:+.1f}%" if "vs_doc_base_pct" in u else ""
-        print(f"  {u['id']}: ADR {u['adr']:.2f} ({u['adr_p25']:.2f}–{u['adr_p75']:.2f}) occ {u['occupancy']:.0%} "
+        print(f"  {u['id']}: ADR {u['adr']:.2f} ({u['adr_p25']:.2f}–{u['adr_p75']:.2f}) occ {u['occupancy']:.1%} (doc {u.get('doc_occupancy',0):.0%}) "
               f"RevPAU {u['revpau']:.2f} {u['confidence']}{extra}")
 
 

@@ -78,7 +78,8 @@
    "net_per_year": 29948,
    "cap_rate_pct": 7.87,
    "reference_list_price": 380614,
-   "note": null
+   "note": null,
+   "has_den": false
   },
   {
    "id": "a1",
@@ -125,7 +126,8 @@
    "net_per_year": 36156,
    "cap_rate_pct": 7.87,
    "reference_list_price": 459344,
-   "note": null
+   "note": null,
+   "has_den": false
   },
   {
    "id": "a2",
@@ -172,7 +174,8 @@
    "net_per_year": 41105,
    "cap_rate_pct": 7.92,
    "reference_list_price": 518900,
-   "note": null
+   "note": null,
+   "has_den": true
   },
   {
    "id": "a3",
@@ -219,7 +222,8 @@
    "net_per_year": 46199,
    "cap_rate_pct": 7.97,
    "reference_list_price": 579900,
-   "note": null
+   "note": null,
+   "has_den": true
   },
   {
    "id": "a4",
@@ -266,7 +270,8 @@
    "net_per_year": 47133,
    "cap_rate_pct": 7.84,
    "reference_list_price": 601400,
-   "note": null
+   "note": null,
+   "has_den": true
   },
   {
    "id": "b1",
@@ -313,7 +318,8 @@
    "net_per_year": 54829,
    "cap_rate_pct": 7.97,
    "reference_list_price": 688300,
-   "note": null
+   "note": null,
+   "has_den": true
   },
   {
    "id": "b2",
@@ -360,7 +366,8 @@
    "net_per_year": 50960,
    "cap_rate_pct": 7.88,
    "reference_list_price": 646900,
-   "note": null
+   "note": null,
+   "has_den": false
   },
   {
    "id": "b3",
@@ -407,7 +414,8 @@
    "net_per_year": 50960,
    "cap_rate_pct": 7.88,
    "reference_list_price": 646900,
-   "note": "B3 uses the same cost assumptions as B2 (per the document)."
+   "note": "B3 uses the same cost assumptions as B2 (per the document).",
+   "has_den": false
   },
   {
    "id": "c1",
@@ -454,7 +462,8 @@
    "net_per_year": 60600,
    "cap_rate_pct": 7.93,
    "reference_list_price": 764400,
-   "note": null
+   "note": null,
+   "has_den": false
   }
  ]
 }

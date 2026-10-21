@@ -1,6 +1,6 @@
 {
   "_readme": "All tunable inputs for the Week Ahead engine. Mode 'hotel_median' (live): the comp-set median of the site's weekly comparable hotel rates (data/comps.json) is the Studio-equivalent baseline; each plan = baseline x realization x position index x plan ratio to S1 (document base ADRs). Values marked NEEDS_INPUT still need Callum's confirmation. See README.",
-  "version": "2026-10-21b",
+  "version": "2026-10-21c",
   "pipeline": {
     "stale_days": 14,
     "_stale_days": "Comp records whose observation date is more than this many days before as_of (or after it) are dropped as stale.",
@@ -57,52 +57,34 @@
   "_unit_types": "realization and position_index: NEEDS_INPUT, kept at 1.00 (no haircut, parity). In hotel_median mode they multiply the comp-median baseline for every plan of that type. In unit_type_feed mode realization applies to listed records only.",
   "layouts": {
     "s1": {
-      "occupancy": 0.79,
-      "layout_index": 1.0,
-      "occupancy_status": "confirmed"
+      "layout_index": 1.0
     },
     "a1": {
-      "occupancy": 0.79,
-      "layout_index": 1.0,
-      "occupancy_status": "confirmed"
+      "layout_index": 1.0
     },
     "a2": {
-      "occupancy": 0.82,
-      "layout_index": 1.0978,
-      "occupancy_status": "confirmed"
+      "layout_index": 1.0978
     },
     "a3": {
-      "occupancy": 0.82,
-      "layout_index": 1.2323,
-      "occupancy_status": "confirmed"
+      "layout_index": 1.2323
     },
     "a4": {
-      "occupancy": 0.82,
-      "layout_index": 1.2469,
-      "occupancy_status": "confirmed"
+      "layout_index": 1.2469
     },
     "b1": {
-      "occupancy": 0.84,
-      "layout_index": 1.067,
-      "occupancy_status": "confirmed"
+      "layout_index": 1.067
     },
     "b2": {
-      "occupancy": 0.84,
-      "layout_index": 1.0,
-      "occupancy_status": "confirmed"
+      "layout_index": 1.0
     },
     "b3": {
-      "occupancy": 0.84,
-      "layout_index": 1.0,
-      "occupancy_status": "confirmed"
+      "layout_index": 1.0
     },
     "c1": {
-      "occupancy": 0.83,
-      "layout_index": 1.0,
-      "occupancy_status": "confirmed"
+      "layout_index": 1.0
     }
   },
-  "_layouts": "occupancy: CONFIRMED by Callum (Oct 21, 2026) = the AMBAR Residence Cards base-scenario occupancy (S1/A1 79%, A2-A4 82%, B1-B3 84%, C1 83%). layout_index is only used by the per-unit-type feed mode (unit_type_feed); hotel_median mode uses the plan ratio to S1 instead.",
+  "_layouts": "layout_index is only used by the per-unit-type feed mode (unit_type_feed); hotel_median mode uses the plan ratio to S1 (document base ADRs) instead. Occupancy is no longer set per plan here: see occupancy_model.",
   "gap_fill": {
     "method": "ratio",
     "ratios_to_studio": {
@@ -122,5 +104,16 @@
     "baseline_layout": "s1",
     "_note": "Plan ratios are computed from units.json base ADRs (S1 338, A1 409, A2 449, A3 504, A4 510, B1 589, B2/B3 552, C1 658), so they update if the document figures are replaced."
   },
-  "_modes": "hotel_median (default, live): built from data/comps.json. unit_type_feed: a future per-unit-type STR comp feed (CSV/JSON) via update_week_ahead.py --feed ..."
+  "_modes": "hotel_median (default, live): built from data/comps.json. unit_type_feed: a future per-unit-type STR comp feed (CSV/JSON) via update_week_ahead.py --feed ...",
+  "occupancy_model": {
+    "method": "size_step_down",
+    "formula": "Occ(plan) = occ_studio x (1 - d) ^ size_units;  size_units = bedrooms + den_weight x has_den",
+    "occ_studio": 0.79,
+    "occ_studio_status": "anchored on the document's S1 base-scenario occupancy (79%)",
+    "d": 0.04,
+    "d_status": "proposed, adjustable",
+    "den_weight": 0.5,
+    "den_weight_status": "proposed, adjustable",
+    "_note": "Larger residences step down from the Studio's occupancy by d for each bedroom step; a den counts as den_weight of a bedroom. size_units: Studio 0, 1 Bed 1, 1 Bed + Den 1.5, 2 Bed 2, 2 Bed + Den 2.5, 3 Bed 3. Bedrooms and has_den come from data/week_ahead/units.json. Defaults give S1 79.0%, A1 75.8%, A2-A4 74.3%, B2/B3 72.8%, B1 71.3%, C1 69.9%. The document's own per-plan occupancies (units.json base_scenario.occupancy) are shown alongside as 'document base' and still drive the document's net/cap-rate figures, which are not recomputed."
+  }
 }

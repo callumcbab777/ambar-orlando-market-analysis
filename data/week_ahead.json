@@ -153,7 +153,9 @@
    "adr_p25": 269.75,
    "adr_p75": 451.5,
    "occupancy": 0.79,
-   "occupancy_status": "confirmed",
+   "occupancy_method": "size_step_down",
+   "size_units": 0.0,
+   "doc_occupancy": 0.79,
    "revpau": 302.57,
    "revpau_p25": 213.1,
    "revpau_p75": 356.69,
@@ -174,11 +176,13 @@
    "adr": 463.45,
    "adr_p25": 326.41,
    "adr_p75": 546.34,
-   "occupancy": 0.79,
-   "occupancy_status": "confirmed",
-   "revpau": 366.13,
-   "revpau_p25": 257.87,
-   "revpau_p75": 431.61,
+   "occupancy": 0.7584,
+   "occupancy_method": "size_step_down",
+   "size_units": 1.0,
+   "doc_occupancy": 0.79,
+   "revpau": 351.48,
+   "revpau_p25": 247.55,
+   "revpau_p75": 414.35,
    "comp_count": 11,
    "method": "median",
    "basis": "scaled",
@@ -196,11 +200,13 @@
    "adr": 508.78,
    "adr_p25": 358.34,
    "adr_p75": 599.77,
-   "occupancy": 0.82,
-   "occupancy_status": "confirmed",
-   "revpau": 417.2,
-   "revpau_p25": 293.84,
-   "revpau_p75": 491.81,
+   "occupancy": 0.743077,
+   "occupancy_method": "size_step_down",
+   "size_units": 1.5,
+   "doc_occupancy": 0.82,
+   "revpau": 378.06,
+   "revpau_p25": 266.27,
+   "revpau_p75": 445.68,
    "comp_count": 11,
    "method": "median",
    "basis": "scaled",
@@ -218,11 +224,13 @@
    "adr": 571.1,
    "adr_p25": 402.23,
    "adr_p75": 673.24,
-   "occupancy": 0.82,
-   "occupancy_status": "confirmed",
-   "revpau": 468.3,
-   "revpau_p25": 329.83,
-   "revpau_p75": 552.06,
+   "occupancy": 0.743077,
+   "occupancy_method": "size_step_down",
+   "size_units": 1.5,
+   "doc_occupancy": 0.82,
+   "revpau": 424.37,
+   "revpau_p25": 298.89,
+   "revpau_p75": 500.27,
    "comp_count": 11,
    "method": "median",
    "basis": "scaled",
@@ -240,11 +248,13 @@
    "adr": 577.9,
    "adr_p25": 407.02,
    "adr_p75": 681.26,
-   "occupancy": 0.82,
-   "occupancy_status": "confirmed",
-   "revpau": 473.88,
-   "revpau_p25": 333.76,
-   "revpau_p75": 558.63,
+   "occupancy": 0.743077,
+   "occupancy_method": "size_step_down",
+   "size_units": 1.5,
+   "doc_occupancy": 0.82,
+   "revpau": 429.42,
+   "revpau_p25": 302.45,
+   "revpau_p75": 506.23,
    "comp_count": 11,
    "method": "median",
    "basis": "scaled",
@@ -262,11 +272,13 @@
    "adr": 667.42,
    "adr_p25": 470.07,
    "adr_p75": 786.79,
-   "occupancy": 0.84,
-   "occupancy_status": "confirmed",
-   "revpau": 560.63,
-   "revpau_p25": 394.86,
-   "revpau_p75": 660.9,
+   "occupancy": 0.713354,
+   "occupancy_method": "size_step_down",
+   "size_units": 2.5,
+   "doc_occupancy": 0.84,
+   "revpau": 476.1,
+   "revpau_p25": 335.32,
+   "revpau_p75": 561.26,
    "comp_count": 11,
    "method": "median",
    "basis": "scaled",
@@ -284,11 +296,13 @@
    "adr": 625.49,
    "adr_p25": 440.54,
    "adr_p75": 737.36,
-   "occupancy": 0.84,
-   "occupancy_status": "confirmed",
-   "revpau": 525.41,
-   "revpau_p25": 370.05,
-   "revpau_p75": 619.38,
+   "occupancy": 0.728064,
+   "occupancy_method": "size_step_down",
+   "size_units": 2.0,
+   "doc_occupancy": 0.84,
+   "revpau": 455.4,
+   "revpau_p25": 320.74,
+   "revpau_p75": 536.85,
    "comp_count": 11,
    "method": "median",
    "basis": "scaled",
@@ -306,11 +320,13 @@
    "adr": 625.49,
    "adr_p25": 440.54,
    "adr_p75": 737.36,
-   "occupancy": 0.84,
-   "occupancy_status": "confirmed",
-   "revpau": 525.41,
-   "revpau_p25": 370.05,
-   "revpau_p75": 619.38,
+   "occupancy": 0.728064,
+   "occupancy_method": "size_step_down",
+   "size_units": 2.0,
+   "doc_occupancy": 0.84,
+   "revpau": 455.4,
+   "revpau_p25": 320.74,
+   "revpau_p75": 536.85,
    "comp_count": 11,
    "method": "median",
    "basis": "scaled",
@@ -328,11 +344,13 @@
    "adr": 745.6,
    "adr_p25": 525.13,
    "adr_p75": 878.96,
-   "occupancy": 0.83,
-   "occupancy_status": "confirmed",
-   "revpau": 618.85,
-   "revpau_p25": 435.86,
-   "revpau_p75": 729.53,
+   "occupancy": 0.698941,
+   "occupancy_method": "size_step_down",
+   "size_units": 3.0,
+   "doc_occupancy": 0.83,
+   "revpau": 521.13,
+   "revpau_p25": 367.04,
+   "revpau_p75": 614.34,
    "comp_count": 11,
    "method": "median",
    "basis": "scaled",
@@ -381,49 +399,31 @@
   },
   "layouts": {
    "s1": {
-    "occupancy": 0.79,
-    "layout_index": 1.0,
-    "occupancy_status": "confirmed"
+    "layout_index": 1.0
    },
    "a1": {
-    "occupancy": 0.79,
-    "layout_index": 1.0,
-    "occupancy_status": "confirmed"
+    "layout_index": 1.0
    },
    "a2": {
-    "occupancy": 0.82,
-    "layout_index": 1.0978,
-    "occupancy_status": "confirmed"
+    "layout_index": 1.0978
    },
    "a3": {
-    "occupancy": 0.82,
-    "layout_index": 1.2323,
-    "occupancy_status": "confirmed"
+    "layout_index": 1.2323
    },
    "a4": {
-    "occupancy": 0.82,
-    "layout_index": 1.2469,
-    "occupancy_status": "confirmed"
+    "layout_index": 1.2469
    },
    "b1": {
-    "occupancy": 0.84,
-    "layout_index": 1.067,
-    "occupancy_status": "confirmed"
+    "layout_index": 1.067
    },
    "b2": {
-    "occupancy": 0.84,
-    "layout_index": 1.0,
-    "occupancy_status": "confirmed"
+    "layout_index": 1.0
    },
    "b3": {
-    "occupancy": 0.84,
-    "layout_index": 1.0,
-    "occupancy_status": "confirmed"
+    "layout_index": 1.0
    },
    "c1": {
-    "occupancy": 0.83,
-    "layout_index": 1.0,
-    "occupancy_status": "confirmed"
+    "layout_index": 1.0
    }
   },
   "gap_fill": {
@@ -450,6 +450,16 @@
    "min_priced_nights": 2,
    "per_hotel_statistic": "median of the hotel's priced nights in the week",
    "baseline_layout": "s1"
+  },
+  "occupancy_model": {
+   "method": "size_step_down",
+   "formula": "Occ(plan) = occ_studio x (1 - d) ^ size_units;  size_units = bedrooms + den_weight x has_den",
+   "occ_studio": 0.79,
+   "occ_studio_status": "anchored on the document's S1 base-scenario occupancy (79%)",
+   "d": 0.04,
+   "d_status": "proposed, adjustable",
+   "den_weight": 0.5,
+   "den_weight_status": "proposed, adjustable"
   }
  },
  "residences": {
@@ -532,7 +542,8 @@
     "net_per_year": 29948,
     "cap_rate_pct": 7.87,
     "reference_list_price": 380614,
-    "note": null
+    "note": null,
+    "has_den": false
    },
    {
     "id": "a1",
@@ -579,7 +590,8 @@
     "net_per_year": 36156,
     "cap_rate_pct": 7.87,
     "reference_list_price": 459344,
-    "note": null
+    "note": null,
+    "has_den": false
    },
    {
     "id": "a2",
@@ -626,7 +638,8 @@
     "net_per_year": 41105,
     "cap_rate_pct": 7.92,
     "reference_list_price": 518900,
-    "note": null
+    "note": null,
+    "has_den": true
    },
    {
     "id": "a3",
@@ -673,7 +686,8 @@
     "net_per_year": 46199,
     "cap_rate_pct": 7.97,
     "reference_list_price": 579900,
-    "note": null
+    "note": null,
+    "has_den": true
    },
    {
     "id": "a4",
@@ -720,7 +734,8 @@
     "net_per_year": 47133,
     "cap_rate_pct": 7.84,
     "reference_list_price": 601400,
-    "note": null
+    "note": null,
+    "has_den": true
    },
    {
     "id": "b1",
@@ -767,7 +782,8 @@
     "net_per_year": 54829,
     "cap_rate_pct": 7.97,
     "reference_list_price": 688300,
-    "note": null
+    "note": null,
+    "has_den": true
    },
    {
     "id": "b2",
@@ -814,7 +830,8 @@
     "net_per_year": 50960,
     "cap_rate_pct": 7.88,
     "reference_list_price": 646900,
-    "note": null
+    "note": null,
+    "has_den": false
    },
    {
     "id": "b3",
@@ -861,7 +878,8 @@
     "net_per_year": 50960,
     "cap_rate_pct": 7.88,
     "reference_list_price": 646900,
-    "note": "B3 uses the same cost assumptions as B2 (per the document)."
+    "note": "B3 uses the same cost assumptions as B2 (per the document).",
+    "has_den": false
    },
    {
     "id": "c1",
@@ -908,7 +926,8 @@
     "net_per_year": 60600,
     "cap_rate_pct": 7.93,
     "reference_list_price": 764400,
-    "note": null
+    "note": null,
+    "has_den": false
    }
   ]
  }

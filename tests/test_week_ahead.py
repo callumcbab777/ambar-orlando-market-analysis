@@ -172,7 +172,7 @@ class HotelMedianScaling(unittest.TestCase):
         self.assertEqual((b["median"], b["comp_count"], b["confidence"]), (380.0, 9, "High"))
         self.assertAlmostEqual(b["p25"], 340.0)
         self.assertAlmostEqual(b["p75"], 420.0)
-        occ = {k: v["occupancy"] for k, v in CFG["layouts"].items()}
+        occ = {u["id"]: E.plan_occupancy(u, CFG) for u in UNITS}
         for u in out["units"]:
             k = self.DOC_ADR[u["id"]] / 338
             self.assertAlmostEqual(u["adr"], round(380 * k, 2), places=2, msg=u["id"])
@@ -215,7 +215,28 @@ class HotelMedianScaling(unittest.TestCase):
         self.assertAlmostEqual(b["p25"], 269.75)
         self.assertAlmostEqual(b["p75"], 451.5)
 
-    def test_occupancy_confirmed(self):
-        self.assertTrue(all(v["occupancy_status"] == "confirmed" for v in CFG["layouts"].values()))
-        self.assertEqual({k: v["occupancy"] for k, v in CFG["layouts"].items()},
-                         {"s1": .79, "a1": .79, "a2": .82, "a3": .82, "a4": .82, "b1": .84, "b2": .84, "b3": .84, "c1": .83})
+    def test_step_down_occupancy_formula(self):
+        # Occ = 79% x (1 - 4%) ^ (bedrooms + 0.5 x den)
+        m = CFG["occupancy_model"]
+        self.assertEqual((m["occ_studio"], m["d"], m["den_weight"]), (0.79, 0.04, 0.5))
+        self.assertEqual((m["d_status"], m["den_weight_status"]), ("proposed, adjustable", "proposed, adjustable"))
+        expected = {"s1": 79.0, "a1": 75.8, "a2": 74.3, "a3": 74.3, "a4": 74.3, "b1": 71.3, "b2": 72.8, "b3": 72.8, "c1": 69.9}
+        units = {"s1": 0, "a1": 1, "a2": 1.5, "a3": 1.5, "a4": 1.5, "b1": 2.5, "b2": 2, "b3": 2, "c1": 3}
+        for u in UNITS:
+            self.assertEqual(E.size_units(u["bedrooms"], u["has_den"], 0.5), units[u["id"]], u["id"])
+            self.assertEqual(round(E.plan_occupancy(u, CFG) * 100, 1), expected[u["id"]], u["id"])
+        self.assertAlmostEqual(E.step_down_occupancy(0.79, 0.04, 2.5), 0.79 * 0.96 ** 2.5)
+
+    def test_revpau_uses_step_down_and_keeps_document_base(self):
+        db = json.loads((ROOT / "data/comps.json").read_text())
+        out = E.run_hotel_median(db, CFG, UNITS, "2026-10-19")
+        doc = {u["id"]: u for u in UNITS}
+        for u in out["units"]:
+            occ = E.plan_occupancy(doc[u["id"]], CFG)
+            self.assertAlmostEqual(u["revpau"], round(u["adr"] * occ, 2), places=1)
+            self.assertAlmostEqual(u["revpau_p25"], round(u["adr_p25"] * occ, 2), places=1)
+            self.assertEqual(u["doc_occupancy"], doc[u["id"]]["base_scenario"]["occupancy"])
+        c1 = next(u for u in out["units"] if u["id"] == "c1")
+        self.assertAlmostEqual(c1["revpau"], 521.13, places=2)
+        # document's own net / cap-rate figures are untouched
+        self.assertEqual((doc["c1"]["net_per_year"], doc["c1"]["cap_rate_pct"]), (60600, 7.93))
