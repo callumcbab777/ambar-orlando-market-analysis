@@ -292,3 +292,131 @@ def run(comps: list[Comp], cfg: dict, units: list[dict], as_of: date, data_statu
 
 def load_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
+# ================================================================ hotel comp-median mode
+# The live source is the site's own weekly comparable hotel rates (data/comps.json).
+# Those are lowest public standard-room rates with unspecified room types, so the comp-set
+# median is treated as a STUDIO-EQUIVALENT baseline and every AMBAR plan is scaled from it
+# with the floor-plan ratios in the AMBAR Residence Cards (plan base ADR / S1 base ADR).
+
+CONF_ORDER = ["High", "Medium", "Low"]
+
+
+def downgrade(conf: str, steps: int = 1) -> str:
+    i = CONF_ORDER.index(conf) if conf in CONF_ORDER else len(CONF_ORDER) - 1
+    return CONF_ORDER[min(i + steps, len(CONF_ORDER) - 1)]
+
+
+def latest_collected_week(db: dict) -> dict:
+    weeks = [w for w in db["weeks"] if w.get("status") == "collected"]
+    if not weeks:
+        raise ValueError("comps.json has no collected week")
+    return max(weeks, key=lambda w: w["week"])
+
+
+def hotel_comps_from_market(db: dict, week: str | None = None, min_priced_nights: int = 2):
+    """One comp record per hotel: the median of that hotel's priced nights in the week.
+
+    Returns (comps, details). details lists every hotel, including ones excluded for
+    having fewer than min_priced_nights priced nights."""
+    wk = next(w for w in db["weeks"] if w["week"] == week) if week else latest_collected_week(db)
+    names = {h["id"]: h for h in db["hotels"]}
+    nights: dict[str, list] = {}
+    for r in db["rates"]:
+        if r["week"] != wk["week"] or r["hotel"] not in names:
+            continue
+        nights.setdefault(r["hotel"], []).append(r)
+    comps, details = [], []
+    for hid, h in names.items():
+        rs = nights.get(hid, [])
+        priced = [float(r["rate"]) for r in rs if r.get("status") == "OK" and r.get("rate") and float(r["rate"]) > 0]
+        d = {"hotel": hid, "name": h["name"], "brand": h.get("brand"), "non_marriott": bool(h.get("non_marriott")),
+             "priced_nights": len(priced), "nights": len(rs), "weekly_median": round(median(priced), 2) if priced else None,
+             "status": "used"}
+        if len(priced) < min_priced_nights:
+            d["status"] = f"excluded: {len(priced)} priced night(s) < {min_priced_nights}"
+        else:
+            comps.append(Comp(date.fromisoformat(wk["week"]), h["name"], "studio", 0, None, median(priced), None, False))
+        details.append(d)
+    return wk, comps, details
+
+
+def plan_ratios(units: list[dict], baseline_layout: str = "s1") -> dict:
+    base = next(u for u in units if u["id"] == baseline_layout)["base_scenario"]["adr"]
+    return {u["id"]: u["base_scenario"]["adr"] / base for u in units}
+
+
+def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = None) -> dict:
+    hm = cfg["hotel_median"]
+    pipe = cfg["pipeline"]
+    wk, comps, details = hotel_comps_from_market(db, week, hm["min_priced_nights"])
+    as_of = date.fromisoformat(wk["week"])
+    d = dedupe(comps)
+    s = drop_stale(d, as_of, pipe["stale_days"])
+    vals = [c.rate for c in s]
+    if len(vals) < pipe["gap_fill_min_n"]:
+        raise ValueError(f"only {len(vals)} comparable hotels this week; need {pipe['gap_fill_min_n']}")
+    diag_mean, diag_median = mean(vals), median(vals)
+    gap = abs(diag_mean - diag_median) / diag_median * 100.0
+    flagged = gap > pipe["mean_median_flag_pct"]
+    clean = s
+    if pipe.get("iqr_trim", True) and len(vals) >= pipe.get("iqr_min_n", 5):
+        lo, hi = iqr_bounds(vals, pipe.get("iqr_k", 1.5))
+        clean = [c for c in s if lo <= c.rate <= hi]
+        trimmed_names = {c.property for c in s if c not in clean}
+        for dd in details:
+            if dd["name"] in trimmed_names:
+                dd["status"] = f"trimmed: outside IQR fence {lo:.0f}–{hi:.0f}"
+    cv = [c.rate for c in clean]
+    n = len(cv)
+    if n >= pipe["median_min_n"]:
+        method, point = "median", median(cv)
+    else:
+        method, point = "trimmed_mean", trimmed_mean(cv)
+    p25, p75 = percentile(cv, 25), percentile(cv, 75)
+    if method == "trimmed_mean":
+        conf = "Low"
+    elif n >= pipe["high_confidence_min_n"] and not flagged:
+        conf = "High"
+    else:
+        conf = "Medium"
+    baseline = {"method": method, "median": round(point, 2), "p25": round(p25, 2), "p75": round(p75, 2),
+                "comp_count": n, "raw_count": len(vals), "trimmed_out": len(vals) - n,
+                "diag_mean": round(diag_mean, 2), "diag_median": round(diag_median, 2), "gap_pct": round(gap, 2),
+                "flagged": flagged, "confidence": conf}
+    ratios = plan_ratios(units, hm["baseline_layout"])
+    out_units = []
+    for u in units:
+        t = cfg["unit_types"][u["unit_type"]]
+        lc = cfg["layouts"][u["id"]]
+        ratio = ratios[u["id"]]
+        k = t["realization"] * t["position_index"] * ratio
+        adr = point * k
+        occ = lc["occupancy"]
+        scaled = u["id"] != hm["baseline_layout"]
+        base_adr = u["base_scenario"]["adr"]
+        out_units.append({
+            "id": u["id"], "unit_type": u["unit_type"], "ratio_to_s1": round(ratio, 4),
+            "realization": t["realization"], "position_index": t["position_index"],
+            "adr": round(adr, 2), "adr_p25": round(p25 * k, 2), "adr_p75": round(p75 * k, 2),
+            "occupancy": occ, "occupancy_status": lc.get("occupancy_status", "needs_input"),
+            "revpau": round(revpau(adr, occ), 2),
+            "revpau_p25": round(revpau(p25 * k, occ), 2), "revpau_p75": round(revpau(p75 * k, occ), 2),
+            "comp_count": n, "method": method,
+            "basis": "scaled" if scaled else "comp_median",
+            "confidence": downgrade(conf) if scaled else conf,
+            "doc_base_adr": base_adr, "vs_doc_base_pct": round((adr / base_adr - 1) * 100, 1),
+            "doc_base_revpau": round(base_adr * u["base_scenario"]["occupancy"], 2),
+        })
+    return {
+        "mode": "hotel_median",
+        "as_of": wk["week"], "week_start": wk["week"], "week_end": wk.get("week_end"), "week_label": wk.get("label"),
+        "snapshot_generated": wk.get("generated"), "comp_source": wk.get("rate_sources"),
+        "data_status": "live",
+        "basis": "ADR and RevPAU (RevPAU = ADR x occupancy), USD per night",
+        "pipeline": {"records_in": len(comps), "after_dedupe": len(d), "after_stale": len(s),
+                     "duplicates_removed": len(comps) - len(d), "stale_removed": len(d) - len(s),
+                     "hotels_in_landscape": len(details)},
+        "baseline": baseline, "comps": details, "units": out_units,
+    }

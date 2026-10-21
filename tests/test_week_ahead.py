@@ -144,3 +144,78 @@ class DocumentFigures(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def market(rates_by_hotel, week="2026-10-19"):
+    """Minimal comps.json-shaped dict: {hotel_id: [nightly rates or None]}."""
+    hotels = [{"id": h, "name": f"Hotel {h}", "brand": "X"} for h in rates_by_hotel]
+    rates = []
+    for h, rs in rates_by_hotel.items():
+        for i, r in enumerate(rs):
+            rates.append({"hotel": h, "week": week, "date": f"2026-10-{19 + i}", "rate": r, "status": "OK" if r else "UNAVAILABLE"})
+    return {"meta": {"last_updated": week}, "hotels": hotels, "rates": rates,
+            "weeks": [{"week": week, "week_end": "2026-10-25", "status": "collected", "generated": week}]}
+
+
+class HotelMedianScaling(unittest.TestCase):
+    DOC_ADR = {"s1": 338, "a1": 409, "a2": 449, "a3": 504, "a4": 510, "b1": 589, "b2": 552, "b3": 552, "c1": 658}
+
+    def test_plan_ratios_from_document(self):
+        r = E.plan_ratios(UNITS)
+        for k, v in self.DOC_ADR.items():
+            self.assertAlmostEqual(r[k], v / 338, places=9)
+
+    def test_scaling_point_range_revpau_and_vs_base(self):
+        db = market({f"h{i}": [v, v] for i, v in enumerate([300, 320, 340, 360, 380, 400, 420, 440, 460])})
+        out = E.run_hotel_median(db, CFG, UNITS)
+        b = out["baseline"]
+        self.assertEqual((b["median"], b["comp_count"], b["confidence"]), (380.0, 9, "High"))
+        self.assertAlmostEqual(b["p25"], 340.0)
+        self.assertAlmostEqual(b["p75"], 420.0)
+        occ = {k: v["occupancy"] for k, v in CFG["layouts"].items()}
+        for u in out["units"]:
+            k = self.DOC_ADR[u["id"]] / 338
+            self.assertAlmostEqual(u["adr"], round(380 * k, 2), places=2, msg=u["id"])
+            self.assertAlmostEqual(u["adr_p25"], round(340 * k, 2), places=2)
+            self.assertAlmostEqual(u["adr_p75"], round(420 * k, 2), places=2)
+            self.assertAlmostEqual(u["revpau"], round(380 * k * occ[u["id"]], 2), places=1)
+            self.assertAlmostEqual(u["vs_doc_base_pct"], round((380 / 338 - 1) * 100, 1))
+            self.assertEqual(u["basis"], "comp_median" if u["id"] == "s1" else "scaled")
+            self.assertEqual(u["confidence"], "High" if u["id"] == "s1" else "Medium")
+
+    def test_realization_and_position_index_multiply_baseline(self):
+        c = copy.deepcopy(CFG)
+        c["unit_types"]["2br"]["realization"] = 0.9
+        c["unit_types"]["2br"]["position_index"] = 1.05
+        db = market({f"h{i}": [v, v] for i, v in enumerate([300, 320, 340, 360, 380])})
+        out = E.run_hotel_median(db, c, UNITS)
+        b1 = next(u for u in out["units"] if u["id"] == "b1")
+        self.assertAlmostEqual(b1["adr"], round(340 * 0.9 * 1.05 * 589 / 338, 2), places=2)
+
+    def test_hotel_week_median_trim_and_exclusion(self):
+        db = market({"a": [250, 260, 270], "b": [270, 280, None], "c": [290, 300], "d": [300, 310], "e": [320, 330],
+                     "f": [330, 340], "g": [1500, 1600], "thin": [999, None, None]})
+        out = E.run_hotel_median(db, CFG, UNITS)
+        st = {c["hotel"]: c["status"] for c in out["comps"]}
+        self.assertTrue(st["thin"].startswith("excluded"))      # only 1 priced night
+        self.assertTrue(st["g"].startswith("trimmed"))          # IQR outlier
+        self.assertTrue(out["baseline"]["flagged"])             # mean pulled up by the outlier before trim
+        self.assertEqual(out["baseline"]["comp_count"], 6)
+        self.assertAlmostEqual(out["baseline"]["median"], 300.0)
+
+    def test_downgrade(self):
+        self.assertEqual([E.downgrade(x) for x in ("High", "Medium", "Low")], ["Medium", "Low", "Low"])
+
+    def test_live_week_of_2026_10_19(self):
+        db = json.loads((ROOT / "data/comps.json").read_text())
+        out = E.run_hotel_median(db, CFG, UNITS, "2026-10-19")
+        b = out["baseline"]
+        self.assertEqual(b["comp_count"], 11)
+        self.assertAlmostEqual(b["median"], 383.0)
+        self.assertAlmostEqual(b["p25"], 269.75)
+        self.assertAlmostEqual(b["p75"], 451.5)
+
+    def test_occupancy_confirmed(self):
+        self.assertTrue(all(v["occupancy_status"] == "confirmed" for v in CFG["layouts"].values()))
+        self.assertEqual({k: v["occupancy"] for k, v in CFG["layouts"].items()},
+                         {"s1": .79, "a1": .79, "a2": .82, "a3": .82, "a4": .82, "b1": .84, "b2": .84, "b3": .84, "c1": .83})

@@ -1,6 +1,6 @@
 {
-  "_readme": "All tunable inputs for the Week Ahead engine live here. Every value marked NEEDS_INPUT is a neutral placeholder or a default taken from the AMBAR Residence Cards document and should be confirmed by Callum before the section is relied on. See README > 'Week ahead by residence'.",
-  "version": "2026-10-21",
+  "_readme": "All tunable inputs for the Week Ahead engine. Mode 'hotel_median' (live): the comp-set median of the site's weekly comparable hotel rates (data/comps.json) is the Studio-equivalent baseline; each plan = baseline x realization x position index x plan ratio to S1 (document base ADRs). Values marked NEEDS_INPUT still need Callum's confirmation. See README.",
+  "version": "2026-10-21b",
   "pipeline": {
     "stale_days": 14,
     "_stale_days": "Comp records whose observation date is more than this many days before as_of (or after it) are dropped as stale.",
@@ -17,29 +17,110 @@
     "high_confidence_min_n": 8
   },
   "unit_types": {
-    "studio": {"label": "Studio", "plural": "studios", "realization": 1.00, "position_index": 1.00, "reference_layout": "s1"},
-    "1br":    {"label": "1 Bedroom", "plural": "one-bedrooms", "realization": 1.00, "position_index": 1.00, "reference_layout": "a1"},
-    "2br":    {"label": "2 Bedroom", "plural": "two-bedrooms", "realization": 1.00, "position_index": 1.00, "reference_layout": "b3"},
-    "3br":    {"label": "3 Bedroom", "plural": "three-bedrooms", "realization": 1.00, "position_index": 1.00, "reference_layout": "c1"}
+    "studio": {
+      "label": "Studio",
+      "plural": "studios",
+      "realization": 1.0,
+      "position_index": 1.0,
+      "reference_layout": "s1",
+      "realization_status": "NEEDS_INPUT",
+      "position_index_status": "NEEDS_INPUT"
+    },
+    "1br": {
+      "label": "1 Bedroom",
+      "plural": "one-bedrooms",
+      "realization": 1.0,
+      "position_index": 1.0,
+      "reference_layout": "a1",
+      "realization_status": "NEEDS_INPUT",
+      "position_index_status": "NEEDS_INPUT"
+    },
+    "2br": {
+      "label": "2 Bedroom",
+      "plural": "two-bedrooms",
+      "realization": 1.0,
+      "position_index": 1.0,
+      "reference_layout": "b3",
+      "realization_status": "NEEDS_INPUT",
+      "position_index_status": "NEEDS_INPUT"
+    },
+    "3br": {
+      "label": "3 Bedroom",
+      "plural": "three-bedrooms",
+      "realization": 1.0,
+      "position_index": 1.0,
+      "reference_layout": "c1",
+      "realization_status": "NEEDS_INPUT",
+      "position_index_status": "NEEDS_INPUT"
+    }
   },
-  "_unit_types": "realization (NEEDS_INPUT): multiplier applied to LISTED (is_booked=false) comp rates to convert asking prices to realised ADR; booked records are used as-is. 1.00 = no haircut. position_index (NEEDS_INPUT): AMBAR premium/discount vs the comp set for that type (spec example: 1.05 = 5% premium). 1.00 = parity.",
+  "_unit_types": "realization and position_index: NEEDS_INPUT, kept at 1.00 (no haircut, parity). In hotel_median mode they multiply the comp-median baseline for every plan of that type. In unit_type_feed mode realization applies to listed records only.",
   "layouts": {
-    "s1": {"occupancy": 0.79, "layout_index": 1.0000},
-    "a1": {"occupancy": 0.79, "layout_index": 1.0000},
-    "a2": {"occupancy": 0.82, "layout_index": 1.0978},
-    "a3": {"occupancy": 0.82, "layout_index": 1.2323},
-    "a4": {"occupancy": 0.82, "layout_index": 1.2469},
-    "b1": {"occupancy": 0.84, "layout_index": 1.0670},
-    "b2": {"occupancy": 0.84, "layout_index": 1.0000},
-    "b3": {"occupancy": 0.84, "layout_index": 1.0000},
-    "c1": {"occupancy": 0.83, "layout_index": 1.0000}
+    "s1": {
+      "occupancy": 0.79,
+      "layout_index": 1.0,
+      "occupancy_status": "confirmed"
+    },
+    "a1": {
+      "occupancy": 0.79,
+      "layout_index": 1.0,
+      "occupancy_status": "confirmed"
+    },
+    "a2": {
+      "occupancy": 0.82,
+      "layout_index": 1.0978,
+      "occupancy_status": "confirmed"
+    },
+    "a3": {
+      "occupancy": 0.82,
+      "layout_index": 1.2323,
+      "occupancy_status": "confirmed"
+    },
+    "a4": {
+      "occupancy": 0.82,
+      "layout_index": 1.2469,
+      "occupancy_status": "confirmed"
+    },
+    "b1": {
+      "occupancy": 0.84,
+      "layout_index": 1.067,
+      "occupancy_status": "confirmed"
+    },
+    "b2": {
+      "occupancy": 0.84,
+      "layout_index": 1.0,
+      "occupancy_status": "confirmed"
+    },
+    "b3": {
+      "occupancy": 0.84,
+      "layout_index": 1.0,
+      "occupancy_status": "confirmed"
+    },
+    "c1": {
+      "occupancy": 0.83,
+      "layout_index": 1.0,
+      "occupancy_status": "confirmed"
+    }
   },
-  "_layouts": "occupancy (NEEDS_INPUT): per-layout occupancy, defaulted to the base-scenario occupancy in the AMBAR Residence Cards (S1/A1 79%, A2-A4 82%, B1-B3 84%, C1 83%). layout_index: premium of a layout over its type's reference layout, defaulted to the ratio of base-scenario ADRs in the same document (e.g. A2 $449 / A1 $409 = 1.0978; B1 $589 / B3 $552 = 1.0670).",
+  "_layouts": "occupancy: CONFIRMED by Callum (Oct 21, 2026) = the AMBAR Residence Cards base-scenario occupancy (S1/A1 79%, A2-A4 82%, B1-B3 84%, C1 83%). layout_index is only used by the per-unit-type feed mode (unit_type_feed); hotel_median mode uses the plan ratio to S1 instead.",
   "gap_fill": {
     "method": "ratio",
-    "ratios_to_studio": {"studio": 1.0, "1br": 1.2101, "2br": 1.6331, "3br": 1.9467},
+    "ratios_to_studio": {
+      "studio": 1.0,
+      "1br": 1.2101,
+      "2br": 1.6331,
+      "3br": 1.9467
+    },
     "_ratios": "Size ratios vs Studio, defaulted from the document's base-scenario ADRs of each type's reference layout (A1 $409, B3 $552, C1 $658 vs S1 $338). The spec's 1.80 Studio-to-2BR ratio was illustrative. NEEDS_INPUT.",
     "power_beta": null,
     "_power": "If method = 'power', ADR_t = ADR_anchor * (sqft_t / sqft_anchor) ** power_beta using reference-layout sqft. power_beta must be set (no default)."
-  }
+  },
+  "mode": "hotel_median",
+  "hotel_median": {
+    "min_priced_nights": 2,
+    "per_hotel_statistic": "median of the hotel's priced nights in the week",
+    "baseline_layout": "s1",
+    "_note": "Plan ratios are computed from units.json base ADRs (S1 338, A1 409, A2 449, A3 504, A4 510, B1 589, B2/B3 552, C1 658), so they update if the document figures are replaced."
+  },
+  "_modes": "hotel_median (default, live): built from data/comps.json. unit_type_feed: a future per-unit-type STR comp feed (CSV/JSON) via update_week_ahead.py --feed ..."
 }

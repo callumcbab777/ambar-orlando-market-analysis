@@ -22,43 +22,40 @@ Status values: `OK` (rate shown), `UNAVAILABLE` (no offer for a one-night search
 
 ## Residences · The week ahead (estimates engine)
 
-A section that shows, for each AMBAR floor plan (S1 Studio, A1–A4 1 Bedroom, B1–B3 2 Bedroom, C1 3 Bedroom), an **estimated** ADR and RevPAU for the current week, with the P25–P75 range, the comp count, a confidence label and the "as of" date, plus an expandable cost breakdown and rendering from the AMBAR Residence Cards.
+For each AMBAR floor plan (S1 Studio, A1–A4 1 Bedroom, B1–B3 2 Bedroom, C1 3 Bedroom), this section shows an **estimated** ADR and RevPAU for the current comp week, with the range, the comp count, a confidence label, an "as of" date, a **vs. document base scenario** comparison, and an expandable cost breakdown and rendering taken from the AMBAR Residence Cards.
 
-> **Status: SAMPLE DATA.** No per-unit-type vacation-rental comp feed is connected yet. The hotel rates in `data/comps.json` are lowest public hotel-room rates with unspecified room types, so they are not used here. The section runs on `data/week_ahead/comps_feed.sample.csv` (synthetic, property names `SAMPLE Comp …`) and shows a "Sample data · live feed not yet connected" badge until a real feed is built with `--live`.
+### Data source and mapping (mode `hotel_median`, live)
+The comparables are the site's own weekly comparable hotel rates in `data/comps.json`, the same data as the Week ahead grid. Those are lowest public standard-room rates with unspecified room types, so:
+1. Each hotel contributes **one** figure: the median of its priced nights for the latest collected week. Hotels with fewer than `min_priced_nights` (2) priced nights are excluded.
+2. These are de-duplicated, stale records are dropped, and outliers are trimmed by IQR (k = 1.5).
+3. The **comp-set median** (or a trimmed mean below 5 hotels) is the **Studio-equivalent baseline**. The P25–P75 range comes from the same set. The mean is a diagnostic, and the week is flagged when mean and median differ by more than 10%.
+4. Each plan's ADR is `baseline × realization(type) × position_index(type) × ratio_to_S1(plan)`. The ratio is the document base ADR ÷ the S1 base ADR (338, 409, 449, 504, 510, 589, 552, 552, 658), and the same factor applies to the range.
+5. `RevPAU = ADR × occupancy(plan)`. The document occupancies (S1/A1 79%, A2–A4 82%, B1–B3 84%, C1 83%) are **confirmed** by Callum.
+6. Labels: only S1 says "based on N comparable Orlando hotels (median)". Every other plan says "scaled from the comp median using AMBAR floor-plan ratios", and its confidence is one step lower than the baseline's (High → Medium → Low). No plan is ever presented as directly observed.
+7. "Vs. document base scenario" is the estimated ADR ÷ the document base ADR − 1. Because the plan ratios come from the same document, the percentage is the same for every plan while realization and position index are equal across types.
+
+`realization` and `position_index` stay at **1.00** and are marked NEEDS_INPUT in `data/week_ahead/assumptions.json`. There is no seasonality adjustment, because the weekly rates already carry demand.
+
+### Automatic weekly update
+The estimates are regenerated from the same comp data in three ways:
+- **`update_data.py`** (the normal weekly rate update) calls `update_week_ahead.py` at the end, so one run updates `data/comps.json`, `data/comps.js`, `data/week_ahead.json` and `data/week_ahead.js` together. Commit all four.
+- **GitHub Action** `.github/workflows/week-ahead.yml`: on any push to `main` that changes `data/comps.json` (or the engine or assumptions), it runs the tests, regenerates the week-ahead files and commits them if they changed. This catches hand edits to `comps.json`. On pull requests it runs the tests plus `update_week_ahead.py --check`.
+- **Browser guard:** the section also loads `data/comps.json`. If its latest collected week is newer than the week the estimates were built from, it shows "Comparable rates updated for week of …; estimates refresh on the next build" instead of silently showing an old week.
+
+Manual run: `python3 update_week_ahead.py` (latest week), `--week YYYY-MM-DD` (a specific week), or `--check` (exits 1 if the files are stale). Tests: `python3 -m unittest discover -s tests -t . -v`.
 
 ### Files
-- `week_ahead/engine.py`: the calc chain (dedupe → stale filter → IQR trim → segment by type → median / trimmed mean → realization × position index → layout index → occupancy → RevPAU; gap-fill for thin types).
-- `data/week_ahead/assumptions.json`: **every tunable input** (realization and position index per type, occupancy and layout index per floor plan, gap-fill ratios, pipeline thresholds). Values marked NEEDS_INPUT are defaults to confirm.
-- `data/week_ahead/units.json`: floor-plan specs and owner-economics figures transcribed from *AMBAR Residence Cards — Complete Collection* (source: AMBAR Rental Program Cost Breakdown — Owner Economics, Oct 12, 2026; Building 1 HOA budget updated Oct 9, 2026). `tests/` checks these reconcile with the document's own math.
-- `assets/residences/*.jpg`: the overhead renderings from that document, one per floor plan.
-- `update_week_ahead.py`: builds `data/week_ahead.json` and the `data/week_ahead.js` mirror (for `file://`). Don't edit those by hand.
-- `assets/js/week-ahead.js`, `assets/css/week-ahead.css`: section rendering.
+- `week_ahead/engine.py`: the calc chain (`run_hotel_median` for the live mode; `run` for a future per-unit-type feed).
+- `data/week_ahead/assumptions.json`: every tunable input.
+- `data/week_ahead/units.json`: floor-plan specs and owner economics transcribed from *AMBAR Residence Cards — Complete Collection* (AMBAR Rental Program Cost Breakdown — Owner Economics, Oct 12, 2026; Building 1 HOA budget updated Oct 9, 2026). The tests reconcile them with the document's own maths.
+- `assets/residences/*.jpg`: renderings from the same document.
+- `update_week_ahead.py`, `assets/js/week-ahead.js`, `assets/css/week-ahead.css`.
 
-### Formula
-`ADR(type, week) = Median(comp ADR) × Realization(type) × PositionIndex(type)`, then `× LayoutIndex(floor plan)`, and `RevPAU = ADR × Occupancy(floor plan)`. No seasonality adjustment (the weekly feed already carries the demand pattern). Realization is applied only to **listed** records (`is_booked=false`). Booked or realized rates are used as-is.
-
-Rules: median when a type has 5 or more clean comps; trimmed mean (drop high and low) for 4; derived from the best-supported type for fewer than 4 (ratio method, or a power curve on sq ft if `power_beta` is set), labelled **Derived**. The mean is kept as a diagnostic, and the week is flagged when |mean − median| / median > 10%, measured before the IQR trim. Confidence: High = 8+ comps and not flagged; Medium = median on fewer comps or a flagged week; Low = trimmed mean; Derived = gap-filled.
-
-### Feed format (CSV or JSON)
-CSV header, one row per comp observation:
+### Optional upgrade: a per-unit-type STR feed (mode `unit_type_feed`)
+Hotel standard rooms are a proxy. For a true like-for-like feed, drop per-unit-type vacation-rental comps into a CSV and run `python3 update_week_ahead.py --feed data/week_ahead/comps_feed.csv --as-of YYYY-MM-DD --live`. The format is shown in `data/week_ahead/comps_feed.sample.csv`, which is synthetic and is a format example only:
 ```
 date,property,unit_type,bedrooms,sqft,rate,min_stay,is_booked
-2026-10-26,Example Resort Condo 1204,studio,0,510,329,2,false
 ```
-- `date`: observation date (YYYY-MM-DD). Records more than `stale_days` (14) before `--as-of` are dropped.
-- `unit_type`: `studio` | `1br` | `2br` | `3br` (may be blank if `bedrooms` is given).
-- `rate`: nightly rate in USD, before taxes and fees. `is_booked`: `true` for realized (booked) ADR, `false` for listed or asking rates.
-- JSON: either a list of objects with these keys or `{"comps": [...]}`.
-- Duplicates (same date, property, unit_type, sqft, is_booked) keep the last row.
+`unit_type` is studio, 1br, 2br or 3br. `is_booked=true` marks a realized ADR, and realization applies to listed rates only. In this mode types are segmented, and types with fewer than 4 comps are gap-filled from the best-supported type and labelled Derived. Possible sources: AirDNA, KeyData (booked data, best for calibrating realization), PriceLabs, Transparent or Lighthouse, or a manual weekly pull of about 8–10 comps per type.
 
-### Updating each week
-1. Export or pull the week's comps into `data/week_ahead/comps_feed.csv` in the format above.
-2. Run `python3 update_week_ahead.py --feed data/week_ahead/comps_feed.csv --as-of YYYY-MM-DD --live`. Leave off `--live` to keep the SAMPLE badge while testing.
-3. Check the printed summary (comp counts, flags, derived types), then run `python3 -m unittest discover -s tests -t . -v`.
-4. Commit `data/week_ahead.json`, `data/week_ahead.js` and the feed file.
-
-### What a real feed needs
-- A source of per-unit-type short-term-rental comps near AMBAR, i.e. condo-hotel and branded-residence units within the Disney / Bonnet Creek / I-4 corridor, segmented by bedrooms with sq ft. Options: **AirDNA** (MarketMinder or API: listed and booked ADR and occupancy by bedroom count), **KeyData** (property-manager-reported booked data, the best fit for realization calibration), **PriceLabs** (Market Dashboard: listed future rates by bedroom count), **Transparent** or **Lighthouse**, or a manual weekly pull of about 8–10 hand-picked comps per type from Airbnb and VRBO (listed rates only, so `is_booked=false`).
-- An agreed comp set (property list) per type, so the median doesn't drift with listing churn.
-- Calibration of `realization` against booked data, Callum's view on `position_index` and occupancy per type, and a decision on the gap-fill method and ratios.
-- Securities-counsel review of the section wording before it goes in any broker or investor materials. AMBAR may involve a fund or tokenized structure, and live revenue estimates can count as forward-looking statements.
+Securities counsel should review the section wording before any of it goes into broker or investor materials, since AMBAR may involve a fund or tokenized structure and live revenue estimates can be forward-looking statements.
