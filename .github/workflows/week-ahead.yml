@@ -1,4 +1,5 @@
-# Keeps 'Residences · The week ahead' in sync with the weekly comparable hotel rates.
+# Checks the 'Residences · The week ahead' engine (Python + JS parity) and keeps its reference outputs in sync.
+# The page itself computes the residence cards live in the browser from data/comps.json.
 # On every push to main that changes data/comps.json (or the engine/assumptions), it runs the
 # tests, regenerates data/week_ahead.json + .js and commits them if they changed.
 # On pull requests it only runs the tests and checks the generated files are up to date.
@@ -11,12 +12,14 @@ on:
       - "data/week_ahead/**"
       - "week_ahead/**"
       - "update_week_ahead.py"
+      - "assets/js/week-ahead-engine.js"
   pull_request:
     paths:
       - "data/**"
       - "week_ahead/**"
       - "update_week_ahead.py"
       - "tests/**"
+      - "assets/js/week-ahead-engine.js"
   workflow_dispatch:
 permissions:
   contents: write
@@ -31,6 +34,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - name: Tests
         run: python3 -m unittest discover -s tests -t . -v
       - name: Check generated data (pull requests)

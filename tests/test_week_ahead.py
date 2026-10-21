@@ -1,6 +1,8 @@
 """Unit tests for the Week Ahead calc chain.  Run:  python3 -m unittest discover -s tests -v"""
 import copy
 import json
+import shutil
+import subprocess
 import unittest
 from datetime import date
 from pathlib import Path
@@ -179,7 +181,10 @@ class HotelMedianScaling(unittest.TestCase):
             self.assertAlmostEqual(u["adr_p25"], round(340 * k, 2), places=2)
             self.assertAlmostEqual(u["adr_p75"], round(420 * k, 2), places=2)
             self.assertAlmostEqual(u["revpau"], round(380 * k * occ[u["id"]], 2), places=1)
-            self.assertAlmostEqual(u["vs_doc_base_pct"], round((380 / 338 - 1) * 100, 1))
+            self.assertAlmostEqual(u["vs_base_adr_pct"], round((380 / 338 - 1) * 100, 1))
+            base_rp = self.DOC_ADR[u["id"]] * 0.73
+            self.assertAlmostEqual(u["base_revpau"], round(base_rp, 2), places=2)
+            self.assertAlmostEqual(u["vs_base_revpau_pct"], round((380 * k * occ[u["id"]] / base_rp - 1) * 100, 1), places=1)
             self.assertEqual(u["basis"], "comp_median" if u["id"] == "s1" else "scaled")
             self.assertEqual(u["confidence"], "High" if u["id"] == "s1" else "Medium")
 
@@ -216,18 +221,30 @@ class HotelMedianScaling(unittest.TestCase):
         self.assertAlmostEqual(b["p75"], 451.5)
 
     def test_step_down_occupancy_formula(self):
-        # Occ = 79% x (1 - 4%) ^ (bedrooms + 0.5 x den)
+        # Occ = 73% (historical base, Studio anchor) x (1 - 4%) ^ (bedrooms + 0.5 x den)
         m = CFG["occupancy_model"]
-        self.assertEqual((m["occ_studio"], m["d"], m["den_weight"]), (0.79, 0.04, 0.5))
+        self.assertEqual((m["occ_studio"], m["d"], m["den_weight"]), (0.73, 0.04, 0.5))
         self.assertEqual((m["d_status"], m["den_weight_status"]), ("proposed, adjustable", "proposed, adjustable"))
-        expected = {"s1": 79.0, "a1": 75.8, "a2": 74.3, "a3": 74.3, "a4": 74.3, "b1": 71.3, "b2": 72.8, "b3": 72.8, "c1": 69.9}
+        expected = {"s1": 73.0, "a1": 70.1, "a2": 68.7, "a3": 68.7, "a4": 68.7, "b1": 65.9, "b2": 67.3, "b3": 67.3, "c1": 64.6}
         units = {"s1": 0, "a1": 1, "a2": 1.5, "a3": 1.5, "a4": 1.5, "b1": 2.5, "b2": 2, "b3": 2, "c1": 3}
         for u in UNITS:
             self.assertEqual(E.size_units(u["bedrooms"], u["has_den"], 0.5), units[u["id"]], u["id"])
             self.assertEqual(round(E.plan_occupancy(u, CFG) * 100, 1), expected[u["id"]], u["id"])
-        self.assertAlmostEqual(E.step_down_occupancy(0.79, 0.04, 2.5), 0.79 * 0.96 ** 2.5)
+        self.assertAlmostEqual(E.step_down_occupancy(0.73, 0.04, 2.5), 0.73 * 0.96 ** 2.5)
 
-    def test_revpau_uses_step_down_and_keeps_document_base(self):
+    def test_historical_base_occupancy_is_separate_setting(self):
+        bo = CFG["base_occupancy"]
+        self.assertEqual((bo["value"], bo["label"]), (0.73, "Historical base occupancy"))
+        self.assertIn("occ_studio", CFG["occupancy_model"])           # anchor is its own setting
+        c = copy.deepcopy(CFG)
+        c["occupancy_model"]["occ_studio"] = 0.80                      # decoupled anchor
+        db = market({f"h{i}": [v, v] for i, v in enumerate([300, 320, 340, 360, 380])})
+        s1 = next(u for u in E.run_hotel_median(db, c, UNITS)["units"] if u["id"] == "s1")
+        self.assertAlmostEqual(s1["occupancy"], 0.80)
+        self.assertEqual(s1["base_occupancy"], 0.73)
+        self.assertAlmostEqual(s1["base_revpau"], 338 * 0.73, places=2)
+
+    def test_revpau_vs_base_live_week(self):
         db = json.loads((ROOT / "data/comps.json").read_text())
         out = E.run_hotel_median(db, CFG, UNITS, "2026-10-19")
         doc = {u["id"]: u for u in UNITS}
@@ -235,8 +252,56 @@ class HotelMedianScaling(unittest.TestCase):
             occ = E.plan_occupancy(doc[u["id"]], CFG)
             self.assertAlmostEqual(u["revpau"], round(u["adr"] * occ, 2), places=1)
             self.assertAlmostEqual(u["revpau_p25"], round(u["adr_p25"] * occ, 2), places=1)
-            self.assertEqual(u["doc_occupancy"], doc[u["id"]]["base_scenario"]["occupancy"])
+            self.assertEqual(u["base_adr"], doc[u["id"]]["base_scenario"]["adr"])
         c1 = next(u for u in out["units"] if u["id"] == "c1")
-        self.assertAlmostEqual(c1["revpau"], 521.13, places=2)
-        # document's own net / cap-rate figures are untouched
-        self.assertEqual((doc["c1"]["net_per_year"], doc["c1"]["cap_rate_pct"]), (60600, 7.93))
+        self.assertAlmostEqual(c1["revpau"], 481.55, places=2)
+        self.assertEqual((c1["vs_base_adr_pct"], c1["vs_base_revpau_pct"]), (13.3, 0.3))
+        # document's own net / cap-rate figures (modeled at its 83% occupancy) are untouched
+        self.assertEqual((doc["c1"]["net_per_year"], doc["c1"]["cap_rate_pct"], doc["c1"]["base_scenario"]["occupancy"]), (60600, 7.93, 0.83))
+
+
+@unittest.skipUnless(shutil.which("node"), "node is required for the JS parity test")
+class JsParity(unittest.TestCase):
+    """The browser engine (assets/js/week-ahead-engine.js) must match the Python engine exactly."""
+    WEEKS = ["2026-10-12", "2026-10-19"]
+
+    @classmethod
+    def setUpClass(cls):
+        script = (
+            "const E=require(process.argv[1]),fs=require('fs');"
+            "const db=JSON.parse(fs.readFileSync(process.argv[2]));"
+            "const cfg=JSON.parse(fs.readFileSync(process.argv[3]));"
+            "const U=JSON.parse(fs.readFileSync(process.argv[4])).units;"
+            "process.stdout.write(JSON.stringify(E.runAllWeeks(db,cfg,U)));")
+        res = subprocess.run(["node", "-e", script, str(ROOT / "assets/js/week-ahead-engine.js"), str(ROOT / "data/comps.json"),
+                              str(ROOT / "data/week_ahead/assumptions.json"), str(ROOT / "data/week_ahead/units.json")],
+                             capture_output=True, text=True, check=True)
+        cls.js = json.loads(res.stdout)
+        cls.py = E.run_all_weeks(json.loads((ROOT / "data/comps.json").read_text()), CFG, UNITS)
+
+    def test_required_weeks_present(self):
+        for w in self.WEEKS:
+            self.assertIn(w, self.js)
+            self.assertIn(w, self.py)
+            self.assertNotIn("error", self.py[w])
+
+    def test_same_weeks(self):
+        self.assertEqual(sorted(self.js), sorted(self.py))
+
+    def test_baseline_and_units_identical(self):
+        for w in self.py:
+            p, j = self.py[w], self.js[w]
+            with self.subTest(week=w):
+                self.assertEqual(p.get("error"), j.get("error"))
+                if "error" in p:
+                    continue
+                self.assertEqual(p["baseline"], j["baseline"])
+                self.assertEqual(p["pipeline"], j["pipeline"])
+                self.assertEqual(len(p["units"]), len(j["units"]))
+                for pu, ju in zip(p["units"], j["units"]):
+                    self.assertEqual(pu, ju, pu["id"])
+                self.assertEqual(p["comps"], j["comps"])
+
+    def test_prebuilt_reference_outputs_match_engine(self):
+        built = json.loads((ROOT / "data/week_ahead.json").read_text())["reference_outputs"]
+        self.assertEqual(built, json.loads(json.dumps(self.py)))

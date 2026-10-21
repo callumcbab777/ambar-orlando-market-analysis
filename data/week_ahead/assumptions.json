@@ -1,6 +1,24 @@
 {
   "_readme": "All tunable inputs for the Week Ahead engine. Mode 'hotel_median' (live): the comp-set median of the site's weekly comparable hotel rates (data/comps.json) is the Studio-equivalent baseline; each plan = baseline x realization x position index x plan ratio to S1 (document base ADRs). Values marked NEEDS_INPUT still need Callum's confirmation. See README.",
-  "version": "2026-10-21c",
+  "version": "2026-10-21d",
+  "mode": "hotel_median",
+  "base_occupancy": {
+    "value": 0.73,
+    "label": "Historical base occupancy",
+    "source": "Callum's historical occupancy figure (Oct 21, 2026); replaces the document's per-plan 79-84% as the base for every plan",
+    "_note": "Base scenario per plan: base ADR = document base ADR; base occupancy = this flat value; base RevPAU = base ADR x base occupancy. Cards compare this week's ADR and RevPAU against it."
+  },
+  "occupancy_model": {
+    "method": "size_step_down",
+    "formula": "Occ(plan) = occ_studio x (1 - d) ^ size_units;  size_units = bedrooms + den_weight x has_den",
+    "occ_studio": 0.73,
+    "occ_studio_status": "anchor for the step-down; currently set equal to base_occupancy (historical 73%). Separate setting so it can be decoupled later.",
+    "d": 0.04,
+    "d_status": "proposed, adjustable",
+    "den_weight": 0.5,
+    "den_weight_status": "proposed, adjustable",
+    "_note": "Larger residences step down from the Studio anchor by d per bedroom step; a den counts as den_weight of a bedroom. size_units: Studio 0, 1 Bed 1, 1 Bed + Den 1.5, 2 Bed 2, 2 Bed + Den 2.5, 3 Bed 3. With occ_studio 0.73: S1 73.0%, A1 70.1%, A2-A4 68.7%, B2/B3 67.3%, B1 65.9%, C1 64.6%. The document's own per-plan occupancies (units.json base_scenario.occupancy, 79-84%) only underlie the document's own net / cap-rate figures, which are shown unchanged."
+  },
   "pipeline": {
     "stale_days": 14,
     "_stale_days": "Comp records whose observation date is more than this many days before as_of (or after it) are dropped as stale.",
@@ -97,23 +115,11 @@
     "power_beta": null,
     "_power": "If method = 'power', ADR_t = ADR_anchor * (sqft_t / sqft_anchor) ** power_beta using reference-layout sqft. power_beta must be set (no default)."
   },
-  "mode": "hotel_median",
   "hotel_median": {
     "min_priced_nights": 2,
     "per_hotel_statistic": "median of the hotel's priced nights in the week",
     "baseline_layout": "s1",
     "_note": "Plan ratios are computed from units.json base ADRs (S1 338, A1 409, A2 449, A3 504, A4 510, B1 589, B2/B3 552, C1 658), so they update if the document figures are replaced."
   },
-  "_modes": "hotel_median (default, live): built from data/comps.json. unit_type_feed: a future per-unit-type STR comp feed (CSV/JSON) via update_week_ahead.py --feed ...",
-  "occupancy_model": {
-    "method": "size_step_down",
-    "formula": "Occ(plan) = occ_studio x (1 - d) ^ size_units;  size_units = bedrooms + den_weight x has_den",
-    "occ_studio": 0.79,
-    "occ_studio_status": "anchored on the document's S1 base-scenario occupancy (79%)",
-    "d": 0.04,
-    "d_status": "proposed, adjustable",
-    "den_weight": 0.5,
-    "den_weight_status": "proposed, adjustable",
-    "_note": "Larger residences step down from the Studio's occupancy by d for each bedroom step; a den counts as den_weight of a bedroom. size_units: Studio 0, 1 Bed 1, 1 Bed + Den 1.5, 2 Bed 2, 2 Bed + Den 2.5, 3 Bed 3. Bedrooms and has_den come from data/week_ahead/units.json. Defaults give S1 79.0%, A1 75.8%, A2-A4 74.3%, B2/B3 72.8%, B1 71.3%, C1 69.9%. The document's own per-plan occupancies (units.json base_scenario.occupancy) are shown alongside as 'document base' and still drive the document's net/cap-rate figures, which are not recomputed."
-  }
+  "_modes": "hotel_median (default, live): built from data/comps.json. unit_type_feed: a future per-unit-type STR comp feed (CSV/JSON) via update_week_ahead.py --feed ..."
 }

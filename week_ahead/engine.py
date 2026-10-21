@@ -20,6 +20,7 @@ type via a size ratio or power curve and labelled 'Derived'.
 from __future__ import annotations
 
 import csv
+import math
 import json
 from dataclasses import dataclass, field
 from datetime import date, timedelta
@@ -88,6 +89,17 @@ def size_units(bedrooms: int, has_den: bool, den_weight: float) -> float:
 def step_down_occupancy(occ_studio: float, d: float, units_: float) -> float:
     """Occ(plan) = Occ_Studio x (1 - d) ^ size_units."""
     return occ_studio * (1.0 - d) ** units_
+
+
+def run_all_weeks(db: dict, cfg: dict, units: list[dict]) -> dict:
+    """Engine output for every collected week (insufficient weeks get an 'error' entry)."""
+    out = {}
+    for w in sorted((w for w in db["weeks"] if w.get("status") == "collected"), key=lambda w: w["week"]):
+        try:
+            out[w["week"]] = run_hotel_median(db, cfg, units, w["week"])
+        except ValueError as e:
+            out[w["week"]] = {"week_start": w["week"], "error": str(e)}
+    return out
 
 
 def plan_occupancy(unit: dict, cfg: dict) -> float:
@@ -317,6 +329,12 @@ def load_json(path):
 # median is treated as a STUDIO-EQUIVALENT baseline and every AMBAR plan is scaled from it
 # with the floor-plan ratios in the AMBAR Residence Cards (plan base ADR / S1 base ADR).
 
+def _r(x: float, nd: int = 0) -> float:
+    """Round half up, matching JavaScript Math.round(x * 10**nd) / 10**nd exactly (parity with week-ahead-engine.js)."""
+    f = 10 ** nd
+    return math.floor(x * f + 0.5) / f
+
+
 CONF_ORDER = ["High", "Medium", "Low"]
 
 
@@ -349,7 +367,7 @@ def hotel_comps_from_market(db: dict, week: str | None = None, min_priced_nights
         rs = nights.get(hid, [])
         priced = [float(r["rate"]) for r in rs if r.get("status") == "OK" and r.get("rate") and float(r["rate"]) > 0]
         d = {"hotel": hid, "name": h["name"], "brand": h.get("brand"), "non_marriott": bool(h.get("non_marriott")),
-             "priced_nights": len(priced), "nights": len(rs), "weekly_median": round(median(priced), 2) if priced else None,
+             "priced_nights": len(priced), "nights": len(rs), "weekly_median": _r(median(priced), 2) if priced else None,
              "status": "used"}
         if len(priced) < min_priced_nights:
             d["status"] = f"excluded: {len(priced)} priced night(s) < {min_priced_nights}"
@@ -384,7 +402,7 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
         trimmed_names = {c.property for c in s if c not in clean}
         for dd in details:
             if dd["name"] in trimmed_names:
-                dd["status"] = f"trimmed: outside IQR fence {lo:.0f}–{hi:.0f}"
+                dd["status"] = f"trimmed: outside IQR fence {_r(lo):.0f}–{_r(hi):.0f}"
     cv = [c.rate for c in clean]
     n = len(cv)
     if n >= pipe["median_min_n"]:
@@ -398,9 +416,9 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
         conf = "High"
     else:
         conf = "Medium"
-    baseline = {"method": method, "median": round(point, 2), "p25": round(p25, 2), "p75": round(p75, 2),
+    baseline = {"method": method, "median": _r(point, 2), "p25": _r(p25, 2), "p75": _r(p75, 2),
                 "comp_count": n, "raw_count": len(vals), "trimmed_out": len(vals) - n,
-                "diag_mean": round(diag_mean, 2), "diag_median": round(diag_median, 2), "gap_pct": round(gap, 2),
+                "diag_mean": _r(diag_mean, 2), "diag_median": _r(diag_median, 2), "gap_pct": _r(gap, 2),
                 "flagged": flagged, "confidence": conf}
     ratios = plan_ratios(units, hm["baseline_layout"])
     out_units = []
@@ -414,19 +432,23 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
         su = size_units(u["bedrooms"], u.get("has_den", False), cfg["occupancy_model"]["den_weight"])
         scaled = u["id"] != hm["baseline_layout"]
         base_adr = u["base_scenario"]["adr"]
+        base_occ = cfg["base_occupancy"]["value"]
+        base_rp = base_adr * base_occ
+        rp = revpau(adr, occ)
         out_units.append({
-            "id": u["id"], "unit_type": u["unit_type"], "ratio_to_s1": round(ratio, 4),
+            "id": u["id"], "unit_type": u["unit_type"], "ratio_to_s1": _r(ratio, 4),
             "realization": t["realization"], "position_index": t["position_index"],
-            "adr": round(adr, 2), "adr_p25": round(p25 * k, 2), "adr_p75": round(p75 * k, 2),
-            "occupancy": round(occ, 6), "occupancy_method": "size_step_down", "size_units": su,
-            "doc_occupancy": u["base_scenario"]["occupancy"],
-            "revpau": round(revpau(adr, occ), 2),
-            "revpau_p25": round(revpau(p25 * k, occ), 2), "revpau_p75": round(revpau(p75 * k, occ), 2),
+            "adr": _r(adr, 2), "adr_p25": _r(p25 * k, 2), "adr_p75": _r(p75 * k, 2),
+            "occupancy": _r(occ, 6), "occupancy_method": "size_step_down", "size_units": su,
+            "revpau": _r(rp, 2),
+            "revpau_p25": _r(revpau(p25 * k, occ), 2), "revpau_p75": _r(revpau(p75 * k, occ), 2),
             "comp_count": n, "method": method,
             "basis": "scaled" if scaled else "comp_median",
             "confidence": downgrade(conf) if scaled else conf,
-            "doc_base_adr": base_adr, "vs_doc_base_pct": round((adr / base_adr - 1) * 100, 1),
-            "doc_base_revpau": round(base_adr * u["base_scenario"]["occupancy"], 2),
+            "base_adr": base_adr, "base_occupancy": base_occ, "base_revpau": _r(base_rp, 2),
+            "vs_base_adr_pct": _r((adr / base_adr - 1) * 100, 1),
+            "vs_base_revpau_pct": _r((rp / base_rp - 1) * 100, 1),
+            "doc_occupancy": u["base_scenario"]["occupancy"],
         })
     return {
         "mode": "hotel_median",
