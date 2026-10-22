@@ -319,12 +319,15 @@ class JsParity(unittest.TestCase):
             "const db=JSON.parse(fs.readFileSync(process.argv[2]));"
             "const cfg=JSON.parse(fs.readFileSync(process.argv[3]));"
             "const U=JSON.parse(fs.readFileSync(process.argv[4])).units;"
-            "process.stdout.write(JSON.stringify(E.runAllWeeks(db,cfg,U)));")
+            "process.stdout.write(JSON.stringify({weeks:E.runAllWeeks(db,cfg,U),nights:E.runAllNights(db,cfg,U)}));")
         res = subprocess.run(["node", "-e", script, str(ROOT / "assets/js/week-ahead-engine.js"), str(ROOT / "data/comps.json"),
                               str(ROOT / "data/week_ahead/assumptions.json"), str(ROOT / "data/week_ahead/units.json")],
                              capture_output=True, text=True, check=True)
-        cls.js = json.loads(res.stdout)
-        cls.py = E.run_all_weeks(json.loads((ROOT / "data/comps.json").read_text()), CFG, UNITS)
+        both = json.loads(res.stdout)
+        cls.js, cls.js_nights = both["weeks"], both["nights"]
+        db = json.loads((ROOT / "data/comps.json").read_text())
+        cls.py = E.run_all_weeks(db, CFG, UNITS)
+        cls.py_nights = json.loads(json.dumps(E.run_all_nights(db, CFG, UNITS)))
 
     def test_required_weeks_present(self):
         for w in self.WEEKS:
@@ -352,3 +355,79 @@ class JsParity(unittest.TestCase):
     def test_prebuilt_reference_outputs_match_engine(self):
         built = json.loads((ROOT / "data/week_ahead.json").read_text())["reference_outputs"]
         self.assertEqual(built, json.loads(json.dumps(self.py)))
+
+    def test_nights_identical(self):
+        self.assertEqual(sorted(self.js_nights), sorted(self.py_nights))
+        self.assertIn("2026-10-22", self.py_nights)
+        for n, p in self.py_nights.items():
+            with self.subTest(night=n):
+                self.assertEqual(p, self.js_nights[n])
+
+    def test_prebuilt_reference_nights_match_engine(self):
+        built = json.loads((ROOT / "data/week_ahead_nights.json").read_text())["reference_nights"]
+        self.assertEqual(built, self.py_nights)
+
+
+def night_market(rates, night="2026-10-22", snapshot="2026-10-19", week="2026-10-19"):
+    """comps.json-shaped dict with one night: {hotel_id: rate or None (UNAVAILABLE)}."""
+    hotels = [{"id": h, "name": f"Hotel {h}", "brand": "X"} for h in rates]
+    rows = [{"hotel": h, "week": week, "date": night, "rate": r, "status": "OK" if r else "UNAVAILABLE", "source_date": snapshot}
+            for h, r in rates.items()]
+    return {"meta": {"last_updated": week}, "hotels": hotels, "rates": rows,
+            "weeks": [{"week": week, "week_end": "2026-10-25", "status": "collected", "generated": week}]}
+
+
+class Nightly(unittest.TestCase):
+    """Daily view: each hotel's rate for one night, same rules as the week (stale, IQR, median / trimmed mean / too few)."""
+
+    def test_live_night_of_2026_10_22(self):
+        db = json.loads((ROOT / "data/comps.json").read_text())
+        out = E.run_hotel_night(db, CFG, UNITS, "2026-10-22")
+        b = out["baseline"]
+        self.assertEqual((out["night"], out["week_start"]), ("2026-10-22", "2026-10-19"))
+        self.assertEqual((b["method"], b["median"], b["comp_count"], b["trimmed_out"]), ("median", 354.0, 11, 0))
+        self.assertEqual((out["pipeline"]["hotels_priced"], out["pipeline"]["hotels_in_landscape"]), (11, 11))
+        u = {x["id"]: x for x in out["units"]}
+        self.assertEqual((u["s1"]["adr"], u["s1"]["revpau"], u["s1"]["vs_base_adr_pct"], u["s1"]["vs_base_revpau_pct"]), (354.0, 293.82, 4.7, 19.1))
+        self.assertEqual((u["c1"]["adr"], u["c1"]["revpau"], u["c1"]["vs_base_adr_pct"], u["c1"]["vs_base_revpau_pct"]), (689.15, 506.06, 4.7, 19.1))
+        self.assertEqual((u["s1"]["base_revpau"], u["c1"]["base_revpau"]), (246.74, 424.97))   # base ADR x 73% step-down
+        self.assertEqual(u["c1"]["owner_economics"], E.owner_economics(next(x for x in UNITS if x["id"] == "c1"), CFG))
+
+    def test_night_differs_from_week(self):
+        db = json.loads((ROOT / "data/comps.json").read_text())
+        wk = E.run_hotel_median(db, CFG, UNITS, "2026-10-19")["baseline"]["median"]
+        self.assertEqual(wk, 383.0)
+        self.assertEqual(E.run_hotel_night(db, CFG, UNITS, "2026-10-20")["baseline"]["median"], 469.0)
+        self.assertEqual(E.run_hotel_night(db, CFG, UNITS, "2026-10-23")["baseline"]["median"], 304.0)
+
+    def test_n_of_landscape_when_hotels_unpriced(self):
+        db = json.loads((ROOT / "data/comps.json").read_text())
+        out = E.run_hotel_night(db, CFG, UNITS, "2026-10-19")
+        self.assertEqual((out["pipeline"]["hotels_priced"], out["baseline"]["comp_count"]), (6, 6))
+        st = [c["status"] for c in out["comps"]]
+        self.assertEqual(sum(s.startswith("no rate this night") for s in st), 5)
+
+    def test_trimmed_mean_with_four_and_error_below(self):
+        out = E.run_hotel_night(night_market({"a": 300, "b": 310, "c": 320, "d": 400, "e": None}), CFG, UNITS, "2026-10-22")
+        self.assertEqual((out["baseline"]["method"], out["baseline"]["median"], out["baseline"]["confidence"]), ("trimmed_mean", 315.0, "Low"))
+        with self.assertRaises(ValueError):
+            E.run_hotel_night(night_market({"a": 300, "b": 310, "c": 320}), CFG, UNITS, "2026-10-22")
+
+    def test_iqr_trim_and_median(self):
+        out = E.run_hotel_night(night_market({"a": 300, "b": 310, "c": 320, "d": 330, "e": 340, "f": 2000}), CFG, UNITS, "2026-10-22")
+        self.assertEqual((out["baseline"]["comp_count"], out["baseline"]["trimmed_out"], out["baseline"]["median"]), (5, 1, 320.0))
+        self.assertTrue(next(c for c in out["comps"] if c["hotel"] == "f")["status"].startswith("trimmed"))
+
+    def test_stale_snapshot_dropped(self):
+        rates = {k: 300 + 10 * i for i, k in enumerate("abcdef")}
+        fresh = E.run_hotel_night(night_market(rates, snapshot="2026-10-08"), CFG, UNITS, "2026-10-22")   # 14 days: kept
+        self.assertEqual(fresh["pipeline"]["stale_removed"], 0)
+        with self.assertRaises(ValueError):   # 15 days before the night: all stale
+            E.run_hotel_night(night_market(rates, snapshot="2026-10-07"), CFG, UNITS, "2026-10-22")
+
+    def test_uncollected_night(self):
+        db = json.loads((ROOT / "data/comps.json").read_text())
+        with self.assertRaises(ValueError):
+            E.run_hotel_night(db, CFG, UNITS, "2026-10-07")   # week of Oct 5 was not collected
+        self.assertNotIn("2026-10-07", E.collected_nights(db))
+        self.assertEqual(len(E.collected_nights(db)), 28)

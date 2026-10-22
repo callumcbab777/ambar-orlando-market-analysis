@@ -1,7 +1,7 @@
 # Checks the 'Residences · The week ahead' engine (Python + JS parity) and keeps its reference outputs in sync.
 # The page itself computes the residence cards live in the browser from data/comps.json.
 # On every push to main that changes data/comps.json (or the engine/assumptions), it runs the
-# tests, regenerates data/week_ahead.json + .js and commits them if they changed.
+# tests, regenerates data/week_ahead.json + .js + data/week_ahead_nights.json and commits them if they changed.
 # On pull requests it only runs the tests and checks the generated files are up to date.
 name: week-ahead
 on:
@@ -49,11 +49,11 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           python3 update_week_ahead.py
-          if git diff --quiet -- data/week_ahead.json data/week_ahead.js; then
+          if git diff --quiet -- data/week_ahead.json data/week_ahead.js data/week_ahead_nights.json; then
             echo "Week-ahead data already up to date."; exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
-          git add data/week_ahead.json data/week_ahead.js
+          git add data/week_ahead.json data/week_ahead.js data/week_ahead_nights.json
           git commit -m "Regenerate week-ahead estimates from comparable rates"
           git push
