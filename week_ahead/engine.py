@@ -426,16 +426,15 @@ def plan_ratios(units: list[dict], baseline_layout: str = "s1") -> dict:
     return {u["id"]: u["base_scenario"]["adr"] / base for u in units}
 
 
-def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = None) -> dict:
+def _estimate_hotels(s: list, details: list, cfg: dict, units: list[dict], what: str = "this week") -> tuple[dict, list]:
+    """Shared tail of the hotel comp-median modes (weekly and nightly): IQR trim, median / trimmed mean,
+    P25-P75, mean diagnostic and flag, confidence, then every plan scaled from the baseline.
+    s = de-duplicated, non-stale Comp records (one per hotel); details = per-hotel rows (status updated in place)."""
     hm = cfg["hotel_median"]
     pipe = cfg["pipeline"]
-    wk, comps, details = hotel_comps_from_market(db, week, hm["min_priced_nights"])
-    as_of = date.fromisoformat(wk["week"])
-    d = dedupe(comps)
-    s = drop_stale(d, as_of, pipe["stale_days"])
     vals = [c.rate for c in s]
     if len(vals) < pipe["gap_fill_min_n"]:
-        raise ValueError(f"only {len(vals)} comparable hotels this week; need {pipe['gap_fill_min_n']}")
+        raise ValueError(f"only {len(vals)} comparable hotels {what}; need {pipe['gap_fill_min_n']}")
     diag_mean, diag_median = mean(vals), median(vals)
     gap = abs(diag_mean - diag_median) / diag_median * 100.0
     flagged = gap > pipe["mean_median_flag_pct"]
@@ -468,7 +467,6 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
     out_units = []
     for u in units:
         t = cfg["unit_types"][u["unit_type"]]
-        lc = cfg["layouts"][u["id"]]
         ratio = ratios[u["id"]]
         k = t["realization"] * t["position_index"] * ratio
         adr = point * k
@@ -495,6 +493,17 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
             "doc_occupancy": u["base_scenario"]["occupancy"],
             "owner_economics": owner_economics(u, cfg),
         })
+    return baseline, out_units
+
+
+def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = None) -> dict:
+    hm = cfg["hotel_median"]
+    pipe = cfg["pipeline"]
+    wk, comps, details = hotel_comps_from_market(db, week, hm["min_priced_nights"])
+    as_of = date.fromisoformat(wk["week"])
+    d = dedupe(comps)
+    s = drop_stale(d, as_of, pipe["stale_days"])
+    baseline, out_units = _estimate_hotels(s, details, cfg, units, "this week")
     return {
         "mode": "hotel_median",
         "as_of": wk["week"], "week_start": wk["week"], "week_end": wk.get("week_end"), "week_label": wk.get("label"),
@@ -506,3 +515,80 @@ def run_hotel_median(db: dict, cfg: dict, units: list[dict], week: str | None = 
                      "hotels_in_landscape": len(details)},
         "baseline": baseline, "comps": details, "units": out_units,
     }
+
+
+# ================================================================ nightly mode
+# comps.json stores one lowest public rate per hotel per NIGHT (rates[].date), captured on a snapshot
+# date (rates[].source_date). The nightly estimate uses each hotel's rate for that one night, with the
+# same rules: one record per hotel, de-duplicated, dropped as stale if the snapshot was captured more
+# than stale_days before the night (or after it), IQR-trimmed, then median (>= median_min_n hotels) or
+# trimmed mean (gap_fill_min_n .. median_min_n - 1). Below gap_fill_min_n the night is not estimated.
+
+def collected_nights(db: dict) -> list[str]:
+    """Every night that has rate rows in a collected week, sorted."""
+    weeks = {w["week"] for w in db["weeks"] if w.get("status") == "collected"}
+    return sorted({r["date"] for r in db["rates"] if r.get("week") in weeks and r.get("date")})
+
+
+def hotel_comps_for_night(db: dict, night: str):
+    """One comp record per hotel: that hotel's lowest public rate for this night.
+    Returns (week, comps, details); details lists every hotel in the landscape."""
+    rows = [r for r in db["rates"] if r.get("date") == night]
+    weeks = {w["week"]: w for w in db["weeks"]}
+    wk = next((weeks[r["week"]] for r in rows if r.get("week") in weeks), None)
+    if wk is None or wk.get("status") != "collected":
+        raise ValueError(f"night not collected: {night}")
+    by_hotel = {}
+    for r in rows:
+        by_hotel[r["hotel"]] = r  # last row wins (dedupe by hotel + night)
+    comps, details = [], []
+    for h in db["hotels"]:
+        r = by_hotel.get(h["id"])
+        ok = bool(r) and r.get("status") == "OK" and r.get("rate") and float(r["rate"]) > 0
+        d = {"hotel": h["id"], "name": h["name"], "brand": h.get("brand"), "non_marriott": bool(h.get("non_marriott")),
+             "rate": _r(float(r["rate"]), 2) if ok else None,
+             "night_status": (r.get("status") or "NO_DATA") if r else "NO_DATA",
+             "snapshot": (r.get("source_date") or wk["week"]) if r else None,
+             "status": "used"}
+        if not ok:
+            d["status"] = "no rate this night" + (f" ({r.get('status').replace('_', ' ').lower()})" if r and r.get("status") else " (not tracked yet)")
+        else:
+            comps.append(Comp(date.fromisoformat(d["snapshot"][:10]), h["name"], "studio", 0, None, float(r["rate"]), None, False))
+        details.append(d)
+    return wk, comps, details
+
+
+def run_hotel_night(db: dict, cfg: dict, units: list[dict], night: str) -> dict:
+    """Estimates for one night from the comp hotels' rates for that night (same engine rules as the week)."""
+    pipe = cfg["pipeline"]
+    wk, comps, details = hotel_comps_for_night(db, night)
+    as_of = date.fromisoformat(night)
+    d = dedupe(comps)
+    s = drop_stale(d, as_of, pipe["stale_days"])
+    stale_names = {c.property for c in d if c not in s}
+    for dd in details:
+        if dd["name"] in stale_names:
+            dd["status"] = f"stale: snapshot more than {pipe['stale_days']} days before the night"
+    baseline, out_units = _estimate_hotels(s, details, cfg, units, "with a rate this night")
+    return {
+        "mode": "hotel_median_night",
+        "night": night, "as_of": night, "week_start": wk["week"], "week_end": wk.get("week_end"), "week_label": wk.get("label"),
+        "snapshot_generated": wk.get("generated"), "comp_source": wk.get("rate_sources"),
+        "data_status": "live",
+        "basis": "ADR and RevPAR (RevPAR = ADR x occupancy), USD per night",
+        "pipeline": {"records_in": len(comps), "after_dedupe": len(d), "after_stale": len(s),
+                     "duplicates_removed": len(comps) - len(d), "stale_removed": len(d) - len(s),
+                     "hotels_in_landscape": len(details), "hotels_priced": len(comps)},
+        "baseline": baseline, "comps": details, "units": out_units,
+    }
+
+
+def run_all_nights(db: dict, cfg: dict, units: list[dict]) -> dict:
+    """Nightly engine output for every collected night (nights with too few hotels get an 'error' entry)."""
+    out = {}
+    for n in collected_nights(db):
+        try:
+            out[n] = run_hotel_night(db, cfg, units, n)
+        except ValueError as e:
+            out[n] = {"night": n, "error": str(e)}
+    return out

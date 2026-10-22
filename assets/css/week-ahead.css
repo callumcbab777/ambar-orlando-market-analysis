@@ -160,3 +160,39 @@ html.wa-modal-open{overflow:hidden}
   .wa-modal .m-scroll{padding:16px 16px 28px}
   .wa-modal .m-head{padding:14px 16px 12px}
 }
+/* night chips, ADR / RevPAR switch, single-figure cards */
+.wa-weekbar{align-items:center;gap:8px 12px}
+.wa-ctl-l{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brown);font-weight:600;min-width:44px}
+.wa-daybar{margin-bottom:8px}
+.wa-days{border-radius:16px}
+.wa-days .wa-day{display:flex;flex-direction:column;align-items:center;line-height:1.1;padding:7px 12px;border-radius:12px;min-width:52px;position:relative}
+.wa-days .wa-day span{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;font-weight:600;opacity:.8}
+.wa-days .wa-day b{font-size:1.05rem;font-weight:600}
+.wa-days .wa-day i{font-style:normal;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--orange);margin-top:1px}
+.wa-days .wa-day.is-today{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.wa-days .wa-day[aria-pressed="true"]{background:var(--forest);color:var(--gold-2)}
+.wa-days .wa-day[aria-pressed="true"] i{color:var(--gold-2)}
+.wa-days .wa-day:disabled{opacity:.4;cursor:not-allowed}
+.wa-cardbar{align-items:flex-start}
+.wa-metricwrap{display:flex;flex-direction:column;gap:6px}
+.wa-metric .seg-btn{font-weight:600}
+.wa-metric .seg-btn[aria-pressed="true"]{background:var(--forest);color:var(--gold-2)}
+.wa-metric-hint{margin:0 0 0 6px;font-size:.78rem}
+.rcard .r-one{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.rcard .r-one-l{margin:0;font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.rcard .r-one-v{margin:2px 0 0;font-size:2.1rem;font-weight:500;color:var(--ink);font-variant-numeric:lining-nums tabular-nums;letter-spacing:-.01em;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.rcard .r-one-n{font-size:.76rem;color:var(--muted);letter-spacing:0;font-weight:400}
+.rcard .r-one-vs{margin:4px 0 0;font-size:.82rem;color:var(--muted)}
+.rcard .r-one-vs b{font-size:1rem;font-weight:700;margin-right:2px}
+.rcard .r-one-vs.up b{color:var(--forest)}
+.rcard .r-one-vs.down b{color:#9a3b1c}
+.wa-modal .m-daybar .wa-day{padding:5px 8px;min-width:42px}
+@media (max-width:760px){
+  .wa-weekbar{flex-wrap:nowrap}
+  .wa-weekbar .seg{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
+  .wa-cardbar{flex-direction:column;align-items:stretch}
+  .wa-metric{align-self:flex-start}
+  .wa-modal .m-weekbar{max-width:100%}
+  .wa-modal .m-weekbar .seg{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
+}
+@media (max-width:520px){.rcard .r-one-v{font-size:1.8rem}.wa-ctl-l{display:none}}

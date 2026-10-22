@@ -101,12 +101,11 @@
     return comps.filter((c) => { const d = toDay(c.date); return d >= a - staleDays && d <= a; });
   }
 
-  function runHotelMedian(db, cfg, units, week) {
+  // shared tail of the weekly and nightly modes; mirrors _estimate_hotels() in engine.py
+  function estimateHotels(s, details, cfg, units, what) {
     const hm = cfg.hotel_median, pipe = cfg.pipeline;
-    const { wk, comps, details } = hotelCompsFromMarket(db, week, hm.min_priced_nights);
-    const d = dedupe(comps), s = dropStale(d, wk.week, pipe.stale_days);
     const vals = s.map((c) => c.rate);
-    if (vals.length < pipe.gap_fill_min_n) throw new Error(`only ${vals.length} comparable hotels this week; need ${pipe.gap_fill_min_n}`);
+    if (vals.length < pipe.gap_fill_min_n) throw new Error(`only ${vals.length} comparable hotels ${what}; need ${pipe.gap_fill_min_n}`);
     const diagMean = mean(vals), diagMedian = median(vals);
     const gap = Math.abs(diagMean - diagMedian) / diagMedian * 100, flagged = gap > pipe.mean_median_flag_pct;
     let clean = s;
@@ -138,12 +137,68 @@
         vs_base_adr_pct: r1((adr / baseAdr - 1) * 100), vs_base_revpau_pct: r1((rp / baseRp - 1) * 100),
         doc_occupancy: u.base_scenario.occupancy, owner_economics: ownerEconomics(u, cfg) };
     });
+    return { baseline, outUnits };
+  }
+
+  function runHotelMedian(db, cfg, units, week) {
+    const hm = cfg.hotel_median, pipe = cfg.pipeline;
+    const { wk, comps, details } = hotelCompsFromMarket(db, week, hm.min_priced_nights);
+    const d = dedupe(comps), s = dropStale(d, wk.week, pipe.stale_days);
+    const { baseline, outUnits } = estimateHotels(s, details, cfg, units, "this week");
     return { mode: "hotel_median", as_of: wk.week, week_start: wk.week, week_end: wk.week_end, week_label: wk.label,
       snapshot_generated: wk.generated, comp_source: wk.rate_sources, data_status: "live",
       basis: "ADR and RevPAU (RevPAU = ADR x occupancy), USD per night",
       pipeline: { records_in: comps.length, after_dedupe: d.length, after_stale: s.length, duplicates_removed: comps.length - d.length,
         stale_removed: d.length - s.length, hotels_in_landscape: details.length },
       baseline, comps: details, units: outUnits };
+  }
+
+  /* ---- nightly mode: each hotel's lowest public rate for ONE night (rates[].date), captured on rates[].source_date.
+     Same rules as the week; mirrors hotel_comps_for_night / run_hotel_night / run_all_nights in engine.py. */
+  function collectedNights(db) {
+    const weeks = new Set(db.weeks.filter((w) => w.status === "collected").map((w) => w.week));
+    return [...new Set(db.rates.filter((r) => weeks.has(r.week) && r.date).map((r) => r.date))].sort();
+  }
+  function hotelCompsForNight(db, night) {
+    const rows = db.rates.filter((r) => r.date === night);
+    const weeks = Object.fromEntries(db.weeks.map((w) => [w.week, w]));
+    const hit = rows.find((r) => weeks[r.week]), wk = hit ? weeks[hit.week] : null;
+    if (!wk || wk.status !== "collected") throw new Error("night not collected: " + night);
+    const byHotel = {};
+    for (const r of rows) byHotel[r.hotel] = r; // last row wins (dedupe by hotel + night)
+    const comps = [], details = [];
+    for (const h of db.hotels) {
+      const r = byHotel[h.id];
+      const ok = !!r && r.status === "OK" && !!r.rate && Number(r.rate) > 0;
+      const d = { hotel: h.id, name: h.name, brand: h.brand, non_marriott: !!h.non_marriott,
+        rate: ok ? r2(Number(r.rate)) : null, night_status: r ? (r.status || "NO_DATA") : "NO_DATA",
+        snapshot: r ? (r.source_date || wk.week) : null, status: "used" };
+      if (!ok) d.status = "no rate this night" + (r && r.status ? ` (${r.status.replace(/_/g, " ").toLowerCase()})` : " (not tracked yet)");
+      else comps.push({ date: d.snapshot.slice(0, 10), property: h.name, unit_type: "studio", sqft: null, rate: Number(r.rate), is_booked: false });
+      details.push(d);
+    }
+    return { wk, comps, details };
+  }
+  function runHotelNight(db, cfg, units, night) {
+    const pipe = cfg.pipeline;
+    const { wk, comps, details } = hotelCompsForNight(db, night);
+    const d = dedupe(comps), s = dropStale(d, night, pipe.stale_days);
+    const stale = new Set(d.filter((c) => !s.includes(c)).map((c) => c.property));
+    for (const dd of details) if (stale.has(dd.name)) dd.status = `stale: snapshot more than ${pipe.stale_days} days before the night`;
+    const { baseline, outUnits } = estimateHotels(s, details, cfg, units, "with a rate this night");
+    return { mode: "hotel_median_night", night, as_of: night, week_start: wk.week, week_end: wk.week_end, week_label: wk.label,
+      snapshot_generated: wk.generated, comp_source: wk.rate_sources, data_status: "live",
+      basis: "ADR and RevPAR (RevPAR = ADR x occupancy), USD per night",
+      pipeline: { records_in: comps.length, after_dedupe: d.length, after_stale: s.length, duplicates_removed: comps.length - d.length,
+        stale_removed: d.length - s.length, hotels_in_landscape: details.length, hotels_priced: comps.length },
+      baseline, comps: details, units: outUnits };
+  }
+  function runAllNights(db, cfg, units) {
+    const out = {};
+    for (const n of collectedNights(db)) {
+      try { out[n] = runHotelNight(db, cfg, units, n); } catch (e) { out[n] = { night: n, error: e.message }; }
+    }
+    return out;
   }
   function runAllWeeks(db, cfg, units) {
     const out = {};
@@ -153,5 +208,6 @@
     return out;
   }
   return { median, mean, percentile, trimmedMean, iqrBounds, downgrade, sizeUnits, stepDownOccupancy, planOccupancy, basePlanOccupancy, ownerEconomics, planRatios,
-    hotelCompsFromMarket, dedupe, dropStale, runHotelMedian, runAllWeeks, collectedWeeks };
+    hotelCompsFromMarket, dedupe, dropStale, runHotelMedian, runAllWeeks, collectedWeeks,
+    estimateHotels, collectedNights, hotelCompsForNight, runHotelNight, runAllNights };
 });
