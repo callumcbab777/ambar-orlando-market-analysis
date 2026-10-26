@@ -24,7 +24,7 @@
       "Key counts for Hyatt Regency Grand Cypress (779) and Wyndham Grand Bonnet Creek (400) are as provided by Callum Brown; Conrad Orlando (433) and ette (126) match their official fact sheets. Key counts for the Marriott hotels are not shown."
     ],
     "last_updated": "2026-10-26",
-    "built": "2026-10-26T08:23"
+    "built": "2026-10-26T09:08"
   },
   "tiers": [
     {
@@ -4561,6 +4561,41 @@
       "headline": "Orlando World Center Marriott announces \"Twelve Nights of Wonder\" (20–31 Dec).",
       "source": "PR Newswire",
       "orlando": true
+    },
+    {
+      "week": "2026-10-26",
+      "date": "Ahead: Mon 2 Nov",
+      "headline": "Marriott International Q3 2026 results before the open; call 8:00am ET. Consensus EPS $2.84 on $6.92bn revenue vs company Q3 guide $2.74–$2.82 [verify: MarketBeat]; stock opened $390.71 on 26 Oct.",
+      "source": "Marriott IR; MarketBeat [verify]",
+      "orlando": false
+    },
+    {
+      "week": "2026-10-26",
+      "date": "As of 22 Oct",
+      "headline": "Chicago UNITE HERE Local 1 strike widens to 8 hotels (incl. Sheraton Grand Riverwalk, Westin River North, Westin Michigan Ave); 38 more hotels authorized to join; no new talks as of 22 Oct.",
+      "source": "Travelers Today / WTTW / Hotel Dive",
+      "orlando": false
+    },
+    {
+      "week": "2026-10-26",
+      "date": "Oct 22",
+      "headline": "Comcast Q3: theme parks revenue −4.4%, adj. EBITDA −17%, citing promotions and “technological challenges at Epic Universe”; growth expected to return 2H27 — soft Orlando leisure read-across.",
+      "source": "CNBC; Comcast IR",
+      "orlando": true
+    },
+    {
+      "week": "2026-10-26",
+      "date": "Oct 22",
+      "headline": "Peers: IHG U.S. RevPAR +6.9% (Q3); Hilton launches Pay with Points and reports Q3 Tue 27 Oct. Marriott: Bonvoy Samsung Card premium co-brand in Korea (22 Oct) — minor for Orlando.",
+      "source": "Hotel Dive; Marriott news",
+      "orlando": false
+    },
+    {
+      "week": "2026-10-26",
+      "date": "Orlando",
+      "headline": "ice! at Gaylord Palms runs 13 Nov–3 Jan (holiday driver, not this week). No new Ambar Residences Orlando coverage; “late 2028” opening still cited.",
+      "source": "Marriott news; Travel Trade Desk",
+      "orlando": true
     }
   ],
   "context": {
@@ -4734,35 +4769,194 @@
         "source": "National Hurricane Center via stormtracking.com",
         "hotels": []
       }
+    ],
+    "2026-10-26": [
+      {
+        "dates": "Oct 24–27 (through Tue 27)",
+        "title": "IACP 2026 Annual Conference & Exposition, OCCC",
+        "type": "Convention",
+        "detail": "Main conference through Tue 27: Mon General Assembly + expo; Chiefs Night Mon 7:30–11pm at Universal Islands of Adventure; Tue Closing Assembly, expo to 2pm, Annual Banquet 6–9:30pm at OCCC (keeps delegates in town Tue night).",
+        "source": "theiacpconference.org schedule-at-a-glance",
+        "hotels": []
+      },
+      {
+        "dates": "Sun 25 – Tue 27",
+        "title": "Florida Restaurant Show + Pizza Tomorrow Summit, OCCC North Hall B",
+        "type": "Convention",
+        "detail": "Industry-only show; Mon 10am–4pm, Tue 10am–2:30pm. Front-loads Mon–Tue group demand with IACP.",
+        "source": "floridarestaurantshow.com; pizzatomorrow.com",
+        "hotels": []
+      },
+      {
+        "dates": "Mon 26 – Thu 29",
+        "title": "ICMI Contact Center Expo, Gaylord Palms",
+        "type": "Group",
+        "detail": "Mon 26 pre-conference training; conference Tue 27 4pm through Thu 29; expo Tue–Thu. Peak in-house nights Tue–Wed per organizer schedule.",
+        "source": "icmievents.com event schedule",
+        "hotels": [
+          "gaylord-palms"
+        ]
+      },
+      {
+        "dates": "Tue 27 (10am) – Wed 28 (2pm)",
+        "title": "Florida Chamber Future of Florida Forum (F3) & Annual Meeting, JW Bonnet Creek",
+        "type": "Group",
+        "detail": "On-site at JW Marriott Orlando Bonnet Creek. Florida Chamber pages state the F3 room block at the JW is sold out (overflow note points guests to nearby Wyndham Grand Bonnet Creek).",
+        "source": "flchamber.com (F3 event + Future of Florida Forum pages)",
+        "hotels": [
+          "jw-bonnet-creek",
+          "wyndham-grand-bonnet-creek"
+        ]
+      },
+      {
+        "dates": "Thu 29 – Fri 30 (setup Wed 28)",
+        "title": "FACCS Christian Educators' Convention, OCCC",
+        "type": "Convention",
+        "detail": "Regional Florida teacher event; exhibitor setup from Wed 28. Modest, rate-sensitive room-night impact expected [brief inference]. Rosen Plaza group block reported closed.",
+        "source": "faccs.org conferences; Mon 26 research memo",
+        "hotels": []
+      },
+      {
+        "dates": "Sat 31 Oct",
+        "title": "Halloween",
+        "type": "Holiday",
+        "detail": "No federal holiday this week. Leisure peak night of the week by crowd trackers, while OTA rates stayed soft vs group Mon–Tue.",
+        "source": "Calendar; Mon 26 Marriott Orlando brief",
+        "hotels": []
+      },
+      {
+        "dates": "Tue 27, Thu 29, Sat 31 (final)",
+        "title": "Mickey's Not-So-Scary Halloween Party — all 2026 dates sold out",
+        "type": "Disney",
+        "detail": "Party nights this week Tue/Thu/Sat; Sat 31 is the final night. Disney's official page: 'All 2026 event dates have sold out.' Magic Kingdom closes to day guests at 6pm on party nights.",
+        "source": "disneyworld.disney.go.com (MNSSHP)",
+        "hotels": []
+      },
+      {
+        "dates": "Mon 26 – Sun 1 Nov",
+        "title": "Lightest leisure stretch of autumn (crowd trackers)",
+        "type": "Disney",
+        "detail": "SupaPark 4-park avg ~3.8/10 this week (Sat 31 busiest at 5.3). Lightning Brain: Halloween week among the lightest stretches; Mon–Thu described as Disney 'Good-To-Go' days. Disney Tourist Blog flags Oct 26 and 30 as Magic Kingdom 'red flag' (non-party) days. EPCOT Food & Wine continues (through Nov 21).",
+        "source": "supapark.com; Lightning Brain week-ahead; Disney Tourist Blog; disneyworld.disney.go.com Food & Wine",
+        "hotels": []
+      },
+      {
+        "dates": "Wed 28 – Sun 1 Nov (final)",
+        "title": "Universal Halloween Horror Nights 35 — final week",
+        "type": "Universal",
+        "detail": "Event nights Wed–Sun in this window per Thrill Data [verify tracker]; no event Mon–Tue. Scream Early top price $85 Sat 31; $75 other nights in window. Final night Sun 1 Nov. Volcano Bay closed for season after Sun 25.",
+        "source": "thrill-data.com; Theme Park Insider",
+        "hotels": []
+      },
+      {
+        "dates": "Fri 30 Oct, 7:30pm ET",
+        "title": "UCF vs Baylor 'Space Game', Acrisure Bounce House",
+        "type": "Other",
+        "detail": "Home football; weekend leisure build with HHN and FACCS final day.",
+        "source": "ucfknights.com football schedule",
+        "hotels": []
+      },
+      {
+        "dates": "As of Mon 26 Oct",
+        "title": "No tropical cyclone formation expected (7-day)",
+        "type": "Weather",
+        "detail": "NHC 8am EDT Mon 26: formation not expected in next 7 days. NWS Orange County: breezy NE winds; ~50% rain chance Wed 28 and Thu 29; highs low–mid 80s.",
+        "source": "nhc.noaa.gov; forecast.weather.gov zone FLZ045",
+        "hotels": []
+      }
+    ],
+    "2026-10-19": [
+      {
+        "dates": "Oct 19–22",
+        "title": "Gartner IT Symposium/Xpo at Swan & Dolphin",
+        "type": "Convention",
+        "detail": "Host complex Mon–Thu; multiple UNAV one-night searches across Swan/Dolphin/Swan Reserve. Shuttle demand at Bonnet Creek hotels noted in the Oct 19 brief.",
+        "source": "gartner.com; Mon 19 Marriott Orlando brief",
+        "hotels": [
+          "swan",
+          "dolphin",
+          "swan-reserve",
+          "jw-bonnet-creek",
+          "wyndham-grand-bonnet-creek"
+        ]
+      },
+      {
+        "dates": "Oct 21–24",
+        "title": "BMES / NAILBA and related midweek groups",
+        "type": "Convention",
+        "detail": "BMES at Orlando World Center Marriott (21–24) and NAILBA at Gaylord (from ~21) stacked midweek with Gartner close; Wed UNAV at Gaylord in the Oct 19 rate table.",
+        "source": "Mon 19 brief demand notes; Exhibitors Marketplace / ConventionGrid (prior looking_ahead)",
+        "hotels": [
+          "gaylord-palms"
+        ]
+      },
+      {
+        "dates": "Oct 22–25",
+        "title": "runDisney Wine & Dine Half Marathon Weekend",
+        "type": "Disney",
+        "detail": "All races sold out per Oct 19 brief; peaks Sat–Sun with IACP open and Florida Restaurant Show from Sun 25.",
+        "source": "disneydining.com; Mon 19 brief",
+        "hotels": []
+      },
+      {
+        "dates": "Oct 24–27 (opens Sat 24)",
+        "title": "IACP opens at OCCC; Florida Restaurant Show from Sun 25",
+        "type": "Convention",
+        "detail": "Weekend stack into the following week’s Mon–Tue group peak.",
+        "source": "theiacpconference.org; floridarestaurantshow.com",
+        "hotels": []
+      },
+      {
+        "dates": "Week of Oct 19",
+        "title": "Mickey's Not-So-Scary Halloween Party + HHN backdrop",
+        "type": "Disney",
+        "detail": "MNSSHP dates in-window sold out on Disney’s site; Wine & Dine and party nights lift weekend leisure vs a softer midweek after Gartner.",
+        "source": "disneyworld.disney.go.com; Mon 19 brief",
+        "hotels": []
+      }
     ]
   },
   "looking_ahead": [
     {
-      "dates": "Oct 19–22",
-      "title": "Gartner IT Symposium/Xpo at the Swan & Dolphin",
-      "type": "Convention",
-      "detail": "Arrivals expected to build from Sun Oct 18; Gartner HR Symposium follows Oct 26–28.",
-      "source": "gartner.com",
-      "hotels": [
-        "swan",
-        "dolphin",
-        "swan-reserve"
-      ]
-    },
-    {
-      "dates": "Oct 22–25",
-      "title": "runDisney Wine & Dine Half Marathon Weekend",
-      "type": "Disney",
-      "detail": "",
-      "source": "disneydining.com",
+      "dates": "Mon 2 Nov",
+      "title": "Marriott International Q3 2026 results",
+      "type": "Other",
+      "detail": "Before the open; earnings call 8:00am ET (Marriott IR). Consensus EPS ~$2.84 on ~$6.92bn revenue vs company Q3 guide $2.74–$2.82 [verify: MarketBeat].",
+      "source": "marriott.gcs-web.com IR release; MarketBeat preview [verify]",
       "hotels": []
     },
     {
-      "dates": "Oct 21–27",
-      "title": "BMES (21–24), IACP (24–27) and Florida Restaurant & Lodging Show (25–27), OCCC",
-      "type": "Convention",
-      "detail": "",
-      "source": "Exhibitors Marketplace / ConventionGrid",
+      "dates": "Sat 7 Nov",
+      "title": "Disney Jollywood Nights opens (opening sold out)",
+      "type": "Disney",
+      "detail": "Holiday hard-ticket season begins after Halloween week.",
+      "source": "wdwnt.com",
+      "hotels": []
+    },
+    {
+      "dates": "Sun 8 Nov",
+      "title": "Mickey's Very Merry Christmas Party opens (opening sold out)",
+      "type": "Disney",
+      "detail": "Magic Kingdom holiday parties start.",
+      "source": "wdwnt.com",
+      "hotels": []
+    },
+    {
+      "dates": "13 Nov 2026 – 3 Jan 2027",
+      "title": "ice! featuring The Polar Express at Gaylord Palms",
+      "type": "Group",
+      "detail": "Holiday demand driver for Gaylord Palms from mid-November (carving under way as of mid-Oct).",
+      "source": "news.marriott.com (19 Oct 2026 ice! release)",
+      "hotels": [
+        "gaylord-palms"
+      ]
+    },
+    {
+      "dates": "14 Nov 2026 – 3 Jan 2027",
+      "title": "Holidays at Universal Orlando",
+      "type": "Universal",
+      "detail": "Holiday season starts after HHN ends Sun 1 Nov.",
+      "source": "universalfamilyvacations.com / Universal Orlando news",
       "hotels": []
     }
   ],
@@ -4780,6 +4974,20 @@
       "value": "66.0%",
       "change": "+17.3% YoY; largest occupancy gain among the top 25 U.S. markets",
       "source": "CoStar via Asian Hospitality (Oct 12, 2026)"
+    },
+    {
+      "period": "August 2026",
+      "metric": "Metro Orlando hotel occupancy",
+      "value": "62.4%",
+      "change": "−5.8% YoY; ADR $174.95",
+      "source": "Visit Orlando / CoStar (cited in Mon 26 brief)"
+    },
+    {
+      "period": "Oct–Dec 2026 (pacing)",
+      "metric": "Metro Orlando demand pacing",
+      "value": "6% ahead of last year",
+      "change": "Forward look cited in Mon 26 brief — not a weekly CoStar print",
+      "source": "Mon 26 Marriott Orlando brief (Visit Orlando / CoStar context) [verify primary release]"
     }
   ]
 }
