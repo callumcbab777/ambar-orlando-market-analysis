@@ -80,12 +80,15 @@
 
   /* ---------- 1 hero ---------- */
   function renderHero() {
-    const all = DB.rates.filter((r) => r.status === "OK").length;
+    const okRates = priced(DB.rates);
+    const all = okRates.length;
+    const medAll = median(okRates);
     const gaps = weeks.filter((w) => w.status === "missing");
     const stats = [
       ["Hotels tracked", H.length, `${H.filter((h) => !h.non_marriott).length} Marriott · ${H.filter((h) => h.non_marriott).length} non-Marriott`],
       ["Weeks tracked", collected.length, `of ${weeks.length} in window`],
       ["Priced nights", all, "lowest public rates"],
+      ["Median $", money(medAll), "across all nights tracked"],
       ["Latest snapshot", fMD(latest.generated), `week of ${fMD(latest.week)}`]
     ];
     $("#heroStats").innerHTML = stats.map(([a, b, c]) => `<div><dt>${a}</dt><dd>${b}<small>${c}</small></dd></div>`).join("");
