@@ -344,3 +344,63 @@ body,h1,h2,h3,h4,.hero-stats dd,.tier-label h3{font-variant-numeric:lining-nums}
 .cap-mark{color:var(--orange);font-size:.9em}
 .mini .m-cap{display:block;font-size:.7rem;color:#B4492A;font-weight:600;margin:2px 0 0}
 .pill-nm{background:#F4EFE7;border:1px dashed #B37D50;color:#6E2E1C}
+
+
+/* ---- Visit Orlando events ---- */
+.vo-toolbar,.demand-toolbar,.news-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.vo-toolbar .chip,.demand-toolbar .chip,.news-toolbar .chip{appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);font:600 .78rem/1 var(--sans);letter-spacing:.03em;padding:8px 12px;border-radius:999px;cursor:pointer}
+.vo-toolbar .chip[aria-pressed="true"],.demand-toolbar .chip[aria-pressed="true"],.news-toolbar .chip[aria-pressed="true"]{background:var(--forest);color:var(--cream);border-color:var(--forest)}
+.vo-meta{font-size:.86rem;color:var(--muted);margin:0 0 18px}
+.vo-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.vo-card{display:flex;flex-direction:column;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);min-height:160px;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+.vo-card:hover{border-color:rgba(201,163,90,.55);transform:translateY(-1px)}
+.vo-card .vo-date{font-size:.74rem;font-weight:700;letter-spacing:.04em;color:var(--brown);text-transform:uppercase}
+.vo-card .vo-title{font-family:var(--serif);font-size:1.15rem;line-height:1.2;color:var(--forest);margin:0}
+.vo-card .vo-loc{font-size:.82rem;color:#4a4b42;margin:0}
+.vo-card .vo-desc{font-size:.82rem;color:var(--muted);margin:0;flex:1}
+.vo-card .vo-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.vo-card .tag{font-size:.68rem;font-weight:600;letter-spacing:.03em;padding:3px 8px;border-radius:999px;background:rgba(30,58,44,.08);color:var(--forest)}
+.vo-attrib{font-size:.78rem;color:var(--muted);font-style:italic;margin:18px 0 0}
+.vo-attrib a{color:var(--blue)}
+.vo-empty{grid-column:1/-1;padding:28px;text-align:center;color:var(--muted);background:rgba(255,255,255,.5);border:1px dashed var(--line);border-radius:var(--r)}
+.vo-more{margin-top:16px;text-align:center}
+.vo-more button{appearance:none;border:1px solid var(--line);background:#fff;color:var(--forest);font:600 .86rem/1 var(--sans);padding:12px 18px;border-radius:999px;cursor:pointer}
+.vo-more button:hover{border-color:var(--gold);background:rgba(201,163,90,.1)}
+
+/* ---- Demand (brief calendar) redesign ---- */
+.demand-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.tweek{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.tweek.missing{opacity:.72}
+.tweek h3{font-size:1.35rem;margin:0 0 4px}
+.tweek .wk-status{font-size:.78rem;color:var(--muted);margin:0 0 12px}
+.ev{border-top:1px solid var(--line);padding:12px 0}
+.ev:first-of-type{border-top:0;padding-top:4px}
+.ev .d{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.74rem;color:var(--brown);font-weight:600;letter-spacing:.04em}
+.ev .t{font-weight:600;font-size:.98rem;line-height:1.3;margin:4px 0 2px;color:var(--forest)}
+.ev .x{font-size:.84rem;color:#4a4b42;margin:0}
+.ev .s{font-size:.72rem;color:var(--muted);font-style:italic;margin:6px 0 0}
+.type{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.68rem;letter-spacing:.03em;text-transform:uppercase;background:rgba(53,89,101,.12);color:var(--blue)}
+.type-Convention{background:rgba(30,58,44,.12);color:var(--forest)}
+.type-Disney{background:rgba(201,163,90,.2);color:#7a5a18}
+.type-Theme{background:rgba(243,111,67,.15);color:#a43a1a}
+.type-Other{background:rgba(117,117,117,.12);color:#555}
+
+/* ---- News redesign ---- */
+.news-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.nitem{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px}
+.nitem .d{font-size:.74rem;font-weight:600;color:var(--brown);letter-spacing:.04em;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.nitem p{margin:0;font-size:.95rem;line-height:1.4;color:var(--ink)}
+.nitem .s{font-size:.74rem;color:var(--muted);font-style:italic}
+.nitem a.nlink{font-size:.78rem;font-weight:600;color:var(--blue);text-decoration:none}
+.nitem a.nlink:hover{text-decoration:underline}
+.tag-orl,.tag-cat{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:999px;text-transform:uppercase}
+.tag-orl{background:rgba(201,163,90,.22);color:#7a5a18}
+.tag-cat-marriott{background:rgba(30,58,44,.12);color:var(--forest)}
+.tag-cat-orlando{background:rgba(53,89,101,.12);color:var(--blue)}
+.tag-cat-hospitality{background:rgba(179,125,80,.18);color:#7a4e28}
+.news-week-label{grid-column:1/-1;font-family:var(--serif);font-size:1.35rem;color:var(--forest);margin:10px 0 0;padding-top:8px;border-top:1px solid var(--line)}
+.news-week-label:first-child{border-top:0;padding-top:0;margin-top:0}
+
+@media (max-width:900px){
+  .vo-grid,.demand-grid,.news-grid{grid-template-columns:1fr}
+}
