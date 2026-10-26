@@ -34,23 +34,31 @@
   };
 
   /* ---------- load data (comps.json; comps.js mirror for file:// use) ---------- */
-  function load() {
-    return fetch("data/comps.json", { cache: "no-cache" }).then((r) => { if (!r.ok) throw 0; return r.json(); })
+  function loadJson(path, globalName, scriptPath) {
+    return fetch(path, { cache: "no-cache" }).then((r) => { if (!r.ok) throw 0; return r.json(); })
       .catch(() => new Promise((res, rej) => {
-        if (window.COMPS_DATA) return res(window.COMPS_DATA);
-        const s = el("script", { src: "data/comps.js" });
-        s.onload = () => res(window.COMPS_DATA); s.onerror = rej; document.body.appendChild(s);
+        if (window[globalName]) return res(window[globalName]);
+        const s = el("script", { src: scriptPath });
+        s.onload = () => res(window[globalName]); s.onerror = rej; document.body.appendChild(s);
       }));
+  }
+  function load() {
+    return Promise.all([
+      loadJson("data/comps.json", "COMPS_DATA", "data/comps.js"),
+      loadJson("data/visitorlando_events.json", "VO_EVENTS_DATA", "data/visitorlando_events.js").catch(() => null),
+    ]).then(([comps, vo]) => ({ comps, vo }));
   }
 
 
-  let DB, H, byHotel, weeks, collected, latest, tip;
+  let DB, VO, H, byHotel, weeks, collected, latest, tip;
 
-  function init(db) {
+    function init(payload) {
+    const db = payload.comps || payload;
+    VO = payload.vo || null;
     DB = db; H = db.hotels; weeks = db.weeks; collected = weeks.filter((w) => w.status === "collected"); latest = collected[collected.length - 1];
     byHotel = Object.fromEntries(H.map((h) => [h.id, h]));
     tip = $("#tip");
-    renderHero(); renderWeekAhead(); renderHistory(); renderMatrix(); renderHotels(); renderDemand(); renderNews(); renderFooter(); navSpy();
+    renderHero(); renderWeekAhead(); renderHistory(); renderMatrix(); renderHotels(); renderVisitOrlando(); renderDemand(); renderNews(); renderFooter(); navSpy();
   }
 
   const ratesFor = (week) => DB.rates.filter((r) => r.week === week);
@@ -462,25 +470,175 @@
   }
   function flashCard(id) { const c = $("#hotel-" + id); if (!c) return; c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 2200); }
 
-  /* ---------- 6 demand ---------- */
-  function renderDemand() {
-    $("#marketStrip").innerHTML = DB.market.map((m) => `<div class="mstat"><div class="p">${esc(m.period)}</div><div class="v">${esc(m.value)}</div><p class="c">${esc(m.metric)} · ${esc(m.change)}</p><p class="s">Metro-wide, not these hotels. ${esc(m.source)}</p></div>`).join("");
-    const evHTML = (e) => `<div class="ev"><div class="d"><span class="type type-${esc(e.type)}">${esc(e.type)}</span>${esc(e.dates)}</div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="x">${esc(e.detail)}</p>` : ""}${e.hotels.length ? `<p class="x">Linked hotels: ${e.hotels.map((id) => `<a href="#hotel-${id}">${esc(byHotel[id].short)}</a>`).join(", ")}</p>` : ""}<p class="s">${esc(e.source)}</p></div>`;
-    $("#timeline").innerHTML = weeks.map((w) => {
-      const evs = DB.context[w.week] || [];
-      return `<article class="tweek${w.status === "missing" ? " missing" : ""}"><h3>${fMD(w.week)} – ${fMD(w.week_end)}</h3>
-        <p class="wk-status">${w.status === "missing" ? "No rate brief · context only" : `Brief of ${fMD(w.generated)}`}</p>${evs.map(evHTML).join("") || '<p class="x">No events recorded.</p>'}</article>`;
-    }).join("");
-    if (DB.looking_ahead?.length) $("#ahead").innerHTML = `<h3>Looking ahead</h3><ul>${DB.looking_ahead.map((e) => `<li><div class="d">${esc(e.dates)}</div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="t" style="font-size:.82rem;opacity:.85">${esc(e.detail)}</p>` : ""}<span class="s">${esc(e.source)}</span></li>`).join("")}</ul>`;
-    else $("#ahead").remove();
+  /* ---------- 6 Visit Orlando calendar ---------- */
+  function fmtRange(s, e) {
+    if (!s) return "";
+    if (!e || e === s) return fMD(s);
+    return `${fMD(s)} – ${fMD(e)}`;
+  }
+  function renderVisitOrlando() {
+    const rootToolbar = $("#voToolbar");
+    const rootGrid = $("#voGrid");
+    const rootMeta = $("#voMeta");
+    const rootAttrib = $("#voAttrib");
+    if (!rootGrid) return;
+    if (!VO || !Array.isArray(VO.events) || !VO.events.length) {
+      rootGrid.innerHTML = `<p class="vo-empty">Visit Orlando events are not loaded yet. Refresh with <code>scripts/fetch_visitorlando_events.py</code>.</p>`;
+      if (rootAttrib) rootAttrib.innerHTML = `Event calendar: <a href="https://www.visitorlando.com/events/" target="_blank" rel="noopener">Visit Orlando</a>.`;
+      return;
+    }
+    const all = VO.events.slice();
+    const cats = Array.from(new Set(all.flatMap((e) => e.categories || []))).sort();
+    // Week buckets overlapping the window
+    const weeksBuckets = [];
+    {
+      const start = new Date(VO.window_start + "T12:00:00");
+      const end = new Date(VO.window_end + "T12:00:00");
+      let cur = new Date(start);
+      // align to Monday of start week
+      const day = (cur.getDay() + 6) % 7;
+      cur.setDate(cur.getDate() - day);
+      while (cur <= end) {
+        const ws = cur.toISOString().slice(0, 10);
+        const we = new Date(cur); we.setDate(we.getDate() + 6);
+        weeksBuckets.push({ start: ws, end: we.toISOString().slice(0, 10), label: `${fMD(ws)} – ${fMD(we.toISOString().slice(0, 10))}` });
+        cur.setDate(cur.getDate() + 7);
+      }
+    }
+    let state = { week: "all", cat: "all", limit: 24 };
+    function overlapsWeek(e, b) {
+      return e.start_date <= b.end && e.end_date >= b.start;
+    }
+    function filtered() {
+      return all.filter((e) => {
+        if (state.cat !== "all" && !(e.categories || []).includes(state.cat)) return false;
+        if (state.week !== "all") {
+          const b = weeksBuckets.find((w) => w.start === state.week);
+          if (b && !overlapsWeek(e, b)) return false;
+        }
+        return true;
+      });
+    }
+    function paintToolbar() {
+      if (!rootToolbar) return;
+      const weekChips = [`<button type="button" class="chip" data-week="all" aria-pressed="${state.week==="all"}">All dates</button>`]
+        .concat(weeksBuckets.map((b) => `<button type="button" class="chip" data-week="${b.start}" aria-pressed="${state.week===b.start}">${esc(b.label)}</button>`))
+        .join("");
+      const catChips = [`<button type="button" class="chip" data-cat="all" aria-pressed="${state.cat==="all"}">All types</button>`]
+        .concat(cats.slice(0, 10).map((c) => `<button type="button" class="chip" data-cat="${esc(c)}" aria-pressed="${state.cat===c}">${esc(c)}</button>`))
+        .join("");
+      rootToolbar.innerHTML = `<div class="vo-chiprow" style="display:flex;flex-wrap:wrap;gap:8px;width:100%">${weekChips}</div><div class="vo-chiprow" style="display:flex;flex-wrap:wrap;gap:8px;width:100%;margin-top:8px">${catChips}</div>`;
+      rootToolbar.querySelectorAll("[data-week]").forEach((b) => b.addEventListener("click", () => { state.week = b.dataset.week; state.limit = 24; paint(); }));
+      rootToolbar.querySelectorAll("[data-cat]").forEach((b) => b.addEventListener("click", () => { state.cat = b.dataset.cat; state.limit = 24; paint(); }));
+    }
+    function card(e) {
+      const tags = (e.categories || []).slice(0, 3).map((c) => `<span class="tag">${esc(c)}</span>`).join("");
+      const loc = [e.location, e.city].filter(Boolean).join(" · ");
+      return `<a class="vo-card" href="${esc(e.url)}" target="_blank" rel="noopener">
+        <div class="vo-date">${esc(fmtRange(e.start_date, e.end_date))}</div>
+        <h3 class="vo-title">${esc(e.title)}</h3>
+        ${loc ? `<p class="vo-loc">${esc(loc)}</p>` : ""}
+        ${e.description ? `<p class="vo-desc">${esc(e.description)}</p>` : ""}
+        <div class="vo-tags">${tags}</div>
+      </a>`;
+    }
+    function paint() {
+      paintToolbar();
+      const list = filtered();
+      const show = list.slice(0, state.limit);
+      rootMeta.textContent = `${list.length} event${list.length===1?"":"s"} in view · window ${fMD(VO.window_start)} – ${fMD(VO.window_end)} · fetched ${VO.fetched_at ? fMD(VO.fetched_at.slice(0,10)) : "—"}`;
+      rootGrid.innerHTML = show.map(card).join("") || `<p class="vo-empty">No Visit Orlando events match these filters.</p>`;
+      if (list.length > state.limit) {
+        rootGrid.insertAdjacentHTML("beforeend", `<div class="vo-more" style="grid-column:1/-1"><button type="button" id="voMore">Show more (${list.length - state.limit} remaining)</button></div>`);
+        $("#voMore")?.addEventListener("click", () => { state.limit += 24; paint(); });
+      }
+      if (rootAttrib) {
+        const cal = VO.calendar_url || "https://www.visitorlando.com/events/";
+        rootAttrib.innerHTML = `Source: <a href="${esc(cal)}" target="_blank" rel="noopener">Visit Orlando events calendar</a>. Listings are attributed to Visit Orlando; this page does not invent events.`;
+      }
+    }
+    paint();
   }
 
-  /* ---------- 7 news ---------- */
+  /* ---------- 7 demand ---------- */
+  function renderDemand() {
+    const strip = $("#marketStrip");
+    if (strip) strip.innerHTML = (DB.market || []).map((m) => `<div class="mstat"><div class="p">${esc(m.period)}</div><div class="v">${esc(m.value)}</div><p class="c">${esc(m.metric)} · ${esc(m.change)}</p><p class="s">Metro-wide, not these hotels. ${esc(m.source)}</p></div>`).join("");
+    const evHTML = (e) => `<div class="ev"><div class="d"><span class="type type-${esc(e.type || "Other")}">${esc(e.type || "Note")}</span><span>${esc(e.dates)}</span></div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="x">${esc(e.detail)}</p>` : ""}${(e.hotels && e.hotels.length) ? `<p class="x">Linked hotels: ${e.hotels.map((id) => `<a href="#hotel-${id}">${esc((byHotel[id]||{}).short || id)}</a>`).join(", ")}</p>` : ""}<p class="s">${esc(e.source || "")}</p></div>`;
+    const weekList = [...weeks].reverse();
+    let active = latest ? latest.week : (weekList[0] && weekList[0].week);
+    const toolbar = $("#demandToolbar");
+    const timeline = $("#timeline");
+    function paintDemand() {
+      if (toolbar) {
+        toolbar.innerHTML = weekList.map((w) => `<button type="button" class="chip" data-dw="${w.week}" aria-pressed="${w.week===active}">${fMD(w.week)}</button>`).join("");
+        toolbar.querySelectorAll("[data-dw]").forEach((b) => b.addEventListener("click", () => { active = b.dataset.dw; paintDemand(); }));
+      }
+      const focus = weekList.filter((w) => w.week === active);
+      const show = focus.length ? focus : weekList.slice(0, 1);
+      if (timeline) {
+        timeline.innerHTML = show.map((w) => {
+          const evs = DB.context[w.week] || [];
+          return `<article class="tweek${w.status === "missing" ? " missing" : ""}"><h3>${fMD(w.week)} – ${fMD(w.week_end)}</h3>
+            <p class="wk-status">${w.status === "missing" ? "No rate brief · context only" : `Brief of ${fMD(w.generated)}`}</p>${evs.map(evHTML).join("") || '<p class="x">No events recorded for this week.</p>'}</article>`;
+        }).join("");
+      }
+    }
+    paintDemand();
+    const ahead = $("#ahead");
+    if (ahead) {
+      if (DB.looking_ahead?.length) {
+        ahead.innerHTML = `<h3>Looking ahead</h3><ul>${DB.looking_ahead.map((e) => `<li><div class="d">${esc(e.dates)}</div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="t" style="font-size:.82rem;opacity:.85">${esc(e.detail)}</p>` : ""}<span class="s">${esc(e.source)}</span></li>`).join("")}</ul>`;
+      } else ahead.remove();
+    }
+  }
+
+  /* ---------- 8 news ---------- */
   function renderNews() {
-    $("#newsList").innerHTML = [...collected].reverse().map((w) => {
-      const items = DB.news.filter((n) => n.week === w.week);
-      return `<div class="news-col"><h3>Brief of ${fMD(w.generated)}</h3>${items.map((n) => `<div class="nitem"><div class="d">${esc(n.date)}${n.orlando ? '<span class="tag-orl">Orlando</span>' : ""}</div><p>${esc(n.headline)}</p><div class="s">${esc(n.source)}</div></div>`).join("") || "<p>No items.</p>"}</div>`;
-    }).join("") + (weeks.some((w) => w.status === "missing") ? "" : "");
+    const list = $("#newsList");
+    const toolbar = $("#newsToolbar");
+    if (!list) return;
+    const items = [...(DB.news || [])].map((n) => ({
+      ...n,
+      category: n.category || (n.orlando ? "orlando" : "marriott"),
+    }));
+    // Sort newest week first, then as listed
+    const weekOrder = [...collected].reverse().map((w) => w.week);
+    items.sort((a, b) => {
+      const ia = weekOrder.indexOf(a.week); const ib = weekOrder.indexOf(b.week);
+      return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+    });
+    let filter = "all";
+    function paint() {
+      if (toolbar) {
+        const counts = { all: items.length, marriott: 0, orlando: 0, hospitality: 0 };
+        items.forEach((n) => { if (counts[n.category] != null) counts[n.category]++; });
+        toolbar.innerHTML = ["all","marriott","orlando","hospitality"].map((k) => {
+          const label = k === "all" ? "All" : k === "marriott" ? "Marriott" : k === "orlando" ? "Wider Orlando" : "Hospitality media";
+          return `<button type="button" class="chip" data-nf="${k}" aria-pressed="${filter===k}">${label} (${counts[k]||0})</button>`;
+        }).join("");
+        toolbar.querySelectorAll("[data-nf]").forEach((b) => b.addEventListener("click", () => { filter = b.dataset.nf; paint(); }));
+      }
+      const shown = items.filter((n) => filter === "all" || n.category === filter);
+      let html = "";
+      let lastWeek = null;
+      for (const n of shown) {
+        if (n.week !== lastWeek) {
+          lastWeek = n.week;
+          const w = weeks.find((x) => x.week === n.week);
+          html += `<div class="news-week-label">Week of ${fMD(n.week)}${w && w.generated ? ` · brief ${fMD(w.generated)}` : ""}</div>`;
+        }
+        const cat = n.category || "marriott";
+        html += `<article class="nitem">
+          <div class="d"><span>${esc(n.date || "")}</span><span class="tag-cat tag-cat-${esc(cat)}">${esc(cat)}</span>${n.orlando ? '<span class="tag-orl">Orlando</span>' : ""}</div>
+          <p>${esc(n.headline)}</p>
+          <div class="s">${esc(n.source || "")}</div>
+          ${n.url ? `<a class="nlink" href="${esc(n.url)}" target="_blank" rel="noopener">Read source</a>` : ""}
+        </article>`;
+      }
+      list.innerHTML = html || `<p class="vo-empty">No headlines in this filter.</p>`;
+    }
+    paint();
   }
 
   /* ---------- 8 footer ---------- */

@@ -68,3 +68,14 @@ date,property,unit_type,bedrooms,sqft,rate,min_stay,is_booked
 `unit_type` is studio, 1br, 2br or 3br. `is_booked=true` marks a realized ADR, and realization applies to listed rates only. In this mode types are segmented, and types with fewer than 4 comps are gap-filled from the best-supported type and labelled Derived. Possible sources: AirDNA, KeyData (booked data, best for calibrating realization), PriceLabs, Transparent or Lighthouse, or a manual weekly pull of about 8–10 comps per type.
 
 Securities counsel should review the section wording before any of it goes into broker or investor materials, since AMBAR may involve a fund or tokenized structure and live revenue estimates can be forward-looking statements.
+
+## Visit Orlando events
+
+The **Orlando events** section (`#orlando-events`) is fed by `data/visitorlando_events.json` (mirrored as `data/visitorlando_events.js`). Refresh with:
+
+```bash
+python3 scripts/fetch_visitorlando_events.py --start YYYY-MM-DD --end YYYY-MM-DD
+```
+
+Visit Orlando’s Simpleview REST API is often blocked by Akamai for non-browser clients. The script tries REST first, then falls back to the public sitemap + event page JSON-LD (warm a session on `/` and `/events/all/` first). Do not invent events; attribute Visit Orlando and link out to the calendar.
+

@@ -26,6 +26,7 @@
       <a href="#history">History</a>
       <a href="#brands">Brand matrix</a>
       <a href="#hotels">Hotels</a>
+      <a href="#orlando-events">Orlando events</a>
       <a href="#demand">Demand</a>
       <a href="#news">News</a>
       <a href="#sources">Sources</a>
@@ -163,27 +164,46 @@
   </section>
 
   <!-- 6 DEMAND -->
-  <section class="section section-alt" id="demand" aria-labelledby="deTitle">
+  <!-- 6 ORLANDO EVENTS (Visit Orlando) -->
+  <section class="section section-alt" id="orlando-events" aria-labelledby="voTitle">
     <div class="wrap">
       <header class="section-head">
-        <p class="kicker">05 · Demand context</p>
-        <h2 id="deTitle">Events and Disney calendar notes</h2>
-        <p class="section-sub">What was on in Orlando each week, as recorded in the weekly briefs. Market occupancy below is metro-wide, not for these hotels.</p>
+        <p class="kicker">05 · Visit Orlando calendar</p>
+        <h2 id="voTitle">What’s on in Orlando</h2>
+        <p class="section-sub">Beyond rates, Orlando’s calendar shows how engaged the destination is — festivals, theme-park seasons, concerts and conventions that pull leisure and group demand. That activity is part of why Orlando matters for AMBAR. Listings below are from <a href="https://www.visitorlando.com/events/" target="_blank" rel="noopener">Visit Orlando</a> for the next ~30 days; open any card for the official listing.</p>
+      </header>
+      <div class="vo-toolbar" id="voToolbar" role="group" aria-label="Filter Orlando events"></div>
+      <div class="vo-meta" id="voMeta"></div>
+      <div class="vo-grid" id="voGrid"></div>
+      <p class="vo-attrib" id="voAttrib"></p>
+    </div>
+  </section>
+
+  <!-- 7 DEMAND -->
+  <section class="section" id="demand" aria-labelledby="deTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">06 · Demand context</p>
+        <h2 id="deTitle">Conventions, Disney &amp; brief notes</h2>
+        <p class="section-sub">Curated demand drivers from the weekly Marriott briefs — conventions, Disney calendars and hotel-linked notes. For the wider public calendar, see <a href="#orlando-events">Orlando events</a>. Market occupancy below is metro-wide, not for these hotels.</p>
       </header>
       <div class="market-strip" id="marketStrip"></div>
-      <div class="timeline" id="timeline"></div>
+      <div class="demand-toolbar" id="demandToolbar" role="group" aria-label="Filter demand weeks"></div>
+      <div class="demand-grid" id="timeline"></div>
       <div class="ahead" id="ahead"></div>
     </div>
   </section>
 
-  <!-- 7 NEWS -->
-  <section class="section" id="news" aria-labelledby="neTitle">
+  <!-- 8 NEWS -->
+  <section class="section section-alt" id="news" aria-labelledby="neTitle">
     <div class="wrap">
       <header class="section-head">
-        <p class="kicker">06 · Marriott news</p>
-        <h2 id="neTitle">Headlines from the weekly briefs</h2>
+        <p class="kicker">07 · Orlando &amp; hospitality news</p>
+        <h2 id="neTitle">Wider Orlando and hospitality headlines</h2>
+        <p class="section-sub">Marriott items from the weekly briefs, plus wider Orlando destination news and hospitality / meetings media that frame the local market.</p>
       </header>
-      <div class="news" id="newsList"></div>
+      <div class="news-toolbar" id="newsToolbar" role="group" aria-label="Filter news"></div>
+      <div class="news-grid" id="newsList"></div>
     </div>
   </section>
 </main>
@@ -194,7 +214,7 @@
     <div class="footer-top">
       <img src="assets/ambar-logo.png" alt="AMBAR Residences · Orlando" width="156" height="66">
       <div>
-        <p class="kicker on-dark">07 · Sources &amp; methodology</p>
+        <p class="kicker on-dark">08 · Sources &amp; methodology</p>
         <h2 id="soTitle">How these figures are gathered</h2>
         <p class="updated" id="updatedNote"></p>
       </div>
