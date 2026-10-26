@@ -430,4 +430,5 @@ class Nightly(unittest.TestCase):
         with self.assertRaises(ValueError):
             E.run_hotel_night(db, CFG, UNITS, "2026-10-07")   # week of Oct 5 was not collected
         self.assertNotIn("2026-10-07", E.collected_nights(db))
-        self.assertEqual(len(E.collected_nights(db)), 28)
+        collected_weeks = sum(1 for w in db["weeks"] if w.get("status") == "collected")
+        self.assertEqual(len(E.collected_nights(db)), collected_weeks * 7)

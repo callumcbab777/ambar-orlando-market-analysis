@@ -29,7 +29,7 @@ HERE = Path(__file__).resolve().parent
 DATA = HERE / "data" / "comps.json"
 JS = HERE / "data" / "comps.js"
 NAME_RE = re.compile(r"marriott-orlando-brief-week-of-(\d{4}-\d{2}-\d{2})\.md$")
-TOKEN = r"(?:\$[\d,]+\*?|UNAV(?:AILABLE)?)"
+TOKEN = r"(?:\$[\d,]+(?:\*|†)?|UNAV(?:AILABLE)?|MISSING)"
 SEQ_RE = re.compile(TOKEN + r"(?:\s*/\s*" + TOKEN + r"){6}")
 # words that belong to the internal benchmark discussion and must never be shown
 BANNED = re.compile(r"anchor|\$350|80%|vs \$|ADR signal|Occ:|projection", re.I)
@@ -65,12 +65,13 @@ def parse_brief(path, hotels):
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
         if len(cells) < 3 or cells[0].lower() == "property":
             continue
-        h = alias.get(cells[0].lower())
+        prop = re.sub(r"[†‡*]+$", "", cells[0]).strip()
+        h = alias.get(prop.lower())
         if not h:
             print(f"  ! {path.name}: unknown property '{cells[0]}' (add it to hotels[].aliases)")
             continue
         cell, demand = cells[1], cells[2]
-        source = "Google Hotels (google.com/travel)" if "google hotels" in cell.lower() else "trivago.com U.S."
+        source = ("Google Hotels (google.com/travel)" if ("google hotels" in cell.lower() or h["id"].startswith("conrad")) else "trivago.com U.S.")
         m = SEQ_RE.search(cell)
         if m:
             tokens = [t.strip() for t in m.group(0).split("/")]
@@ -85,11 +86,19 @@ def parse_brief(path, hotels):
                 d = (start + dt.timedelta(days=i)).isoformat()
                 rec = dict(hotel=h["id"], brand=h["brand"], tier=h["tier"], week=week, date=d,
                            rate=None, status="UNAVAILABLE", source=source, source_date=generated, note="")
-                if t.startswith("$"):
-                    rec["rate"] = int(t.strip("$*").replace(",", ""))
-                    rec["status"] = "OK"
-                    if t.endswith("*") and star_note:
-                        rec["note"] = star_note
+                if t.upper() == "MISSING":
+                    rec["status"] = "NOT_COLLECTED"
+                    rec["note"] = "Rate not collected (source blocked or page failed during the snapshot)."
+                elif t.startswith("$"):
+                    # † = brief marks the figure non-comparable (e.g. tax/breakfast-inclusive); exclude it.
+                    if t.endswith("†"):
+                        rec["status"] = "NOT_COLLECTED"
+                        rec["note"] = "Brief marked this rate non-comparable (excluded from the set)."
+                    else:
+                        rec["rate"] = int(t.strip("$*†").replace(",", ""))
+                        rec["status"] = "OK"
+                        if t.endswith("*") and star_note:
+                            rec["note"] = star_note
                 else:
                     rec["note"] = "No offer returned for a one-night search (scarcity signal, not a confirmed sell-out)."
                 rates.append(rec)
