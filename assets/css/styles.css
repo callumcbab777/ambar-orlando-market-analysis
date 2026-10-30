@@ -404,3 +404,6 @@ body,h1,h2,h3,h4,.hero-stats dd,.tier-label h3{font-variant-numeric:lining-nums}
 @media (max-width:900px){
   .vo-grid,.demand-grid,.news-grid{grid-template-columns:1fr}
 }
+
+/* nav link to the separate Orlando events page */
+.site-nav a.nav-out{border:1px solid rgba(255,169,74,.45)}

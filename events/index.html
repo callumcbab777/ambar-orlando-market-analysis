@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What’s on in Orlando · Visit Orlando events · AMBAR Orlando</title>
+<meta name="description" content="Orlando events from the Visit Orlando calendar, with filters, saved events and personal recommendations. Companion to the AMBAR Orlando Market Landscape.">
+<meta name="theme-color" content="#1E3A2C">
+<link rel="icon" href="../assets/ambar-logo.png">
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/css/styles.css">
+<link rel="stylesheet" href="../assets/css/events.css">
+<link rel="stylesheet" href="../assets/css/assistant.css">
+</head>
+<body class="events-page">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="brand-mark" href="../index.html" aria-label="AMBAR Orlando Market Landscape, home">
+      <img src="../assets/ambar-logo.png" alt="AMBAR Residences · Orlando" width="156" height="66">
+    </a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">← Market landscape</a>
+      <a href="../index.html#week-ahead">Week ahead</a>
+      <a href="../index.html#hotels">Hotels</a>
+      <a href="../index.html#demand">Demand</a>
+      <a href="index.html" class="active" aria-current="page">Orlando events</a>
+    </nav>
+    <span class="update-pill" id="evUpdatePill">Visit Orlando calendar</span>
+  </div>
+</header>
+
+<main id="main">
+  <section class="hero ev-hero" id="top" aria-labelledby="evHeroTitle">
+    <div class="hero-bands" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow">Visit Orlando calendar · Orlando, Florida</p>
+      <h1 id="evHeroTitle">What’s on in <em>Orlando</em></h1>
+      <p class="lede">Festivals, concerts, theatre, sport and theme-park seasons from the official <a href="https://www.visitorlando.com/events/" target="_blank" rel="noopener">Visit Orlando</a> calendar. The destination’s calendar is part of why Orlando matters for AMBAR; the hotel rates and market data stay on the <a href="../index.html">Market Landscape</a>.</p>
+      <dl class="hero-stats ev-stats" id="evStats"></dl>
+      <p class="hero-note" id="evSourceNote"></p>
+    </div>
+  </section>
+
+  <section class="section" id="events" aria-labelledby="evTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">Orlando events</p>
+        <h2 id="evTitle">Browse, save and plan</h2>
+        <p class="section-sub">Every card links to its official Visit Orlando listing. Save events to find them later (kept in this browser only, no login), or fill in <em>My preferences</em> for a ranked shortlist.</p>
+      </header>
+
+      <div class="ev-tabs" role="tablist" aria-label="Events views" id="evTabs">
+        <button type="button" role="tab" id="tab-browse" aria-controls="panel-browse" aria-selected="true" tabindex="0">All events</button>
+        <button type="button" role="tab" id="tab-saved" aria-controls="panel-saved" aria-selected="false" tabindex="-1">Saved <span class="ev-count" id="savedCount">0</span></button>
+        <button type="button" role="tab" id="tab-prefs" aria-controls="panel-prefs" aria-selected="false" tabindex="-1">My preferences</button>
+      </div>
+
+      <!-- Browse -->
+      <div class="ev-panel" role="tabpanel" id="panel-browse" aria-labelledby="tab-browse" tabindex="0">
+        <div class="ev-reco" id="evReco" hidden></div>
+        <div class="ev-filters" id="evFilters">
+          <div class="ev-field ev-field-search">
+            <label for="evQ">Search</label>
+            <input type="search" id="evQ" placeholder="Title, venue or keyword" autocomplete="off">
+          </div>
+          <div class="ev-field">
+            <label for="evCat">Category</label>
+            <select id="evCat"><option value="all">All categories</option></select>
+          </div>
+          <div class="ev-field">
+            <label for="evArea">Area</label>
+            <select id="evArea"><option value="all">All areas</option></select>
+          </div>
+          <div class="ev-field">
+            <label for="evFrom">From</label>
+            <input type="date" id="evFrom">
+          </div>
+          <div class="ev-field">
+            <label for="evTo">To</label>
+            <input type="date" id="evTo">
+          </div>
+          <div class="ev-field">
+            <label for="evSort">Sort</label>
+            <select id="evSort"><option value="soon">Soonest first</option><option value="short">One-off events first</option><option value="az">A–Z</option></select>
+          </div>
+        </div>
+        <div class="vo-toolbar ev-quick" id="evQuick" role="group" aria-label="Quick date ranges"></div>
+        <div class="ev-metaRow">
+          <p class="vo-meta" id="evMeta" aria-live="polite"></p>
+          <button type="button" class="ev-link-btn" id="evReset">Reset filters</button>
+        </div>
+        <div class="vo-grid ev-grid" id="evGrid"></div>
+      </div>
+
+      <!-- Saved -->
+      <div class="ev-panel" role="tabpanel" id="panel-saved" aria-labelledby="tab-saved" tabindex="0" hidden>
+        <p class="vo-meta" id="savedMeta" aria-live="polite"></p>
+        <div class="vo-grid ev-grid" id="savedGrid"></div>
+      </div>
+
+      <!-- Preferences -->
+      <div class="ev-panel" role="tabpanel" id="panel-prefs" aria-labelledby="tab-prefs" tabindex="0" hidden>
+        <form class="ev-prefs" id="prefsForm" novalidate>
+          <p class="ev-prefs-intro">Tell us what you like and we’ll put a ranked shortlist at the top of <em>All events</em>. Saved in this browser only. Visit Orlando listings here don’t include prices or start times, so budget uses the <em>Free Events</em> tag and time of day isn’t used.</p>
+          <fieldset><legend>Interests</legend><div class="ev-checks" id="pfCats"></div></fieldset>
+          <fieldset><legend>Areas of Orlando</legend><div class="ev-checks" id="pfAreas"></div></fieldset>
+          <fieldset class="ev-row"><legend>Dates</legend>
+            <div class="ev-field"><label for="pfFrom">From</label><input type="date" id="pfFrom" name="from"></div>
+            <div class="ev-field"><label for="pfTo">To</label><input type="date" id="pfTo" name="to"></div>
+          </fieldset>
+          <fieldset><legend>Budget</legend><div class="ev-checks">
+            <label><input type="radio" name="budget" value="any" checked> Any</label>
+            <label><input type="radio" name="budget" value="free"> Free events only</label>
+          </div></fieldset>
+          <fieldset><legend>Who’s going</legend><div class="ev-checks">
+            <label><input type="radio" name="party" value="any" checked> Not specified</label>
+            <label><input type="radio" name="party" value="solo"> Just me</label>
+            <label><input type="radio" name="party" value="couple"> Couple</label>
+            <label><input type="radio" name="party" value="group"> Friends / group</label>
+            <label><input type="radio" name="party" value="family"> Family with kids</label>
+          </div></fieldset>
+          <div class="ev-field"><label for="pfKw">Keywords <span class="ev-hint">(optional, comma separated, e.g. jazz, food, 5K)</span></label><input type="text" id="pfKw" name="keywords" autocomplete="off"></div>
+          <div class="ev-checks"><label><input type="checkbox" id="pfAccess" name="access"> Prefer accessibility-focused listings</label></div>
+          <div class="ev-actions">
+            <button type="submit" class="btn btn-solid">Save preferences</button>
+            <button type="button" class="btn btn-outline" id="pfClear">Clear preferences</button>
+            <p class="ev-status" id="pfStatus" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </div>
+
+      <p class="vo-attrib" id="evAttrib"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer ev-footer" id="sources">
+  <div class="wrap">
+    <div class="footer-top">
+      <img src="../assets/ambar-logo.png" alt="AMBAR Residences · Orlando" width="156" height="66">
+      <div>
+        <p class="kicker on-dark">Sources</p>
+        <h2>Event listings from Visit Orlando</h2>
+        <p class="updated" id="evFooterNote"></p>
+      </div>
+    </div>
+    <p class="disclaimer">Event titles, dates, venues and descriptions are taken from public Visit Orlando event pages and attributed to Visit Orlando; each card links to its official listing. Check the listing for times, prices and changes before you go. This page does not invent events. Saved events and preferences stay in this browser (localStorage) and are not sent anywhere. Hotel rates, the brand matrix and market data are on the <a href="../index.html">AMBAR Orlando Market Landscape</a>.</p>
+    <p class="fineprint on-dark">Compiled by Callum Brown · Headings in Cormorant Garamond, body in DM Sans (SIL Open Font License)</p>
+  </div>
+</footer>
+
+<script src="../data/visitorlando_events.js"></script>
+<script src="../assets/js/events.js"></script>
+<script src="../assets/js/assistant-config.js"></script>
+<script src="../assets/js/assistant.js" data-root="../" data-page="events"></script>
+</body>
+</html>

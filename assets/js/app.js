@@ -45,20 +45,18 @@
   function load() {
     return Promise.all([
       loadJson("data/comps.json", "COMPS_DATA", "data/comps.js"),
-      loadJson("data/visitorlando_events.json", "VO_EVENTS_DATA", "data/visitorlando_events.js").catch(() => null),
-    ]).then(([comps, vo]) => ({ comps, vo }));
+    ]).then(([comps]) => ({ comps }));
   }
 
 
-  let DB, VO, H, byHotel, weeks, collected, latest, tip;
+  let DB, H, byHotel, weeks, collected, latest, tip;
 
     function init(payload) {
     const db = payload.comps || payload;
-    VO = payload.vo || null;
     DB = db; H = db.hotels; weeks = db.weeks; collected = weeks.filter((w) => w.status === "collected"); latest = collected[collected.length - 1];
     byHotel = Object.fromEntries(H.map((h) => [h.id, h]));
     tip = $("#tip");
-    renderHero(); renderWeekAhead(); renderHistory(); renderMatrix(); renderHotels(); renderVisitOrlando(); renderDemand(); renderNews(); renderFooter(); navSpy();
+    renderHero(); renderWeekAhead(); renderHistory(); renderMatrix(); renderHotels(); renderDemand(); renderNews(); renderFooter(); navSpy();
   }
 
   const ratesFor = (week) => DB.rates.filter((r) => r.week === week);
@@ -473,95 +471,7 @@
   }
   function flashCard(id) { const c = $("#hotel-" + id); if (!c) return; c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 2200); }
 
-  /* ---------- 6 Visit Orlando calendar ---------- */
-  function fmtRange(s, e) {
-    if (!s) return "";
-    if (!e || e === s) return fMD(s);
-    return `${fMD(s)} – ${fMD(e)}`;
-  }
-  function renderVisitOrlando() {
-    const rootToolbar = $("#voToolbar");
-    const rootGrid = $("#voGrid");
-    const rootMeta = $("#voMeta");
-    const rootAttrib = $("#voAttrib");
-    if (!rootGrid) return;
-    if (!VO || !Array.isArray(VO.events) || !VO.events.length) {
-      rootGrid.innerHTML = `<p class="vo-empty">Visit Orlando events are not loaded yet. Refresh with <code>scripts/fetch_visitorlando_events.py</code>.</p>`;
-      if (rootAttrib) rootAttrib.innerHTML = `Event calendar: <a href="https://www.visitorlando.com/events/" target="_blank" rel="noopener">Visit Orlando</a>.`;
-      return;
-    }
-    const all = VO.events.slice();
-    const cats = Array.from(new Set(all.flatMap((e) => e.categories || []))).sort();
-    // Week buckets overlapping the window
-    const weeksBuckets = [];
-    {
-      const start = new Date(VO.window_start + "T12:00:00");
-      const end = new Date(VO.window_end + "T12:00:00");
-      let cur = new Date(start);
-      // align to Monday of start week
-      const day = (cur.getDay() + 6) % 7;
-      cur.setDate(cur.getDate() - day);
-      while (cur <= end) {
-        const ws = cur.toISOString().slice(0, 10);
-        const we = new Date(cur); we.setDate(we.getDate() + 6);
-        weeksBuckets.push({ start: ws, end: we.toISOString().slice(0, 10), label: `${fMD(ws)} – ${fMD(we.toISOString().slice(0, 10))}` });
-        cur.setDate(cur.getDate() + 7);
-      }
-    }
-    let state = { week: "all", cat: "all", limit: 24 };
-    function overlapsWeek(e, b) {
-      return e.start_date <= b.end && e.end_date >= b.start;
-    }
-    function filtered() {
-      return all.filter((e) => {
-        if (state.cat !== "all" && !(e.categories || []).includes(state.cat)) return false;
-        if (state.week !== "all") {
-          const b = weeksBuckets.find((w) => w.start === state.week);
-          if (b && !overlapsWeek(e, b)) return false;
-        }
-        return true;
-      });
-    }
-    function paintToolbar() {
-      if (!rootToolbar) return;
-      const weekChips = [`<button type="button" class="chip" data-week="all" aria-pressed="${state.week==="all"}">All dates</button>`]
-        .concat(weeksBuckets.map((b) => `<button type="button" class="chip" data-week="${b.start}" aria-pressed="${state.week===b.start}">${esc(b.label)}</button>`))
-        .join("");
-      const catChips = [`<button type="button" class="chip" data-cat="all" aria-pressed="${state.cat==="all"}">All types</button>`]
-        .concat(cats.slice(0, 10).map((c) => `<button type="button" class="chip" data-cat="${esc(c)}" aria-pressed="${state.cat===c}">${esc(c)}</button>`))
-        .join("");
-      rootToolbar.innerHTML = `<div class="vo-chiprow" style="display:flex;flex-wrap:wrap;gap:8px;width:100%">${weekChips}</div><div class="vo-chiprow" style="display:flex;flex-wrap:wrap;gap:8px;width:100%;margin-top:8px">${catChips}</div>`;
-      rootToolbar.querySelectorAll("[data-week]").forEach((b) => b.addEventListener("click", () => { state.week = b.dataset.week; state.limit = 24; paint(); }));
-      rootToolbar.querySelectorAll("[data-cat]").forEach((b) => b.addEventListener("click", () => { state.cat = b.dataset.cat; state.limit = 24; paint(); }));
-    }
-    function card(e) {
-      const tags = (e.categories || []).slice(0, 3).map((c) => `<span class="tag">${esc(c)}</span>`).join("");
-      const loc = [e.location, e.city].filter(Boolean).join(" · ");
-      return `<a class="vo-card" href="${esc(e.url)}" target="_blank" rel="noopener">
-        <div class="vo-date">${esc(fmtRange(e.start_date, e.end_date))}</div>
-        <h3 class="vo-title">${esc(e.title)}</h3>
-        ${loc ? `<p class="vo-loc">${esc(loc)}</p>` : ""}
-        ${e.description ? `<p class="vo-desc">${esc(e.description)}</p>` : ""}
-        <div class="vo-tags">${tags}</div>
-      </a>`;
-    }
-    function paint() {
-      paintToolbar();
-      const list = filtered();
-      const show = list.slice(0, state.limit);
-      rootMeta.textContent = `${list.length} event${list.length===1?"":"s"} in view · window ${fMD(VO.window_start)} – ${fMD(VO.window_end)} · fetched ${VO.fetched_at ? fMD(VO.fetched_at.slice(0,10)) : "—"}`;
-      rootGrid.innerHTML = show.map(card).join("") || `<p class="vo-empty">No Visit Orlando events match these filters.</p>`;
-      if (list.length > state.limit) {
-        rootGrid.insertAdjacentHTML("beforeend", `<div class="vo-more" style="grid-column:1/-1"><button type="button" id="voMore">Show more (${list.length - state.limit} remaining)</button></div>`);
-        $("#voMore")?.addEventListener("click", () => { state.limit += 24; paint(); });
-      }
-      if (rootAttrib) {
-        const cal = VO.calendar_url || "https://www.visitorlando.com/events/";
-        rootAttrib.innerHTML = `Source: <a href="${esc(cal)}" target="_blank" rel="noopener">Visit Orlando events calendar</a>. Listings are attributed to Visit Orlando; this page does not invent events.`;
-      }
-    }
-    paint();
-  }
+  /* Visit Orlando calendar: moved to events/index.html (assets/js/events.js) */
 
   /* ---------- 7 demand ---------- */
   function renderDemand() {
@@ -661,7 +571,7 @@
   function navSpy() {
     const links = [...document.querySelectorAll(".site-nav a")];
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) links.forEach((a) => a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id)); }), { rootMargin: "-40% 0px -55% 0px" });
-    links.forEach((a) => { const s = $(a.getAttribute("href")); if (s) io.observe(s); });
+    links.forEach((a) => { const h = a.getAttribute("href"); if (!h.startsWith("#")) return; const s = $(h); if (s) io.observe(s); });
   }
   /* boot */
   load().then(init).catch((e) => {
