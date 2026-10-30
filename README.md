@@ -5,7 +5,9 @@ Static, single-folder site. Open `index.html` directly (works offline, except ma
 Marriott brands are the main focus (AMBAR is part of the Marriott family); key non-Marriott upper-upscale and luxury hotels are included for a fuller picture. The Marriott Brand Matrix section stays Marriott-only.
 
 ## Structure
-- `index.html`: page shell
+- `index.html`: page shell (hotel / ADR / market data)
+- `events/index.html`: Orlando events page (Visit Orlando calendar, Saved, My preferences)
+- `assistant-proxy/`: optional serverless proxy for the AI assistant (deploy separately; see its README)
 - `assets/css/styles.css`, `assets/js/app.js`: design and rendering. All content comes from `data/comps.json`
 - `assets/ambar-logo.png`: AMBAR logo cropped from Callum's brand graphic
 - `assets/fonts/`: self-hosted Cormorant Garamond + DM Sans (SIL OFL)
@@ -69,13 +71,22 @@ date,property,unit_type,bedrooms,sqft,rate,min_stay,is_booked
 
 Securities counsel should review the section wording before any of it goes into broker or investor materials, since AMBAR may involve a fund or tokenized structure and live revenue estimates can be forward-looking statements.
 
-## Visit Orlando events
+## Orlando events page (`events/index.html`)
 
-The **Orlando events** section (`#orlando-events`) is fed by `data/visitorlando_events.json` (mirrored as `data/visitorlando_events.js`). Refresh with:
+The Visit Orlando calendar lives on its own page, **`events/index.html`**, so the main page stays focused on hotel, ADR and market data. The two pages cross-link in the header nav (main: “Orlando events →”; events: “← Market landscape”), and the Demand section links to it.
 
-```bash
-python3 scripts/fetch_visitorlando_events.py --start YYYY-MM-DD --end YYYY-MM-DD
-```
+- **Data:** `data/visitorlando_events.json`, loaded through its mirror `data/visitorlando_events.js` (so `file://` works). Refresh with:
+  ```bash
+  python3 scripts/fetch_visitorlando_events.py --start YYYY-MM-DD --end YYYY-MM-DD
+  ```
+  Visit Orlando’s Simpleview REST API is often blocked by Akamai for non-browser clients. The script tries REST first, then falls back to the public sitemap + event page JSON-LD (warm a session on `/` and `/events/all/` first). Do not invent events; attribute Visit Orlando and link out to the calendar.
+- **Browse** (`assets/js/events.js`, `assets/css/events.css`): search, category, area (from each listing’s city), from/to dates, quick date chips (from today, this weekend, each week, whole window), sort. Every card shows a **“Source: Visit Orlando listing”** link to its official page; the page header and footer attribute Visit Orlando. Deep links: `events/index.html?q=jazz&area=Winter%20Park&from=2026-11-01&to=2026-11-08&cat=Free%20Events`, `#saved`, `#preferences`.
+- **Saved:** a Save toggle on each card; the **Saved** tab lists them. Stored in `localStorage` (`ambar.events.saved.v1`) with a small snapshot (title, dates, URL) so events that later drop out of the data still show as “No longer listed” with their original link and a Remove button. No login.
+- **My preferences:** interests (categories), areas, dates, budget (any / free only — listings have no prices, so this uses Visit Orlando’s *Free Events* tag), who’s going, keywords and accessibility. Stored in `localStorage` (`ambar.events.prefs.v1`). Once saved, **“Recommended for you”** with the tagline **“Powered by Isla AI - ABI Group”** appears at the top of *All events*: up to 6 events ranked in the browser by a transparent score (+3 per matching interest, +2 area, +2 per keyword up to +4, +2 family wording when “Family with kids”, +2 accessibility wording, +1 runs of 7 days or fewer; outside the dates or non-free when “Free only” are excluded). The rules are shown on the page under “How this is ranked”. Edit or Clear at any time.
 
-Visit Orlando’s Simpleview REST API is often blocked by Akamai for non-browser clients. The script tries REST first, then falls back to the public sitemap + event page JSON-LD (warm a session on `/` and `/events/all/` first). Do not invent events; attribute Visit Orlando and link out to the calendar.
+## Site assistant (chat widget)
 
+`assets/js/assistant.js` + `assets/css/assistant.css`, on both pages (bottom-right button).
+
+- **Offline site guide (default):** with `proxyUrl` empty in `assets/js/assistant-config.js`, the widget is labelled “Offline site guide · keyword search, not AI”. It parses dates (“today”, “this weekend”, “Nov 7”), “free”, areas and keywords, searches the site’s sections and the Visit Orlando data locally, and answers with links only.
+- **AI mode (Isla):** set `proxyUrl` to a deployed `assistant-proxy/` endpoint. The widget sends the conversation plus the site’s section list and the events its local search matched; the proxy adds the key and a grounded system prompt. If the proxy fails, it falls back to the offline guide. **No API key is ever in the client or this repo.** Setup: `assistant-proxy/README.md`.

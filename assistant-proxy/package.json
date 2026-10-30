@@ -1,0 +1,8 @@
+{
+  "name": "ambar-assistant-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Serverless proxy for the AMBAR Orlando site assistant (holds the LLM key server-side).",
+  "engines": { "node": ">=18" },
+  "scripts": { "test": "node test/smoke.js" }
+}

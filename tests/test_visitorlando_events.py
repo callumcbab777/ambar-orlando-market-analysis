@@ -35,12 +35,15 @@ class VisitOrlandoEventsTest(unittest.TestCase):
         cats = {n.get("category") for n in comps["news"]}
         self.assertTrue({"marriott", "orlando", "hospitality"} <= cats)
 
-    def test_index_has_section(self):
+    def test_events_moved_to_own_page(self):
         html = (ROOT / "index.html").read_text()
-        self.assertIn('id="orlando-events"', html)
-        self.assertIn('href="#orlando-events"', html)
+        self.assertNotIn('id="orlando-events"', html)
+        self.assertNotIn('href="#orlando-events"', html)
+        self.assertIn('href="events/index.html"', html)
         self.assertIn("Wider Orlando", html)
-
+        ev = (ROOT / "events" / "index.html").read_text()
+        self.assertIn("../data/visitorlando_events.js", ev)
+        self.assertIn('href="../index.html"', ev)
 
 if __name__ == "__main__":
     unittest.main()

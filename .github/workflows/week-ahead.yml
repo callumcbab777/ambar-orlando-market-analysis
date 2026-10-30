@@ -23,6 +23,9 @@ on:
       - "assets/js/week-ahead.js"
       - "assets/css/week-ahead.css"
       - "index.html"
+      - "events/**"
+      - "assets/js/**"
+      - "assistant-proxy/**"
   workflow_dispatch:
 permissions:
   contents: write
