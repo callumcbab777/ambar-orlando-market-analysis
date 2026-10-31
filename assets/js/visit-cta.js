@@ -1,6 +1,7 @@
-/* AMBAR Orlando · events page: mobile-only sticky "Visit AMBAR" bar.
-   Shows on phones (<=760px) once the visitor has scrolled past the hero; hides while the Visit AMBAR band
-   or the Plan your visit section is on screen; dismissible for the session. Never shown on desktop. No popups. */
+/* AMBAR Orlando · events, visit and profile pages: mobile-only sticky "Visit AMBAR" bar.
+   Shows on phones (<=760px) once the visitor has scrolled past the hero (.evh-grid); hides while the Visit AMBAR band
+   (#evVisitBand) or the events page Plan your visit teaser (#plan) is on screen; dismissible for the session.
+   Never shown on desktop. No popups. */
 (function () {
   "use strict";
   const bar = document.getElementById("evMbar");
