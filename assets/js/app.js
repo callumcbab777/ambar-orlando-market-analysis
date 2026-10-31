@@ -20,12 +20,7 @@
   const fLong = (iso) => fmt(iso, { month: "long", day: "numeric", year: "numeric" });
   const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
   const median = (a) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
-  const todayISO = (() => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10);   /* boot */
-  load().then(init).catch((e) => {
-    console.error(e);
-    $("#main").insertAdjacentHTML("afterbegin", '<p class="wrap" style="padding:24px">Data could not be loaded (data/comps.json).</p>');
-  });
-})();
+  const todayISO = (() => { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); })();
 
   const COLORS = {
     "swan-reserve": "#B37D50", "jw-bonnet-creek": "#355965", "dolphin": "#6F97A3", "jw-grande-lakes": "#1E3A2C",
@@ -56,7 +51,7 @@
     DB = db; H = db.hotels; weeks = db.weeks; collected = weeks.filter((w) => w.status === "collected"); latest = collected[collected.length - 1];
     byHotel = Object.fromEntries(H.map((h) => [h.id, h]));
     tip = $("#tip");
-    renderHero(); renderWeekAhead(); renderHistory(); renderMatrix(); renderHotels(); renderDemand(); renderNews(); renderFooter(); navSpy();
+    renderHero(); renderWeekAhead(); renderMatrix(); renderHotels(); renderByHotel(); renderDemand(); renderNews(); renderFooter(); navSpy();
   }
 
   const ratesFor = (week) => DB.rates.filter((r) => r.week === week);
@@ -187,19 +182,19 @@
       (notes.length ? `<br><strong>Brief notes this week:</strong> ` + notes.map((n) => `${esc(byHotel[n.hotel].short)}: ${esc(n.rate_note)}`).join(" · ") : "");
   }
 
-  /* ---------- 3 history ---------- */
-  let chart, view = "nightly", showBand = true, capOn = true, CAP = null, minis = [];
+  /* ---------- by hotel (in the Hotels section): weekly-mean change + nightly sparkline per hotel, with favourites ---------- */
+  let CAP = null;
   const CAP_SHAPE = "triangle";
   // Cap rule: 1.5 x the 95th percentile of all priced nights, rounded up to the next $250 (min $500).
-  // With the current data: p95 = $658 -> cap = $1,000. Recomputed automatically as weeks are added.
+  // Recomputed automatically as weeks are added; nights above it are pinned at the cap with a triangle.
   function capValue() {
     if (CAP) return CAP;
     const v = priced(DB.rates).sort((a, b) => a - b); if (!v.length) return (CAP = Infinity);
     const p95 = v[Math.max(0, Math.ceil(0.95 * v.length) - 1)];
     CAP = Math.max(500, Math.ceil((p95 * 1.5) / 250) * 250); capValue.p95 = p95; return CAP;
   }
-  const capArr = (arr) => (capOn ? arr.map((v) => (v != null && v > capValue() ? capValue() : v)) : arr);
-  const isCapped = (raw, i) => capOn && raw[i] != null && raw[i] > capValue();
+  const capArr = (arr) => arr.map((v) => (v != null && v > capValue() ? capValue() : v));
+  const isCapped = (raw, i) => raw[i] != null && raw[i] > capValue();
   const capPlugin = {
     id: "capLine",
     afterDatasetsDraw(c) {
@@ -207,176 +202,86 @@
       const { ctx, chartArea: a, scales: { y } } = c, py = y.getPixelForValue(o.value);
       if (py < a.top - 1 || py > a.bottom) return;
       ctx.save(); ctx.strokeStyle = "rgba(243,111,67,.75)"; ctx.setLineDash([2, 4]); ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke();
-      if (o.label) { ctx.setLineDash([]); ctx.fillStyle = "#B4492A"; ctx.font = "600 11px 'DM Sans', sans-serif"; ctx.textAlign = "left"; ctx.fillText(o.label, a.left + 6, py + 14); }
-      ctx.restore();
+      ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke(); ctx.restore();
     }
   };
-  const anyAbove = (arrs) => arrs.some((a) => a.some((v) => v != null && v > capValue()));
-  const visible = new Set();
-  const allDates = () => weeks.flatMap(weekDates);
-
   const gapPlugin = {
     id: "gapShade",
     beforeDatasetsDraw(c) {
       const { ctx, chartArea: a, scales: { x } } = c, ranges = c.options.plugins.gapShade?.ranges || [];
-      ranges.forEach(([i0, i1, label]) => {
+      ranges.forEach(([i0, i1]) => {
         const step = x.getPixelForValue(1) - x.getPixelForValue(0) || 40;
         const x0 = x.getPixelForValue(i0) - step / 2, x1 = x.getPixelForValue(i1) + step / 2;
-        ctx.save(); ctx.fillStyle = "rgba(117,117,117,.09)"; ctx.fillRect(x0, a.top, x1 - x0, a.bottom - a.top);
-        ctx.strokeStyle = "rgba(117,117,117,.35)"; ctx.setLineDash([4, 4]);
-        ctx.beginPath(); ctx.moveTo(x0, a.top); ctx.lineTo(x0, a.bottom); ctx.moveTo(x1, a.top); ctx.lineTo(x1, a.bottom); ctx.stroke();
-        ctx.setLineDash([]); ctx.fillStyle = "#757575"; ctx.font = "600 11px 'DM Sans', sans-serif"; ctx.textAlign = "center";
-        const cx = (x0 + x1) / 2; label.split("\n").forEach((l, k) => ctx.fillText(l, cx, a.top + 18 + k * 14));
-        ctx.restore();
+        ctx.save(); ctx.fillStyle = "rgba(117,117,117,.09)"; ctx.fillRect(x0, a.top, x1 - x0, a.bottom - a.top); ctx.restore();
       });
     }
   };
-
-  function series() {
-    if (view === "nightly") {
-      const dates = allDates();
-      const labels = dates.map((d) => fMD(d));
-      const val = (hid, d) => { const r = DB.rates.find((x) => x.hotel === hid && x.date === d); return r && r.status === "OK" && Number(r.rate) > 0 ? r.rate : null; };
-      const per = H.map((h) => ({ h, data: dates.map((d) => val(h.id, d)) }));
-      const set = dates.map((d) => priced(DB.rates.filter((r) => r.date === d)));
-      const gaps = weeks.map((w, i) => w.status === "missing" ? [i * 7, i * 7 + 6, `Week of ${fMD(w.week)}\nnot collected`] : null).filter(Boolean);
-      return { labels, per, min: set.map((p) => (p.length ? Math.min(...p) : null)), max: set.map((p) => (p.length ? Math.max(...p) : null)), med: set.map(median), gaps, dates };
-    }
-    const labels = weeks.map((w) => `w/c ${fMD(w.week)}`);
-    const per = H.map((h) => ({ h, data: weeks.map((w) => mean(priced(DB.rates.filter((r) => r.week === w.week && r.hotel === h.id))) ) }));
-    const set = weeks.map((w, i) => per.map((p) => p.data[i]).filter((v) => v != null));
-    const gaps = weeks.map((w, i) => (w.status === "missing" ? [i, i, "Not\ncollected"] : null)).filter(Boolean);
-    return { labels, per, min: set.map((p) => (p.length ? Math.min(...p) : null)), max: set.map((p) => (p.length ? Math.max(...p) : null)), med: set.map(median), gaps };
+  const allDates = () => weeks.flatMap(weekDates);
+  const P = window.AMBAR_PROFILE || null;
+  const isFav = (id) => !!(P && P.isFavHotel(id));
+  const starBtn = (h, where) => P ? `<button type="button" class="fav-star" data-fav="${h.id}" aria-pressed="${isFav(h.id)}" aria-label="Favourite ${esc(h.short)}${where ? " (" + where + ")" : ""}" title="Save ${esc(h.short)} to My Profile"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg></button>` : "";
+  let favOnly = false;
+  function syncFavs() {
+    if (!P) return;
+    const favs = P.get().hotels;
+    document.querySelectorAll("[data-fav]").forEach((b) => b.setAttribute("aria-pressed", String(favs.includes(b.dataset.fav))));
+    document.querySelectorAll(".hcard,.mini").forEach((c) => c.classList.toggle("is-fav", favs.includes(c.dataset.hid)));
+    const n = H.filter((h) => favs.includes(h.id)).length;
+    $("#favN").textContent = n ? `(${n})` : "";
+    $("#favOnly").disabled = !n && !favOnly;
+    if (favOnly && !n) { favOnly = false; $("#favOnly").setAttribute("aria-pressed", "false"); }
+    document.querySelectorAll("#multiples .mini").forEach((c) => { c.hidden = favOnly && !favs.includes(c.dataset.hid); });
   }
-
-  function buildDatasets(s) {
-    const ds = [];
-    if (showBand) {
-      ds.push({ label: "Range low", data: s.min, borderWidth: 0, pointRadius: 0, fill: false, spanGaps: false, backgroundColor: "rgba(201,163,90,.18)", order: 10, _band: 1 });
-      ds.push({ label: "Range", data: capArr(s.max), borderWidth: 0, pointRadius: 0, fill: "-1", spanGaps: false, backgroundColor: "rgba(201,163,90,.18)", order: 10, _band: 1 });
-      ds.push({ label: "Median", data: s.med, borderColor: "#171717", borderDash: [6, 5], borderWidth: 1.6, pointRadius: 0, spanGaps: false, tension: 0.25, order: 1 });
-    }
-    s.per.forEach(({ h, data }) => {
-      if (!visible.has(h.id)) return;
-      const base = view === "weekly" ? 5 : 2.5;
-      ds.push({ label: h.short, data: capArr(data), _raw: data, borderColor: COLORS[h.id], backgroundColor: COLORS[h.id], borderWidth: 2.2, tension: 0.25,
-        pointStyle: (c) => (isCapped(data, c.dataIndex) ? CAP_SHAPE : "circle"),
-        pointRadius: (c) => (isCapped(data, c.dataIndex) ? 8 : base),
-        pointHoverRadius: (c) => (isCapped(data, c.dataIndex) ? 10 : 6),
-        pointBorderColor: (c) => (isCapped(data, c.dataIndex) ? "#F36F43" : COLORS[h.id]),
-        pointBorderWidth: (c) => (isCapped(data, c.dataIndex) ? 2.5 : 1),
-        spanGaps: false, order: 2, clip: 12, _hid: h.id });
+  function bindFavs() {
+    if (!P) { $("#favOnly").hidden = true; return; }
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-fav]"); if (!b) return;
+      e.preventDefault();
+      const id = b.dataset.fav, h = byHotel[id];
+      const before = isFav(id);
+      if (!before && P.get().hotels.length >= P.LIMITS.hotels) { $("#favStatus").textContent = `You can favourite up to ${P.LIMITS.hotels} hotels.`; return; }
+      P.toggleHotel(id);
+      $("#favStatus").textContent = before ? `${h.short} removed from your favourites.` : `${h.short} saved to your favourites in My Profile.`;
     });
-    return ds;
+    $("#favOnly").addEventListener("click", (e) => { favOnly = !favOnly; e.currentTarget.setAttribute("aria-pressed", String(favOnly)); syncFavs(); });
+    P.subscribe(syncFavs);
+    syncFavs();
   }
-
-  function renderHistory() {
-    H.forEach((h) => visible.add(h.id));
-    const chips = $("#hotelChips");
-    H.forEach((h) => {
-      const b = el("button", { type: "button", class: "chip", "aria-pressed": "true", "data-hid": h.id }, `<i style="background:${COLORS[h.id]}"></i>${esc(h.short)}`);
-      b.addEventListener("click", () => { visible.has(h.id) ? visible.delete(h.id) : visible.add(h.id); syncChips(); updateChart(); });
-      chips.appendChild(b);
-    });
-    document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => {
-      view = b.dataset.view; document.querySelectorAll("[data-view]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); updateChart(true);
-    }));
-    $("#toggleBand").addEventListener("click", (e) => { showBand = !showBand; e.currentTarget.setAttribute("aria-pressed", String(showBand)); updateChart(); });
-    $("#allHotels").addEventListener("click", () => { H.forEach((h) => visible.add(h.id)); syncChips(); updateChart(); });
-    $("#noHotels").addEventListener("click", () => { visible.clear(); syncChips(); updateChart(); });
-    $("#toggleCap").addEventListener("click", (e) => { capOn = !capOn; e.currentTarget.setAttribute("aria-pressed", String(capOn)); updateChart(); updateMinis(); });
-
-    Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif"; Chart.defaults.color = "#5f5f55";
-    const s = series();
-    chart = new Chart($("#historyChart"), {
-      type: "line", data: { labels: s.labels, datasets: buildDatasets(s) }, plugins: [gapPlugin, capPlugin],
-      options: {
-        responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false }, animation: { duration: 450 }, layout: { padding: { top: 12 } },
-        scales: {
-          x: { grid: { display: false }, ticks: { maxRotation: 0, autoSkip: true, autoSkipPadding: 14 } },
-          y: { grid: { color: "rgba(30,58,44,.08)" }, beginAtZero: false, ticks: { callback: (v) => (Number(v) > 0 ? "$" + Number(v).toLocaleString("en-US") : "") }, title: { display: true, text: "Lowest public nightly rate (USD)" } }
-        },
-        plugins: {
-          legend: { display: false }, gapShade: { ranges: s.gaps }, capLine: { on: false },
-          tooltip: {
-            backgroundColor: "#143023", titleColor: "#E3C68A", padding: 12, boxPadding: 4,
-            filter: (i) => !i.dataset._band && i.raw != null,
-            callbacks: {
-              title: (items) => (view === "nightly" && items[0] ? fDay(series.cache.dates[items[0].dataIndex]) + " " + items[0].label : items[0]?.label),
-              label: (i) => {
-                const raw = i.dataset._raw ? i.dataset._raw[i.dataIndex] : i.raw;
-                return raw > i.raw ? ` ${i.dataset.label}: shown at ${money(i.raw)} cap · Actual: ${money(raw)}` : ` ${i.dataset.label}: ${money(raw)}`;
-              }
-            }
-          }
-        }
-      }
-    });
-    series.cache = s;
-    applyCapAxis(s);
-    chart.update("none");
-    updateCaption(s);
-
-    // small multiples
+  function renderByHotel() {
     const box = $("#multiples");
     const dates = allDates();
+    const gaps = weeks.map((w, i) => w.status === "missing" ? [i * 7, i * 7 + 6] : null).filter(Boolean);
+    const allPriced = priced(DB.rates);
+    const anyCapped = allPriced.some((v) => v > capValue());
+    const yMax = anyCapped ? capValue() * 1.22 : Math.max(...allPriced) * 1.02;
+    if (window.Chart) { Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif"; Chart.defaults.color = "#5f5f55"; }
     H.forEach((h) => {
       const wm = weeks.map((w) => ({ w, m: mean(priced(DB.rates.filter((r) => r.week === w.week && r.hotel === h.id))) }));
       const have = wm.filter((x) => x.m != null), last = have[have.length - 1], prev = have[have.length - 2];
       const ch = last && prev ? (last.m / prev.m - 1) * 100 : null;
-      const card = el("button", { type: "button", class: "mini", "aria-label": `Show only ${h.short} in the main chart` },
-        `<h4><i style="background:${COLORS[h.id]}"></i>${esc(h.short)}</h4><span class="m-brand">${esc(h.brand)} · ${h.tier}</span>
+      const card = el("article", { class: "mini", id: "mini-" + h.id, "data-hid": h.id, "aria-labelledby": "mn-" + h.id, tabindex: "-1" },
+        `<div class="mini-top"><h4 id="mn-${h.id}"><i style="background:${COLORS[h.id]}"></i>${esc(h.short)}</h4>${starBtn(h, "rate history")}</div><span class="m-brand">${esc(h.brand)} · ${h.tier}</span>
          <div class="m-stats"><span><b>${money(last?.m)}</b> w/c ${last ? fMD(last.w.week) : "—"}</span>
          ${ch == null ? "" : Math.abs(ch) < 0.5 ? `<span class="delta flat" title="Change in weekly mean vs w/c ${fMD(prev.w.week)}">Flat vs ${fMD(prev.w.week)}</span>` : `<span class="delta ${ch > 0 ? "up" : "down"}" title="Change in weekly mean vs w/c ${fMD(prev.w.week)}">${ch > 0 ? "▲" : "▼"} ${Math.abs(ch).toFixed(0)}% vs ${fMD(prev.w.week)}</span>`}</div>
-         <canvas aria-hidden="true"></canvas>`);
-      card.addEventListener("click", () => { visible.clear(); visible.add(h.id); syncChips(); updateChart(); $("#history").scrollIntoView({ behavior: "smooth" }); });
+         <div class="m-chart"><canvas role="img" aria-label="Nightly lowest public rates for ${esc(h.short)}, ${fMD(weeks[0].week)} to ${fMD(weeks[weeks.length - 1].week_end)}"></canvas></div>`);
       box.appendChild(card);
       const data = dates.map((d) => { const r = DB.rates.find((x) => x.hotel === h.id && x.date === d); return r && r.status === "OK" && Number(r.rate) > 0 ? r.rate : null; });
-      const mc = new Chart($("canvas", card), {
+      if (window.Chart) new Chart($("canvas", card), {
         type: "line", data: { labels: dates, datasets: [{ data: capArr(data), borderColor: COLORS[h.id], borderWidth: 1.8, tension: 0.3, spanGaps: false, fill: false,
           pointStyle: CAP_SHAPE, pointBackgroundColor: "#F36F43", pointBorderColor: "#fff", pointBorderWidth: 1,
           pointRadius: (c) => (isCapped(data, c.dataIndex) ? 8 : 0), clip: 12 }] },
         plugins: [gapPlugin, capPlugin],
-        options: { responsive: true, maintainAspectRatio: false, animation: false, events: [], layout: { padding: { top: 10 } }, plugins: { legend: { display: false }, tooltip: { enabled: false }, gapShade: { ranges: weeks.map((w, i) => w.status === "missing" ? [i * 7, i * 7 + 6, ""] : null).filter(Boolean) } },
-          scales: { x: { display: false }, y: { display: false, min: undefined, suggestedMin: undefined, max: miniMax() } } }
+        options: { responsive: true, maintainAspectRatio: false, animation: false, events: [], layout: { padding: { top: 10 } },
+          plugins: { legend: { display: false }, tooltip: { enabled: false }, gapShade: { ranges: gaps }, capLine: { on: anyCapped, value: capValue() } },
+          scales: { x: { display: false }, y: { display: false, max: yMax } } }
       });
-      mc._raw = data; minis.push(mc);
       const capped = data.filter((v) => v != null && v > capValue());
-      if (capped.length) card.querySelector(".m-stats").insertAdjacentHTML("afterend", `<span class="m-cap" data-capnote>▲ ${capped.length} night${capped.length > 1 ? "s" : ""} above ${money(capValue())} cap (max ${money(Math.max(...capped))})</span>`);
+      if (capped.length) card.querySelector(".m-stats").insertAdjacentHTML("afterend", `<span class="m-cap">▲ ${capped.length} night${capped.length > 1 ? "s" : ""} above ${money(capValue())} cap (max ${money(Math.max(...capped))})</span>`);
     });
-  }
-  const miniMax = () => (capOn && anyAbove([priced(DB.rates)]) ? capValue() * 1.22 : Math.max(...priced(DB.rates)) * 1.02);
-  function updateMinis() {
-    minis.forEach((m) => { m.data.datasets[0].data = capArr(m._raw); m.options.scales.y.max = miniMax(); m.update("none"); });
-    document.querySelectorAll("[data-capnote]").forEach((n) => (n.hidden = !capOn));
-  }
-  function applyCapAxis(s) {
-    const above = capOn && anyAbove([...s.per.filter((p) => visible.has(p.h.id)).map((p) => p.data), showBand ? s.max : []]);
-    chart.options.scales.y.max = above ? capValue() : undefined;
-    chart.options.plugins.capLine = { on: above, value: capValue(), label: above ? `Cap ${money(capValue())}` : "" };
-    const note = $("#capNote");
-    if (!capOn) note.innerHTML = `Cap is off: the axis shows every value, so the highest nights compress the rest of the chart.`;
-    else note.innerHTML = `<span class="cap-mark" aria-hidden="true">▲</span> <strong>Cap extreme values is on.</strong> The axis stops at ${money(capValue())} (1.5 × the 95th percentile of all priced nights, ${money(capValue.p95)}, rounded up to the next $250). ` +
-      (above ? `Nights above the cap are pinned at ${money(capValue())} with a triangle marker; hover or tap one to see the actual rate. Currently capped: ${cappedList()}.` : `No values in the current view exceed the cap.`) + ` Turn the toggle off to see the full scale.`;
-  }
-  function cappedList() {
-    return DB.rates.filter((r) => r.status === "OK" && r.rate > capValue() && (view === "nightly" ? visible.has(r.hotel) : false))
-      .map((r) => `${esc(byHotel[r.hotel].short)}, ${fDay(r.date)} ${fMD(r.date)} (actual ${money(r.rate)})`).join("; ") || (view === "weekly" ? "none (weekly means are all below the cap)" : "none for the hotels shown");
-  }
-  function syncChips() { document.querySelectorAll("#hotelChips .chip").forEach((c) => c.setAttribute("aria-pressed", String(visible.has(c.dataset.hid)))); }
-  function updateChart(relabel) {
-    const s = series(); series.cache = s;
-    chart.data.labels = s.labels; chart.data.datasets = buildDatasets(s); chart.options.plugins.gapShade.ranges = s.gaps;
-    applyCapAxis(s); chart.update(); updateCaption(s);
-  }
-  function updateCaption(s) {
-    $("#historyCaption").textContent = (view === "nightly"
-      ? "Nightly view: each point is one night’s lowest public rate. Unavailable or uncollected nights break the line."
-      : "Weekly view: simple mean of the nights that showed a price, per hotel (illustrative, not ADR).") +
-      ` The range band and median are calculated across all ${H.length} hotels, whichever hotels are toggled on. Sources: ` +
-      collected.map((w) => `w/c ${fMD(w.week)}: ${sourcesOf(ratesFor(w.week)).join(" & ")} (${fMD(w.generated)})`).join("; ") + ".";
-    $("#historyChart").setAttribute("aria-label", `${view === "nightly" ? "Nightly" : "Weekly mean"} lowest public rates for ${visible.size} hotels from ${fMD(weeks[0].week)} to ${fMD(weeks[weeks.length - 1].week_end)}; week of ${weeks.filter((w) => w.status === "missing").map((w) => fMD(w.week)).join(", ") || "none"} not collected.`);
+    $("#byHotelNote").textContent = `Each line is one hotel’s lowest public nightly rate, ${fMD(weeks[0].week)} to ${fMD(weeks[weeks.length - 1].week_end)}; the figure is the simple mean of the nights that showed a price in the latest collected week (illustrative, not ADR), compared with the week before. Shaded weeks were not collected and gaps are unavailable nights. ` +
+      (anyCapped ? `Nights above ${money(capValue())} (1.5 × the 95th percentile of all priced nights, ${money(capValue.p95)}, rounded up to the next $250) are pinned at that cap with a triangle so they don’t flatten the rest. ` : "") +
+      `Sources: ` + collected.map((w) => `w/c ${fMD(w.week)}: ${sourcesOf(ratesFor(w.week)).join(" & ")} (${fMD(w.generated)})`).join("; ") + `. Tap the star to save a hotel to My Profile.`;
+    bindFavs();
   }
 
   /* ---------- 4 brand matrix ---------- */
@@ -432,8 +337,8 @@
     const grid = $("#hotelGrid");
     H.forEach((h, i) => {
       const rs = DB.rates.filter((r) => r.hotel === h.id && r.week === latest.week), p = priced(rs);
-      const card = el("article", { class: "hcard", id: "hotel-" + h.id, "aria-labelledby": "hn-" + h.id });
-      card.innerHTML = `<div class="pills"><span class="pill t-${h.tier}">${h.tier}</span><span class="pill">${esc(h.brand)}</span>${h.non_marriott ? `<span class="pill pill-nm">Non-Marriott${h.parent && h.parent !== h.brand ? " · " + esc(h.parent) : ""}</span>` : ""}</div>
+      const card = el("article", { class: "hcard", id: "hotel-" + h.id, "data-hid": h.id, "aria-labelledby": "hn-" + h.id });
+      card.innerHTML = `${starBtn(h, "")}<div class="pills"><span class="pill t-${h.tier}">${h.tier}</span><span class="pill">${esc(h.brand)}</span>${h.non_marriott ? `<span class="pill pill-nm">Non-Marriott${h.parent && h.parent !== h.brand ? " · " + esc(h.parent) : ""}</span>` : ""}</div>
         <h3 id="hn-${h.id}">${i + 1}. ${esc(h.name)}</h3>
         <p class="loc">${esc(h.area)}<br>${esc(h.address)}</p>
         ${h.keys ? `<p class="dist">${h.keys.toLocaleString("en-US")} keys</p>` : ""}<p class="dist">${h.on_disney_property ? "On Walt Disney World® property · " : ""}≈ ${h.distance_to_epcot_mi} mi straight-line to EPCOT</p>
@@ -445,7 +350,12 @@
     grid.addEventListener("click", (e) => {
       const m = e.target.closest("[data-map]"), c = e.target.closest("[data-chart]");
       if (m && markers[m.dataset.map]) { map.flyTo(markers[m.dataset.map].getLatLng(), 14, { duration: 0.8 }); markers[m.dataset.map].openPopup(); $("#map").scrollIntoView({ behavior: "smooth", block: "center" }); }
-      if (c) { visible.clear(); visible.add(c.dataset.chart); syncChips(); updateChart(); $("#history").scrollIntoView({ behavior: "smooth" }); }
+      if (c) {
+        const mini = $("#mini-" + c.dataset.chart); if (!mini) return;
+        if (mini.hidden) { favOnly = false; $("#favOnly").setAttribute("aria-pressed", "false"); syncFavs(); }
+        mini.scrollIntoView({ behavior: "smooth", block: "center" }); mini.focus({ preventScroll: true });
+        mini.classList.add("flash"); setTimeout(() => mini.classList.remove("flash"), 2200);
+      }
     });
     if (!window.L) { $("#map").innerHTML = '<p style="padding:20px">Map library could not load.</p>'; return; }
     map = L.map("map", { scrollWheelZoom: false, zoomControl: true });
