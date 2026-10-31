@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>What’s on in Orlando · Visit Orlando events · AMBAR Orlando</title>
-<meta name="description" content="Orlando events from the Visit Orlando calendar, with filters, saved events and personal recommendations. Companion to the AMBAR Orlando Market Landscape.">
+<meta name="description" content="What’s on in Orlando: this week’s picks from the Visit Orlando calendar, saved and shareable event lists, and tips for planning a visit. Companion to the AMBAR Orlando Market Landscape.">
 <meta name="theme-color" content="#1E3A2C">
 <link rel="icon" href="../assets/ambar-logo.png">
 <link rel="stylesheet" href="../assets/fonts/fonts.css">
@@ -26,67 +26,134 @@
       <a href="../index.html#hotels">Hotels</a>
       <a href="../index.html#demand">Demand</a>
       <a href="index.html" class="active" aria-current="page">Orlando events</a>
+      <a href="#plan">Plan your visit</a>
     </nav>
     <span class="update-pill" id="evUpdatePill">Visit Orlando calendar</span>
   </div>
 </header>
 
 <main id="main">
-  <section class="hero ev-hero" id="top" aria-labelledby="evHeroTitle">
-    <div class="hero-bands" aria-hidden="true"><span></span><span></span><span></span></div>
-    <div class="wrap hero-inner">
-      <p class="eyebrow">Visit Orlando calendar · Orlando, Florida</p>
-      <h1 id="evHeroTitle">What’s on in <em>Orlando</em></h1>
-      <p class="lede">Festivals, concerts, theatre, sport and theme-park seasons from the official <a href="https://www.visitorlando.com/events/" target="_blank" rel="noopener">Visit Orlando</a> calendar. The destination’s calendar is part of why Orlando matters for AMBAR; the hotel rates and market data stay on the <a href="../index.html">Market Landscape</a>.</p>
-      <dl class="hero-stats ev-stats" id="evStats"></dl>
-      <p class="hero-note" id="evSourceNote"></p>
+  <!-- Shared list (shown only when the page is opened from a share link: ?shared=id.id.id) -->
+  <section class="ev-shared" id="evShared" aria-labelledby="evSharedTitle" hidden></section>
+
+  <!-- 1 Landing: editorial hero + this week's picks + date buckets -->
+  <section class="evh" id="top" aria-labelledby="evHeroTitle">
+    <div class="wrap evh-grid">
+      <div class="evh-copy">
+        <p class="evh-dateline"><span id="evDateline">This week</span><span aria-hidden="true"> · </span>Orlando, Florida</p>
+        <h1 id="evHeroTitle">What’s on in <em>Orlando</em></h1>
+        <p class="evh-lede">A calm edit of the days ahead: festivals, music, theatre and the city’s long-running seasons, drawn from the official <a href="https://www.visitorlando.com/events/" target="_blank" rel="noopener">Visit Orlando</a> calendar.</p>
+        <div class="evh-cta">
+          <a class="btn evh-btn" href="#events">See all events</a>
+          <a class="btn evh-btn-line" href="#plan">Plan your visit</a>
+        </div>
+      </div>
+      <figure class="evh-art" aria-hidden="true">
+        <svg viewBox="0 0 480 560" preserveAspectRatio="xMidYMid slice" role="presentation" focusable="false">
+          <defs>
+            <clipPath id="evhArch"><path d="M24 560V240C24 120.7 120.7 24 240 24s216 96.7 216 216v320z"/></clipPath>
+            <linearGradient id="evhSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#1E3A2C"/><stop offset=".42" stop-color="#B37D50"/><stop offset=".62" stop-color="#FFA94A"/><stop offset=".74" stop-color="#F4D9B0"/>
+            </linearGradient>
+            <linearGradient id="evhLake" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#355965"/><stop offset="1" stop-color="#143023"/></linearGradient>
+            <radialGradient id="evhSun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE2B0"/><stop offset=".7" stop-color="#FFA94A"/><stop offset="1" stop-color="#F36F43" stop-opacity="0"/></radialGradient>
+          </defs>
+          <g clip-path="url(#evhArch)">
+            <rect width="480" height="560" fill="url(#evhSky)"/>
+            <g fill="#E3C68A" opacity=".85"><circle cx="118" cy="132" r="1.6"/><circle cx="352" cy="98" r="1.3"/><circle cx="300" cy="160" r="1"/><circle cx="170" cy="86" r="1"/><circle cx="398" cy="186" r="1.4"/></g>
+            <g stroke="#E3C68A" stroke-width="1.3" stroke-linecap="round" opacity=".75" fill="none">
+              <path d="M330 150v-22M330 150l15-15M330 150h21M330 150l15 15M330 150l-15-15M330 150h-21M330 150l-15 15M330 150v22"/>
+              <path d="M150 196v-14M150 196l10-10M150 196h14M150 196l10 10M150 196l-10-10M150 196h-14M150 196l-10 10M150 196v14" opacity=".7"/>
+            </g>
+            <circle cx="240" cy="372" r="92" fill="url(#evhSun)"/>
+            <circle cx="240" cy="372" r="54" fill="#FFD9A0"/>
+            <path d="M0 392c60-10 110-8 160-2s110 10 170 2 110-8 150-2v170H0z" fill="#27492F"/>
+            <rect y="400" width="480" height="160" fill="url(#evhLake)"/>
+            <g stroke="#E3C68A" stroke-linecap="round" fill="none">
+              <path d="M186 418h108M204 434h72M168 452h144M214 470h52M150 492h180M226 512h28" stroke-width="2" opacity=".75"/>
+              <path d="M60 446h50M376 460h44M90 500h40M352 524h60" stroke-width="1.2" opacity=".35"/>
+            </g>
+            <g fill="#0F2D21">
+              <path d="M86 404c2-58 6-104 14-150l5 1c-7 45-10 92-11 149z"/>
+              <path d="M102 256c-22-10-48-8-66 6 22-4 44 0 62 10zm1 0c4-24 22-42 46-48-18 12-30 28-38 50zm-2 0c-16-18-40-26-62-22 22 4 40 14 56 30zm3 0c22-4 44 4 58 20-20-10-38-12-56-10zm-2 0c-10 18-14 40-10 60 4-20 8-40 14-58z"/>
+              <path d="M402 404c-1-46-4-84-12-124l-5 1c6 38 9 78 9 123z"/>
+              <path d="M388 282c18-12 40-14 58-4-20 0-38 4-54 12zm-1 0c-2-20-16-36-36-42 14 10 24 24 30 44zm2 0c14-16 34-22 52-18-18 4-34 12-48 26zm-3 0c-18-2-36 6-48 20 16-8 32-12 46-10zm2 0c8 16 10 34 6 50-2-16-6-32-12-48z"/>
+            </g>
+          </g>
+          <path d="M24 560V240C24 120.7 120.7 24 240 24s216 96.7 216 216v320" fill="none" stroke="#C9A35A" stroke-width="1.5"/>
+          <path d="M6 560V240C6 110.8 110.8 6 240 6s234 104.8 234 234v320" fill="none" stroke="#C9A35A" stroke-width=".75" opacity=".55"/>
+        </svg>
+        <figcaption class="evh-stamp" id="evStamp"></figcaption>
+      </figure>
+    </div>
+
+    <div class="wrap evh-picks">
+      <header class="evh-picks-head">
+        <div>
+          <p class="evh-kicker">This week’s picks</p>
+          <h2 id="evPicksTitle">A handful to start with</h2>
+        </div>
+        <p class="evh-picks-note">Short-run events in the next seven days, chosen automatically from the Visit Orlando calendar: one-offs first, varied by type. Each links to its official listing.</p>
+      </header>
+      <ol class="evh-pick-list" id="evPicks" aria-labelledby="evPicksTitle"></ol>
+      <p class="evh-more"><a href="#events" data-bucket-link="next">See everything this week and next <span aria-hidden="true">→</span></a></p>
+    </div>
+
+    <div class="wrap">
+      <nav class="evh-buckets" id="evBucketTiles" aria-label="Browse events by date"></nav>
     </div>
   </section>
 
-  <section class="section" id="events" aria-labelledby="evTitle">
+  <!-- 2 Full list -->
+  <section class="section ev-section" id="events" aria-labelledby="evTitle">
     <div class="wrap">
       <header class="section-head">
-        <p class="kicker">Orlando events</p>
-        <h2 id="evTitle">Browse, save and plan</h2>
-        <p class="section-sub">Every card links to its official Visit Orlando listing. Save events to find them later (kept in this browser only, no login), or fill in <em>My preferences</em> for a ranked shortlist.</p>
+        <p class="kicker">The full calendar</p>
+        <h2 id="evTitle">Browse, save and share</h2>
+        <p class="section-sub">Every card links to its official Visit Orlando listing. Save events to build your own list (kept in this browser only, no login), share it with friends and family, or fill in <em>My preferences</em> for a ranked shortlist.</p>
       </header>
 
       <div class="ev-tabs" role="tablist" aria-label="Events views" id="evTabs">
         <button type="button" role="tab" id="tab-browse" aria-controls="panel-browse" aria-selected="true" tabindex="0">All events</button>
-        <button type="button" role="tab" id="tab-saved" aria-controls="panel-saved" aria-selected="false" tabindex="-1">Saved <span class="ev-count" id="savedCount">0</span></button>
+        <button type="button" role="tab" id="tab-saved" aria-controls="panel-saved" aria-selected="false" tabindex="-1">My list <span class="ev-count" id="savedCount">0</span></button>
         <button type="button" role="tab" id="tab-prefs" aria-controls="panel-prefs" aria-selected="false" tabindex="-1">My preferences</button>
       </div>
 
       <!-- Browse -->
       <div class="ev-panel" role="tabpanel" id="panel-browse" aria-labelledby="tab-browse" tabindex="0">
         <div class="ev-reco" id="evReco" hidden></div>
-        <div class="ev-filters" id="evFilters">
+        <div class="ev-when" id="evQuick" role="group" aria-label="When"></div>
+        <div class="ev-searchRow">
           <div class="ev-field ev-field-search">
-            <label for="evQ">Search</label>
-            <input type="search" id="evQ" placeholder="Title, venue or keyword" autocomplete="off">
+            <label for="evQ" class="sr-only">Search events</label>
+            <input type="search" id="evQ" placeholder="Search by title, venue or keyword" autocomplete="off">
           </div>
-          <div class="ev-field">
-            <label for="evCat">Category</label>
-            <select id="evCat"><option value="all">All categories</option></select>
-          </div>
-          <div class="ev-field">
-            <label for="evArea">Area</label>
-            <select id="evArea"><option value="all">All areas</option></select>
-          </div>
-          <div class="ev-field">
-            <label for="evFrom">From</label>
-            <input type="date" id="evFrom">
-          </div>
-          <div class="ev-field">
-            <label for="evTo">To</label>
-            <input type="date" id="evTo">
-          </div>
-          <div class="ev-field">
-            <label for="evSort">Sort</label>
-            <select id="evSort"><option value="soon">Soonest first</option><option value="short">One-off events first</option><option value="az">A–Z</option></select>
-          </div>
+          <details class="ev-more-filters" id="evMoreFilters">
+            <summary>More filters</summary>
+            <div class="ev-filters" id="evFilters">
+              <div class="ev-field">
+                <label for="evCat">Category</label>
+                <select id="evCat"><option value="all">All categories</option></select>
+              </div>
+              <div class="ev-field">
+                <label for="evArea">Area</label>
+                <select id="evArea"><option value="all">All areas</option></select>
+              </div>
+              <div class="ev-field">
+                <label for="evFrom">From</label>
+                <input type="date" id="evFrom">
+              </div>
+              <div class="ev-field">
+                <label for="evTo">To</label>
+                <input type="date" id="evTo">
+              </div>
+              <div class="ev-field">
+                <label for="evSort">Sort</label>
+                <select id="evSort"><option value="soon">Soonest first</option><option value="short">One-off events first</option><option value="az">A–Z</option></select>
+              </div>
+            </div>
+          </details>
         </div>
-        <div class="vo-toolbar ev-quick" id="evQuick" role="group" aria-label="Quick date ranges"></div>
         <div class="ev-metaRow">
           <p class="vo-meta" id="evMeta" aria-live="polite"></p>
           <button type="button" class="ev-link-btn" id="evReset">Reset filters</button>
@@ -96,6 +163,18 @@
 
       <!-- Saved -->
       <div class="ev-panel" role="tabpanel" id="panel-saved" aria-labelledby="tab-saved" tabindex="0" hidden>
+        <div class="ev-share" id="evShare" hidden>
+          <div class="ev-share-copy">
+            <h3 id="evShareTitle">Share my list</h3>
+            <p>Send your saved events to friends and family: a branded PDF with each event’s name, dates, place and Visit Orlando link, or a link that opens this list on their phone.</p>
+          </div>
+          <div class="ev-share-actions" role="group" aria-labelledby="evShareTitle">
+            <button type="button" class="btn btn-solid" id="shPdf">Download PDF</button>
+            <button type="button" class="btn btn-outline" id="shNative" hidden>Share…</button>
+            <button type="button" class="btn btn-outline" id="shCopy">Copy share link</button>
+          </div>
+          <p class="ev-status" id="shStatus" role="status" aria-live="polite"></p>
+        </div>
         <p class="vo-meta" id="savedMeta" aria-live="polite"></p>
         <div class="vo-grid ev-grid" id="savedGrid"></div>
       </div>
@@ -134,6 +213,107 @@
       <p class="vo-attrib" id="evAttrib"></p>
     </div>
   </section>
+
+  <!-- 3 Plan your visit -->
+  <section class="section ev-plan" id="plan" aria-labelledby="planTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">Plan your visit</p>
+        <h2 id="planTitle">Getting here, when to come, and visiting AMBAR</h2>
+      </header>
+
+      <div class="ev-tabs" role="tablist" aria-label="Plan your visit" id="planTabs">
+        <button type="button" role="tab" id="ptab-getting" aria-controls="ppanel-getting" aria-selected="true" tabindex="0">Getting here</button>
+        <button type="button" role="tab" id="ptab-when" aria-controls="ppanel-when" aria-selected="false" tabindex="-1">Best time to visit</button>
+        <button type="button" role="tab" id="ptab-visit" aria-controls="ppanel-visit" aria-selected="false" tabindex="-1">Visit AMBAR</button>
+      </div>
+
+      <!-- Getting here -->
+      <div class="ev-panel" role="tabpanel" id="ppanel-getting" aria-labelledby="ptab-getting" tabindex="0">
+        <div class="pl-airports">
+          <article class="pl-card">
+            <p class="pl-code">MCO</p>
+            <h3>Orlando International</h3>
+            <p class="pl-drive"><b>About 27 miles · about 42 min</b> by car from AMBAR with no traffic; allow longer at peak times.</p>
+            <h4>Nonstop from the UK</h4>
+            <ul class="pl-routes">
+              <li><b>London Gatwick</b> British Airways, Norse Atlantic</li>
+              <li><b>London Heathrow</b> Virgin Atlantic</li>
+              <li><b>Manchester</b> Virgin Atlantic</li>
+              <li><b>Edinburgh</b> Virgin Atlantic <span class="pl-seasonal">Seasonal</span></li>
+            </ul>
+            <h4>Other key markets, nonstop</h4>
+            <ul class="pl-routes pl-routes-sm">
+              <li><b>Dublin</b> Aer Lingus</li>
+              <li><b>Paris CDG</b> Air France</li>
+              <li><b>Frankfurt, Munich</b> Discover Airlines</li>
+              <li><b>Madrid</b> Iberia</li>
+              <li><b>Lisbon</b> TAP Air Portugal</li>
+              <li><b>Amsterdam</b> Delta</li>
+              <li><b>Reykjavik</b> Icelandair</li>
+              <li><b>Toronto</b> Air Canada, Flair, Porter, WestJet</li>
+              <li><b>Montreal</b> Air Canada</li>
+              <li><b>São Paulo</b> LATAM (GRU), Azul (VCP)</li>
+              <li><b>Mexico City</b> Aeroméxico, Volaris</li>
+              <li><b>Dubai</b> Emirates</li>
+            </ul>
+            <p class="pl-actions">
+              <a class="btn btn-solid" href="https://www.google.com/travel/flights?q=Flights%20to%20MCO" target="_blank" rel="noopener">Live fares to MCO on Google Flights<span class="sr-only"> (opens in a new tab)</span></a>
+              <a class="ev-link-btn" href="https://www.google.com/maps/dir/?api=1&amp;origin=8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Kissimmee%2C%20FL%2034747&amp;destination=Orlando%20International%20Airport%20(MCO)" target="_blank" rel="noopener">Directions from AMBAR<span class="sr-only"> (opens in a new tab)</span></a>
+            </p>
+          </article>
+          <article class="pl-card">
+            <p class="pl-code">SFB</p>
+            <h3>Orlando Sanford</h3>
+            <p class="pl-drive"><b>About 52 miles · about 70 min</b> by car from AMBAR with no traffic; allow longer at peak times.</p>
+            <h4>From the UK</h4>
+            <p class="pl-none">No nonstop UK flights are listed by the airport at present; UK travellers connect via a US or Caribbean hub.</p>
+            <h4>Nonstop, mainly US</h4>
+            <ul class="pl-routes pl-routes-sm">
+              <li><b>70+ US cities</b> mostly Allegiant</li>
+              <li><b>Bermuda</b> BermudAir, from Oct 31, 2026</li>
+              <li><b>Belize</b> BermudAir, from Dec 21, 2026</li>
+              <li><b>Punta Cana</b> Arajet</li>
+            </ul>
+            <p class="pl-actions">
+              <a class="btn btn-solid" href="https://www.google.com/travel/flights?q=Flights%20to%20SFB" target="_blank" rel="noopener">Live fares to SFB on Google Flights<span class="sr-only"> (opens in a new tab)</span></a>
+              <a class="ev-link-btn" href="https://www.google.com/maps/dir/?api=1&amp;origin=8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Kissimmee%2C%20FL%2034747&amp;destination=Orlando%20Sanford%20International%20Airport%20(SFB)" target="_blank" rel="noopener">Directions from AMBAR<span class="sr-only"> (opens in a new tab)</span></a>
+            </p>
+          </article>
+        </div>
+        <p class="pl-sources"><b>Sources, as of Oct 31, 2026:</b> routes from the airports’ own pages, <a href="https://www.flymco.com/international-service/" target="_blank" rel="noopener">MCO nonstop international destinations</a> (the airport lists service planned for the next 12 months; dates are tentative) and <a href="https://flysfb.com/flights/destinations/" target="_blank" rel="noopener">FlySFB destinations</a> / <a href="https://flysfb.com/" target="_blank" rel="noopener">FlySFB news</a>; Edinburgh marked seasonal per the <a href="https://flymco.com/media/press-releases/item/virgin-atlantic-moving-to-terminal-c-at-orlando-international-airport/" target="_blank" rel="noopener">MCO / Virgin Atlantic release</a>. Some routes run seasonally, so confirm with the airline. Drive distances and no-traffic times are routing estimates from <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a> data (OSRM router), from 8701 W Irlo Bronson Memorial Hwy; open the directions links for live traffic. No fares are shown on this page.</p>
+      </div>
+
+      <!-- Best time to visit -->
+      <div class="ev-panel" role="tabpanel" id="ppanel-when" aria-labelledby="ptab-when" tabindex="0" hidden>
+        <p class="pl-intro">Average daily high and low at Orlando International Airport, and how busy the theme-park side of Orlando usually is. Quieter, milder months tend to be January–February, early May and early November.</p>
+        <div class="pl-months" id="plMonths" role="table" aria-label="Orlando by month: average high and low temperature, and crowd level">
+          <div class="pl-month-legend" role="row"><span role="columnheader">Month</span><span role="columnheader">High / low</span><span role="columnheader">Crowds</span></div>
+        </div>
+        <p class="pl-sources"><b>Sources:</b> temperatures are NOAA NCEI <a href="https://www.ncei.noaa.gov/products/land-based-station/us-climate-normals" target="_blank" rel="noopener">1991–2020 U.S. Climate Normals</a>, monthly normal max/min for Orlando International Airport (station USW00012815), rounded. Crowd levels are qualitative, from the 1–5 monthly ratings in the <a href="https://www.themeparkdirect.com/information/orlando-crowd-calendar" target="_blank" rel="noopener">Theme Park Direct Orlando crowd calendar</a> (1–2 low, 3 moderate, 4–5 high) and reflect theme-park crowds; holiday weeks within a month can be busier.</p>
+      </div>
+
+      <!-- Visit AMBAR -->
+      <div class="ev-panel" role="tabpanel" id="ppanel-visit" aria-labelledby="ptab-visit" tabindex="0" hidden>
+        <div class="pl-visit">
+          <div class="pl-visit-copy">
+            <h3>See AMBAR in person, or start with a call</h3>
+            <p>Book a 30-minute introduction call with Callum Brown to talk through the residences. If you’d like to tour the sales center while you’re in Orlando, mention it when you book and we’ll arrange a time.</p>
+            <p class="pl-actions">
+              <a class="btn btn-solid" id="plBook" href="https://calendly.com/callum-ambarorlando/30min" target="_blank" rel="noopener">Book an introduction call<span class="sr-only"> (Calendly, opens in a new tab)</span></a>
+              <a class="btn btn-outline" href="https://www.google.com/maps/dir/?api=1&amp;destination=8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Unit%20108%2C%20Kissimmee%2C%20FL%2034747" target="_blank" rel="noopener">Directions to the sales center<span class="sr-only"> (Google Maps, opens in a new tab)</span></a>
+            </p>
+            <p class="pl-fine">Booking opens Calendly (30 min, video call). Times are shown in your own time zone.</p>
+          </div>
+          <address class="pl-address">
+            <span class="pl-code">Sales center</span>
+            <b>AMBAR Residences Orlando</b>
+            8701 W Irlo Bronson Memorial Hwy, Unit 108<br>Kissimmee, FL 34747
+          </address>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <footer class="site-footer ev-footer" id="sources">
@@ -152,7 +332,10 @@
 </footer>
 
 <script src="../data/visitorlando_events.js"></script>
+<script src="../assets/js/events-core.js"></script>
+<script src="../assets/js/events-pdf.js"></script>
 <script src="../assets/js/events.js"></script>
+<script src="../assets/js/plan.js"></script>
 <script src="../assets/js/nav.js"></script>
 <script src="../assets/js/assistant-config.js"></script>
 <script src="../assets/js/assistant.js" data-root="../" data-page="events"></script>
