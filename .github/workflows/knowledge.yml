@@ -1,0 +1,51 @@
+# Keeps the assistant's knowledge index in step with the site.
+# tools/build_knowledge.py builds data/knowledge.json (+ .js mirror), the proxy's copy (assistant-proxy/knowledge.json,
+# assistant-proxy/lib/knowledge-search.js) and data/brands.js from the pages and data files below.
+# Pull requests are checked by the week-ahead workflow (`build_knowledge.py --check`). On pushes to main this workflow
+# regenerates the outputs and, if they changed, commits them as github-actions[bot]. It never force-pushes: it rebases
+# onto the latest main and retries, and commits made with GITHUB_TOKEN do not re-trigger workflows.
+name: knowledge-index
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "events/index.html"
+      - "visit/**"
+      - "profile/**"
+      - "data/comps.json"
+      - "data/brands.json"
+      - "assets/js/plan.js"
+      - "assets/js/knowledge.js"
+      - "tools/build_knowledge.py"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: knowledge-index
+  cancel-in-progress: false
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Regenerate
+        run: python3 tools/build_knowledge.py
+      - name: Commit if changed (no force-push)
+        run: |
+          FILES="data/knowledge.json data/knowledge.js data/brands.js assistant-proxy/knowledge.json assistant-proxy/lib/knowledge-search.js"
+          if git diff --quiet -- $FILES && [ -z "$(git ls-files --others --exclude-standard -- $FILES)" ]; then
+            echo "Knowledge index already up to date."; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add $FILES
+          git commit -m "Regenerate assistant knowledge index"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && exit 0
+            echo "Push attempt $i failed; retrying"; sleep $((i * 5))
+          done
+          exit 1
