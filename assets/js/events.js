@@ -1,10 +1,15 @@
 /* AMBAR Orlando · Visit Orlando events page: calm landing (this week's picks + date buckets), full list with filters,
-   My list (localStorage) with "Share my list" (branded PDF, share link, phone share sheet), a read-only shared-list view,
+   My Profile (saved events, kept with favourite hotels and brands in the shared assets/js/profile.js store) with
+   "Share my profile" (branded PDF, share link, phone share sheet), a read-only view for old ?shared= event links,
    and My preferences → Recommended for you.
    Data: data/visitorlando_events.js (window.VO_EVENTS_DATA; .js mirror so file:// works). Never invents events.
    Pure helpers (date buckets, share links, picks) live in assets/js/events-core.js and are unit-tested in Node. */
 (function () {
   "use strict";
+  /* old Plan-tab links (#getting-here, #best-time, #visit-ambar) now live on the Plan your visit page */
+  const MOVED = { "#getting-here": "#getting-here", "#best-time": "#best-time", "#visit-ambar": "#visit-ambar" };
+  if (MOVED[location.hash]) { location.replace("../visit/" + MOVED[location.hash]); return; }
+  window.addEventListener("hashchange", () => { if (MOVED[location.hash]) location.replace("../visit/" + MOVED[location.hash]); });
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -15,17 +20,12 @@
   /* today in the visitor's own calendar: the date buckets follow the user's local date */
   const todayISO = C.localToday();
   const ROOT = "../";
-  const SAVED_KEY = "ambar.events.saved.v1";
-  const PREFS_KEY = "ambar.events.prefs.v1";
-  const store = {
-    get(k, dflt) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : dflt; } catch (e) { return dflt; } },
-    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
-    del(k) { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } },
-  };
+  /* My Profile store (shared with every page); migrates the old ambar.events.saved.v1 / prefs.v1 keys */
+  const P = window.AMBAR_PROFILE;
 
   const VO = window.VO_EVENTS_DATA;
   const grid = $("#evGrid");
-  if (!C || !VO || !Array.isArray(VO.events) || !VO.events.length) {
+  if (!C || !P || !VO || !Array.isArray(VO.events) || !VO.events.length) {
     const msg = `<p class="vo-empty">Visit Orlando events are not loaded yet. Refresh with <code>scripts/fetch_visitorlando_events.py</code>, or browse the <a href="https://www.visitorlando.com/events/" target="_blank" rel="noopener">Visit Orlando calendar</a>.</p>`;
     if (grid) grid.innerHTML = msg;
     if ($("#evPicks")) $("#evPicks").outerHTML = msg;
@@ -66,32 +66,35 @@
   if (fetched) $("#evUpdatePill").textContent = `Visit Orlando · ${fMD(fetched)}`;
 
   /* ---------- saved ---------- */
-  let saved = store.get(SAVED_KEY, []);
-  if (!Array.isArray(saved)) saved = [];
-  saved = saved.filter((s) => s && s.id).map((s) => ({ ...s, id: String(s.id) }));
+  let saved = P.get().events;
   const isSaved = (id) => saved.some((s) => s.id === String(id));
   const snapshot = (e) => ({ id: e.id, title: e.title, url: e.url, start_date: e.start_date, end_date: e.end_date, location: e.location || "", area: e.area, saved_at: new Date().toISOString() });
   function toggleSaved(id) {
     id = String(id);
-    if (isSaved(id)) saved = saved.filter((s) => s.id !== id);
-    else { const e = byId.get(id); if (!e) return; saved.push(snapshot(e)); }
-    store.set(SAVED_KEY, saved);
-    syncSaved();
+    if (isSaved(id)) P.removeEvent(id);
+    else { const e = byId.get(id); if (!e) return; P.toggleEvent(snapshot(e)); }
   }
+  /* any change to My Profile (this page, another page or another tab) repaints the saved state */
+  P.subscribe((p) => {
+    const prefsChanged = JSON.stringify(p.prefs) !== JSON.stringify(prefs);
+    saved = p.events; prefs = p.prefs;
+    syncSaved();
+    if (prefsChanged) { fillForm(prefs); paintReco(); }
+  });
   function syncSaved() {
     $("#savedCount").textContent = String(saved.length);
     $$("[data-save]").forEach((b) => {
       const on = isSaved(b.dataset.save);
       b.setAttribute("aria-pressed", String(on));
       const l = b.querySelector(".ev-save-l"); if (l) l.textContent = on ? "Saved" : "Save";
-      b.setAttribute("aria-label", `${on ? "Remove from my list" : "Save to my list"}: ${b.dataset.title}`);
+      b.setAttribute("aria-label", `${on ? "Remove from My Profile" : "Save to My Profile"}: ${b.dataset.title}`);
     });
     if (!$("#panel-saved").hidden) paintSaved();
     if (!$("#evShared").hidden) paintSharedActions();
   }
 
   /* ---------- cards ---------- */
-  const saveBtn = (e) => { const on = isSaved(e.id); return `<button type="button" class="ev-save" data-save="${esc(e.id)}" data-title="${esc(e.title)}" aria-pressed="${on}" aria-label="${on ? "Remove from my list" : "Save to my list"}: ${esc(e.title)}"><span class="ev-save-i" aria-hidden="true"></span><span class="ev-save-l">${on ? "Saved" : "Save"}</span></button>`; };
+  const saveBtn = (e) => { const on = isSaved(e.id); return `<button type="button" class="ev-save" data-save="${esc(e.id)}" data-title="${esc(e.title)}" aria-pressed="${on}" aria-label="${on ? "Remove from My Profile" : "Save to My Profile"}: ${esc(e.title)}"><span class="ev-save-i" aria-hidden="true"></span><span class="ev-save-l">${on ? "Saved" : "Save"}</span></button>`; };
   const srcLink = (url) => `<a class="ev-src" href="${esc(safeUrl(url))}" target="_blank" rel="noopener">Source: Visit Orlando listing<span aria-hidden="true"> ↗</span><span class="sr-only"> (opens in a new tab)</span></a>`;
   function card(e, extra = "") {
     const loc = [e.location, e.area].filter(Boolean).join(" · ");
@@ -110,7 +113,7 @@
     const b = ev.target.closest("[data-save]");
     if (b) { toggleSaved(b.dataset.save); return; }
     const r = ev.target.closest("[data-unsave]");
-    if (r) { saved = saved.filter((s) => s.id !== r.dataset.unsave); store.set(SAVED_KEY, saved); syncSaved(); paintSaved(); }
+    if (r) P.removeEvent(r.dataset.unsave);
   });
 
   /* ---------- landing: dateline, picks, bucket tiles ---------- */
@@ -231,20 +234,19 @@
   function reset() { Object.assign(F, { q: "", cat: "all", area: "all", sort: "soon" }); setBucket("all"); }
   $("#evReset").addEventListener("click", reset);
 
-  /* ---------- My list (saved) + Share my list ---------- */
+  /* ---------- My Profile (saved events) + Share my profile ---------- */
   const entryOf = (s) => {
     const e = byId.get(s.id) || s;
     return { id: s.id, title: e.title || "Saved event", dates: fmtRangeY(e.start_date, e.end_date), location: [e.location, e.area].filter(Boolean).join(" · "), url: safeUrl(e.url), end_date: e.end_date || "" };
   };
   const pageBase = () => location.href.split("#")[0].split("?")[0];
-  const myShareUrl = () => C.shareUrl(pageBase(), saved.map((s) => s.id));
   function paintSaved() {
     const sg = $("#savedGrid");
-    $("#evShare").hidden = !saved.length;
+    $("#evShare").hidden = P.isEmpty(P.get());
     $("#evVisitLine").hidden = !saved.length;
     if (!saved.length) {
-      $("#savedMeta").textContent = "Your list is empty.";
-      sg.innerHTML = `<p class="vo-empty">Use <b>Save</b> on any event and it will appear here, ready to share as a PDF or a link. Your list stays in this browser only.</p>`;
+      $("#savedMeta").textContent = "No saved events in your profile yet.";
+      sg.innerHTML = `<p class="vo-empty">Use <b>Save</b> on any event and it will appear here and in <a href="../profile/">My Profile</a>, ready to share as a PDF or a link. Your profile stays in this browser only.</p>`;
       return;
     }
     const live = [], gone = [];
@@ -259,15 +261,15 @@
       <p class="vo-desc">This event isn’t in the current Visit Orlando data (it may have ended or been removed). Check the original listing, or remove it.</p>
       <div class="ev-card-foot">
         ${VO_URL.test(s.url || "") ? srcLink(s.url) : `<a class="ev-src" href="${esc(calUrl)}" target="_blank" rel="noopener">Visit Orlando calendar<span aria-hidden="true"> ↗</span></a>`}
-        <button type="button" class="ev-save" data-unsave="${esc(s.id)}" aria-label="Remove from my list: ${esc(s.title || "event")}">Remove</button>
+        <button type="button" class="ev-save" data-unsave="${esc(s.id)}" aria-label="Remove from My Profile: ${esc(s.title || "event")}">Remove</button>
       </div>
     </article>`;
     sg.innerHTML = live.map((s) => card(byId.get(s.id), byId.get(s.id).end_date < todayISO ? `<p class="ev-flag">Ended ${esc(fMD(byId.get(s.id).end_date))}</p>` : "")).join("") + gone.map(goneCard).join("");
   }
-  const canNativeShare = typeof navigator.share === "function";
-  $("#shNative").hidden = !canNativeShare;
-  const status = (msg) => { $("#shStatus").textContent = msg; };
+  /* Share my profile: whole profile (events, hotels, brands, preferences) as a PDF or a ../profile/?p= link */
+  window.AMBAR_PROFILE_SHARE.wire(ROOT, { pdf: "shPdf", copy: "shCopy", native: "shNative", status: "shStatus" }, () => P.get(), "My Orlando profile");
   const genDate = () => new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  /* PDF of an events-only list (the read-only view of an old ?shared= link) */
   async function makePdf(entries, title, link, statusFn) {
     statusFn("Preparing your PDF…");
     try {
@@ -276,31 +278,12 @@
         title, generated: genDate(),
         subtitle: `${sorted.length} event${sorted.length === 1 ? "" : "s"} from the Visit Orlando calendar  ·  Generated ${genDate()}`,
         pageUrl: link,
-      }, `my-orlando-list-${todayISO}.pdf`);
-      statusFn("PDF downloaded. Attach it to a message, or use the share link.");
+      }, `orlando-events-${todayISO}.pdf`);
+      statusFn("PDF downloaded.");
     } catch (err) {
       statusFn("Sorry, the PDF couldn’t be created here. Use your browser’s Print → Save as PDF instead.");
     }
   }
-  $("#shPdf").addEventListener("click", () => makePdf(saved.map(entryOf), "My Orlando list", myShareUrl(), status));
-  async function copyText(text) {
-    try { await navigator.clipboard.writeText(text); return true; }
-    catch (e) {
-      const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
-      document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (e2) { ok = false; } ta.remove(); return ok;
-    }
-  }
-  $("#shCopy").addEventListener("click", async () => {
-    const url = myShareUrl();
-    status((await copyText(url)) ? `Link copied. Anyone who opens it sees these ${saved.length} event${saved.length === 1 ? "" : "s"}.` : `Copy this link: ${url}`);
-  });
-  $("#shNative").addEventListener("click", async () => {
-    const url = myShareUrl();
-    try {
-      await navigator.share({ title: "My Orlando list", text: `${saved.length} Orlando event${saved.length === 1 ? "" : "s"} I’ve saved, from the Visit Orlando calendar:`, url });
-      status("Shared.");
-    } catch (e) { if (e && e.name !== "AbortError") status("Sharing isn’t available here. Use Copy share link instead."); }
-  });
 
   /* ---------- shared-list view (?shared=id.id.id) ---------- */
   const decoded = C.decodeShare(params.get("shared"), byId);
@@ -308,7 +291,7 @@
   function paintSharedActions() {
     const notMine = sharedIds.filter((id) => !isSaved(id)).length;
     const b = $("#shAddAll");
-    if (b) { b.disabled = !notMine; b.textContent = notMine ? `Save all ${notMine === sharedIds.length ? sharedIds.length : notMine} to my list` : "All saved to my list"; }
+    if (b) { b.disabled = !notMine; b.textContent = notMine ? `Save all ${notMine === sharedIds.length ? sharedIds.length : notMine} to my profile` : "All saved to my profile"; }
   }
   function paintShared() {
     const box = $("#evShared");
@@ -320,7 +303,7 @@
         <div>
           <p class="evh-kicker">Shared with you</p>
           <h2 id="evSharedTitle">An Orlando list, <em>shared with you</em></h2>
-          <p class="ev-shared-meta">${evs.length ? `${evs.length} event${evs.length === 1 ? "" : "s"} from the Visit Orlando calendar.` : "None of the events in this link are in the current Visit Orlando listings."}${decoded.unknown ? ` ${decoded.unknown} item${decoded.unknown === 1 ? " in the link was" : "s in the link were"} not recognised or no longer listed, so ${decoded.unknown === 1 ? "it’s" : "they’re"} not shown.` : ""} This view is read-only; save any you like to your own list.</p>
+          <p class="ev-shared-meta">${evs.length ? `${evs.length} event${evs.length === 1 ? "" : "s"} from the Visit Orlando calendar.` : "None of the events in this link are in the current Visit Orlando listings."}${decoded.unknown ? ` ${decoded.unknown} item${decoded.unknown === 1 ? " in the link was" : "s in the link were"} not recognised or no longer listed, so ${decoded.unknown === 1 ? "it’s" : "they’re"} not shown.` : ""} This view is read-only; save any you like to your own profile.</p>
         </div>
         <div class="ev-shared-actions">
           ${evs.length ? `<button type="button" class="btn btn-solid" id="shAddAll"></button><button type="button" class="btn btn-outline" id="shSharedPdf">Download PDF</button>` : ""}
@@ -344,9 +327,10 @@
     if (ev.target.id === "shClose") closeShared();
     if (ev.target.id === "shAddAll") {
       let n = 0;
-      sharedIds.forEach((id) => { if (!isSaved(id) && byId.get(id)) { saved.push(snapshot(byId.get(id))); n++; } });
-      store.set(SAVED_KEY, saved); syncSaved();
-      $("#shSharedStatus").textContent = n ? `Added ${n} to your list. Open My list to see or share it.` : "Already in your list.";
+      const add = sharedIds.filter((id) => !isSaved(id) && byId.get(id)).map((id) => snapshot(byId.get(id)));
+      n = add.length;
+      if (n) P.update((p) => { p.events = [...p.events, ...add]; return p; });
+      $("#shSharedStatus").innerHTML = n ? `Added ${n} to your profile. <a href="../profile/">Open My Profile</a> to see or share it.` : "Already in your profile.";
     }
     if (ev.target.id === "shSharedPdf") makePdf(sharedIds.map((id) => entryOf({ id })), "An Orlando list", C.shareUrl(pageBase(), sharedIds), (m) => { $("#shSharedStatus").textContent = m; });
   });
@@ -358,7 +342,7 @@
   for (const id of ["pfFrom", "pfTo"]) { $("#" + id).min = windowStart; $("#" + id).max = windowEnd; }
   const FAMILY_RE = /\b(kids?|family|families|children|child|all ages|toddlers?)\b/i;
   const ACCESS_RE = /\b(accessib\w*|sensory|asl|wheelchair|access for all|neurodivers\w*)\b/i;
-  let prefs = store.get(PREFS_KEY, null);
+  let prefs = P.get().prefs;
   const hasPrefs = (p) => !!p && ((p.cats || []).length || (p.areas || []).length || (p.keywords || []).length || p.from || p.to || p.budget === "free" || p.party === "family" || p.access);
 
   function readForm() {
@@ -443,14 +427,14 @@
     const p = readForm();
     if (p.from && p.to && p.from > p.to) { $("#pfStatus").textContent = "“From” must be on or before “To”."; $("#pfFrom").focus(); return; }
     if (!hasPrefs(p)) { $("#pfStatus").textContent = "Pick at least one interest, area, date, keyword or option."; return; }
-    prefs = p; store.set(PREFS_KEY, prefs);
+    prefs = P.cleanPrefs(p); P.setPrefs(prefs);
     $("#pfStatus").textContent = "Saved. Your recommendations are at the top of All events.";
     paintReco();
     selectTab("browse", true);
     $("#evReco").scrollIntoView({ block: "start" });
   });
   function clearPrefs() {
-    prefs = null; store.del(PREFS_KEY); fillForm(null); paintReco();
+    prefs = null; P.clearPrefs(); fillForm(null); paintReco();
     $("#pfStatus").textContent = "Preferences cleared.";
   }
   $("#pfClear").addEventListener("click", clearPrefs);

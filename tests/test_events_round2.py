@@ -1,4 +1,5 @@
-"""Round 2: calm landing, date buckets, share (PDF + link), plan-your-visit section, header nav."""
+"""Round 2 (+ round 3 moves): calm landing, date buckets, share (PDF + link), Plan your visit (now its own page,
+visit/, with a teaser card on the events page), header nav."""
 from __future__ import annotations
 
 import re
@@ -6,6 +7,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+PAGES = ("index.html", "events/index.html", "visit/index.html", "profile/index.html")
 
 
 def read(rel: str) -> str:
@@ -30,8 +32,10 @@ class LandingAndShareTest(unittest.TestCase):
     def test_share_wiring(self):
         for needle in ['id="evShare"', 'id="shPdf"', 'id="shNative"', 'id="shCopy"', 'id="shStatus"', 'id="evShared"']:
             self.assertIn(needle, self.html)
-        self.assertIn("navigator.share", self.js)
-        self.assertIn("navigator.clipboard", self.js)
+        share = read("assets/js/profile-share.js")
+        self.assertIn("navigator.share", share)
+        self.assertIn("navigator.clipboard", share)
+        self.assertIn("AMBAR_PROFILE_SHARE.wire(", self.js)
         self.assertIn("C.decodeShare(", self.js)
         self.assertIn("C.shareUrl(", self.js)
         self.assertIn("read-only", self.js)
@@ -51,7 +55,7 @@ class LandingAndShareTest(unittest.TestCase):
             self.assertIn(k, fonts)
 
     def test_no_third_party_scripts(self):
-        for page in ("index.html", "events/index.html"):
+        for page in PAGES:
             for src in re.findall(r'<script[^>]+src="([^"]+)"', read(page)):
                 self.assertFalse(src.startswith(("http:", "https:", "//")), f"{page}: external script {src}")
 
@@ -61,21 +65,33 @@ class LandingAndShareTest(unittest.TestCase):
 
 
 class PlanSectionTest(unittest.TestCase):
+    """The Plan your visit content now lives on visit/index.html; the events page keeps a teaser card."""
     def setUp(self):
-        html = read("events/index.html")
-        i = html.index('id="plan"')
-        self.plan = html[i:html.index("</section>", i)]
+        html = read("visit/index.html")
+        self.plan = html[html.index('<main id="main">'):html.index("</main>")]
         self.plan_js = read("assets/js/plan.js")
 
-    def test_tabs_and_panels(self):
-        for needle in ['id="ptab-getting"', 'id="ptab-when"', 'id="ptab-visit"', 'id="plMonths"', 'id="plBook"']:
+    def test_sections(self):
+        for needle in ['id="getting-here"', 'id="brightline"', 'id="drive-times"', 'id="best-time"', 'id="visit-ambar"',
+                       'id="plMonths"', 'id="plBook"', 'id="vhBook"']:
             self.assertIn(needle, self.plan)
+        for code in (">MCO<", ">SFB<", ">MLB<"):
+            self.assertIn(code, self.plan)
+        # the events page keeps a teaser, not the old tabs
+        ev = read("events/index.html")
+        i = ev.index('id="plan"')
+        teaser = ev[i:ev.index("</section>", i)]
+        self.assertIn('class="pl-teaser"', teaser)
+        self.assertIn('href="../visit/"', teaser)
+        self.assertNotIn('role="tab"', teaser)
+        self.assertNotIn("planTabs", read("assets/js/plan.js"))
+        self.assertIn("../visit/", read("assets/js/events.js"))  # old #getting-here etc. links redirect
 
     def test_links_are_https_and_well_formed(self):
         links = re.findall(r'href="([^"]+)"', self.plan)
         self.assertTrue(links)
         for href in links:
-            self.assertTrue(href.startswith("https://") or href.startswith("#"), href)
+            self.assertTrue(href.startswith(("https://", "#", "../")), href)
             self.assertNotRegex(href, r"\s")
         self.assertIn("https://calendly.com/callum-ambarorlando/meet-us-at-ambar", links)
         self.assertIn("https://www.google.com/maps/dir/?api=1&amp;destination="
@@ -93,7 +109,7 @@ class PlanSectionTest(unittest.TestCase):
         self.assertIn("google.com/maps/dir/?api=1", self.plan)
 
     def test_no_video_call_or_30min_anywhere(self):
-        files = [ROOT / "index.html", ROOT / "README.md"] + sorted((ROOT / "events").rglob("*.html"))
+        files = [ROOT / "index.html", ROOT / "README.md"] + [ROOT / p for p in PAGES[1:]]
         files += sorted(p for p in (ROOT / "assets" / "js").glob("*.js"))
         files += sorted((ROOT / "assets" / "css").glob("*.css"))
         files += sorted((ROOT / "data").glob("*.js*")) + sorted((ROOT / "assistant-proxy").rglob("*.*"))
@@ -106,13 +122,14 @@ class PlanSectionTest(unittest.TestCase):
                         "mention it when you book", "mention a tour"):
                 self.assertNotIn(bad, text, f"{f.relative_to(ROOT)}: {bad}")
         # the only Calendly link on the site is the in-person visit
-        for f in [ROOT / "index.html", ROOT / "events" / "index.html", ROOT / "assets" / "js" / "assistant.js", ROOT / "README.md"]:
+        for f in [ROOT / p for p in PAGES] + [ROOT / "assets" / "js" / "assistant.js", ROOT / "README.md"]:
             for url in re.findall(r"https://calendly\.com/[A-Za-z0-9_\-/]+", f.read_text(encoding="utf-8")):
                 self.assertEqual(url, "https://calendly.com/callum-ambarorlando/meet-us-at-ambar", f.name)
 
     def test_sources_and_dates(self):
-        for needle in ["flymco.com", "flysfb.com", "ncei.noaa.gov", "themeparkdirect.com", "openstreetmap.org",
-                       "as of Oct 31, 2026", "Seasonal", "8701 W Irlo Bronson Memorial Hwy"]:
+        for needle in ["flymco.com", "flysfb.com", "mlbair.com", "gobrightline.com", "ncei.noaa.gov", "themeparkdirect.com",
+                       "openstreetmap.org", "project-osrm.org", "as of Oct 31, 2026", "Seasonal", "no traffic",
+                       "8701 W Irlo Bronson Memorial Hwy"]:
             self.assertIn(needle, self.plan)
 
     def test_no_fare_numbers(self):
@@ -146,7 +163,7 @@ class VisitCtaTest(unittest.TestCase):
 
     def test_every_calendly_link_is_the_visit_cta(self):
         anchors = calendly_anchors(self.html) + calendly_anchors(self.js.replace("${VISIT_URL}", VISIT_URL))
-        self.assertGreaterEqual(len(anchors), 5)
+        self.assertGreaterEqual(len(anchors), 4)
         for attrs, inner in anchors:
             self.assertIn(f'href="{VISIT_URL}"', attrs)
             self.assertIn('target="_blank"', attrs)
@@ -211,9 +228,15 @@ class VisitCtaTest(unittest.TestCase):
 
 
 class NavTest(unittest.TestCase):
-    def test_nav_script_on_both_pages(self):
-        for page in ("index.html", "events/index.html"):
-            self.assertIn("assets/js/nav.js", read(page))
+    def test_nav_script_on_every_page(self):
+        for page in PAGES:
+            html = read(page)
+            self.assertIn("assets/js/nav.js", html)
+            nav = re.search(r'<nav class="site-nav".*?</nav>', html, re.S).group(0)
+            self.assertIn("My Profile", nav, page)
+            self.assertIn("data-profile-count", nav, page)
+            self.assertRegex(nav, r'href="(\.\./)?visit/|href="index\.html" class="active"', page)
+            self.assertNotIn("My list", html, page)
 
     def test_menu_breakpoint_and_toggle(self):
         css = read("assets/css/styles.css")

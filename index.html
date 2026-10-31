@@ -24,13 +24,14 @@
     <nav class="site-nav" aria-label="Sections">
       <a href="#week-ahead">Week ahead</a>
       <a href="#residences-week">Residences</a>
-      <a href="#history">History</a>
+      <a href="#familiar">Your brands</a>
       <a href="#brands">Brand matrix</a>
       <a href="#hotels">Hotels</a>
-      <a href="events/index.html" class="nav-out">Events →</a>
       <a href="#demand">Demand</a>
       <a href="#news">News</a>
-      <a href="#sources">Sources</a>
+      <a href="events/index.html" class="nav-out">Events →</a>
+      <a href="visit/" class="nav-out">Visit →</a>
+      <a href="profile/" class="nav-profile" data-profile-label>My Profile <span class="nav-count" data-profile-count hidden></span></a>
     </nav>
     <span class="update-pill" id="updatePill">Updated weekly</span>
   </div>
@@ -96,36 +97,17 @@
     </div>
   </section>
 
-  <!-- 3 HISTORY -->
-  <section class="section section-alt" id="history" aria-labelledby="hiTitle">
+  <!-- 3 YOUR BRANDS (data/brands.json, verified Orlando-area brands; selections saved to My Profile) -->
+  <section class="section section-alt" id="familiar" aria-labelledby="faTitle">
     <div class="wrap">
       <header class="section-head">
-        <p class="kicker">02 · History</p>
-        <h2 id="hiTitle">How rates have moved, week over week</h2>
-        <p class="section-sub">Each line is the lowest public nightly rate observed for that night. The shaded band is the range across all tracked hotels on each night and the dashed line is their median. Gaps are shown as gaps.</p>
+        <p class="kicker">02 · Your brands</p>
+        <h2 id="faTitle">Which hotel brands are you most familiar with?</h2>
+        <p class="section-sub">Select all that apply. Pick a hotel company to see its brands that have hotels in the Orlando area, then tick the ones you know. Your picks are saved to <a href="profile/">My Profile</a> in this browser.</p>
       </header>
-      <div class="chart-controls">
-        <div class="seg" role="group" aria-label="Chart view">
-          <button type="button" class="seg-btn" data-view="nightly" aria-pressed="true">Nightly</button>
-          <button type="button" class="seg-btn" data-view="weekly" aria-pressed="false">Weekly mean</button>
-        </div>
-        <div class="seg" role="group" aria-label="Set overlays">
-          <button type="button" class="seg-btn" id="toggleBand" aria-pressed="true">Range &amp; median</button>
-          <button type="button" class="seg-btn" id="toggleCap" aria-pressed="true">Cap extreme values</button>
-        </div>
-        <div class="seg" role="group" aria-label="Select hotels">
-          <button type="button" class="seg-btn" id="allHotels">All</button>
-          <button type="button" class="seg-btn" id="noHotels">None</button>
-        </div>
+      <div class="fam" id="famBox">
+        <noscript><p>This question needs JavaScript. The brand list is in <a href="data/brands.json">data/brands.json</a>.</p></noscript>
       </div>
-      <div class="chips" id="hotelChips" role="group" aria-label="Show or hide hotels"></div>
-      <figure class="chart-card">
-        <div class="chart-box"><canvas id="historyChart" role="img" aria-label="Line chart of lowest public nightly rates by hotel"></canvas></div>
-        <p class="cap-note" id="capNote" aria-live="polite"></p>
-        <figcaption class="fineprint" id="historyCaption"></figcaption>
-      </figure>
-      <h3 class="sub-title">By hotel</h3>
-      <div class="multiples" id="multiples"></div>
     </div>
   </section>
 
@@ -161,6 +143,15 @@
           <div id="map" role="region" aria-label="Map of the hotels in the landscape"></div>
           <p class="fineprint map-note" id="mapNote">Map tiles © OpenStreetMap contributors. Tiles need an internet connection; everything else on this page works offline.</p>
         </div>
+      </div>
+      <div class="by-hotel" id="byHotel" aria-labelledby="byHotelTitle">
+        <div class="by-hotel-head">
+          <h3 class="sub-title" id="byHotelTitle">By hotel: how rates have moved</h3>
+          <p class="fav-filter"><button type="button" class="seg-btn" id="favOnly" aria-pressed="false">Show favourites only <span class="fav-n" id="favN"></span></button></p>
+        </div>
+        <p class="fineprint" id="byHotelNote"></p>
+        <div class="multiples" id="multiples"></div>
+        <p class="fineprint fav-status" id="favStatus" role="status" aria-live="polite"></p>
       </div>
     </div>
   </section>
@@ -231,7 +222,10 @@
 
 <script src="assets/vendor/chart.umd.min.js"></script>
 <script src="assets/vendor/leaflet.js"></script>
+<script src="assets/js/profile.js"></script>
+<script src="data/brands.js"></script>
 <script src="assets/js/app.js"></script>
+<script src="assets/js/familiar.js"></script>
 <script src="assets/js/week-ahead-engine.js"></script>
 <script src="assets/js/week-ahead.js"></script>
 <script src="assets/js/nav.js"></script>
