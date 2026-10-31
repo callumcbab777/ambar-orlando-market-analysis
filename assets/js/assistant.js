@@ -151,28 +151,48 @@
       return { x, s };
     }).filter((r) => r.s > 0).sort((a, b) => b.s - a.s).slice(0, 3).map((r) => r.x);
   }
-  function profileAnswer() {
-    const P = myProfile(), L = (window.AMBAR_KNOWLEDGE && window.AMBAR_KNOWLEDGE.lookups) || {};
+  /* scope: "all" (whole profile) or one section asked about: "hotels" | "events" | "brands" | "prefs" */
+  const PROFILE_SCOPES = ["hotels", "events", "brands", "prefs"];
+  function profileScope(q) {
+    const KSx = window.AMBAR_KNOWLEDGE_SEARCH;
+    if (KSx && KSx.profileIntent) return KSx.profileIntent(q);
+    return /\b(saved|favou?rite|starred|profile|my (hotels?|brands?|events?|list))\b/i.test(q) ? "all" : null;
+  }
+  function profileAnswer(scope) {
+    scope = PROFILE_SCOPES.includes(scope) ? scope : "all";
+    const P = myProfile() || { events: [], hotels: [], brands: [], prefs: null }, L = (window.AMBAR_KNOWLEDGE && window.AMBAR_KNOWLEDGE.lookups) || {};
     const link = `<a href="${esc(profilePage())}">Open My Profile →</a>`;
-    if (!P || (!P.events.length && !P.hotels.length && !P.brands.length && !P.prefs)) {
+    const starHow = `To save one, go to <a href="${esc(home("#hotels"))}">Hotels</a> and tap the star (☆) on a hotel card, or next to a hotel’s name in <a href="${esc(home("#byHotel"))}">By hotel</a>; starred hotels show up here and in My Profile.`;
+    if (scope === "all" && !P.events.length && !P.hotels.length && !P.brands.length && !P.prefs) {
       return `<p>Your profile on this browser is empty so far. Star hotels in <a href="${esc(home("#hotels"))}">Hotels</a>, pick brands in <a href="${esc(home("#familiar"))}">Your brands</a> and save events on the <a href="${esc(evPage())}">events page</a>; they all show up in ${link.replace("Open My Profile →", "My Profile")}.</p>`;
     }
+    const want = (k) => scope === "all" || scope === k;
     let h = "";
-    if (P.hotels.length) h += `<p>Your favourite hotels:</p><ul class="as-secs">${P.hotels.map((id) => `<li><a href="${esc(home("#hotel-" + id))}">${esc((L.hotels && L.hotels[id]) || id)}</a></li>`).join("")}</ul>`;
-    if (P.brands.length) {
-      const by = {};
-      for (const id of P.brands) { const b = L.brands && L.brands[id]; if (b) (by[b.parent] = by[b.parent] || []).push(b.name); }
-      h += `<p>Brands you know: ${Object.keys(by).map((k) => `<b>${esc(k)}</b>: ${esc(by[k].join(", "))}`).join("; ")}.</p>`;
+    if (want("hotels")) {
+      if (P.hotels.length) h += `<p>Your favourite hotels (${P.hotels.length}):</p><ul class="as-secs as-favs">${P.hotels.map((id) => `<li><a href="${esc(home("#hotel-" + id))}">${esc((L.hotels && L.hotels[id]) || id)}</a></li>`).join("")}</ul>`;
+      else if (scope === "hotels") h += `<p>You haven’t starred any favourite hotels yet. ${starHow}</p>`;
     }
-    if (P.events.length) h += `<p>Saved events:</p><ul class="as-evs">${P.events.slice(0, 8).map((e) => `<li>${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title || "Event")}</a>` : esc(e.title || "Event")}${e.start_date ? `<span>${esc(e.start_date === e.end_date || !e.end_date ? fMD(e.start_date) : `${fMD(e.start_date)} – ${fMD(e.end_date)}`)}</span>` : ""}</li>`).join("")}</ul>${P.events.length > 8 ? `<p>…and ${P.events.length - 8} more.</p>` : ""}`;
-    if (P.prefs) h += `<p>You have event preferences saved; see <a href="${esc(evPage("", "#preferences"))}">Recommended for you</a>.</p>`;
+    if (want("brands")) {
+      if (P.brands.length) {
+        const by = {};
+        for (const id of P.brands) { const b = L.brands && L.brands[id]; if (b) (by[b.parent] = by[b.parent] || []).push(b.name); }
+        h += `<p>Brands you know: ${Object.keys(by).map((k) => `<b>${esc(k)}</b>: ${esc(by[k].join(", "))}`).join("; ")}.</p>`;
+      } else if (scope === "brands") h += `<p>You haven’t picked any hotel brands yet. Tick the ones you know in <a href="${esc(home("#familiar"))}">Your brands</a>.</p>`;
+    }
+    if (want("events")) {
+      if (P.events.length) h += `<p>Saved events (${P.events.length}):</p><ul class="as-evs">${P.events.slice(0, 8).map((e) => `<li>${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title || "Event")}</a>` : esc(e.title || "Event")}${e.start_date ? `<span>${esc(e.start_date === e.end_date || !e.end_date ? fMD(e.start_date) : `${fMD(e.start_date)} – ${fMD(e.end_date)}`)}</span>` : ""}</li>`).join("")}</ul>${P.events.length > 8 ? `<p>…and ${P.events.length - 8} more.</p>` : ""}`;
+      else if (scope === "events") h += `<p>You haven’t saved any events yet. Tap “Save” on any listing on the <a href="${esc(evPage())}">events page</a> and it will show up here and in My Profile.</p>`;
+    }
+    if (want("prefs")) {
+      if (P.prefs) h += `<p>You have event preferences saved; see <a href="${esc(evPage("", "#preferences"))}">Recommended for you</a>.</p>`;
+      else if (scope === "prefs") h += `<p>You haven’t set any event preferences yet. Set them in <a href="${esc(evPage("", "#preferences"))}">Recommended for you</a>.</p>`;
+    }
     return h + `<p>${link}</p>`;
   }
   function guideAnswer(q) {
     const p = parse(q);
-    if (window.AMBAR_KNOWLEDGE_SEARCH && window.AMBAR_KNOWLEDGE_SEARCH.isProfileQuery(q) && /\b(saved|favou?rite|starred|profile|my (hotels?|brands?|events?|list))\b/i.test(q)) {
-      return { html: profileAnswer(), events: [] };
-    }
+    const scope = profileScope(q);
+    if (scope) return { html: profileAnswer(scope), events: [], profileScope: scope };
     const isHelp = /^\s*(help|hi|hello|hey|\?|what can you do)\b/i.test(q);
     if (isHelp) return { html: `<p>I’m the offline site guide: I search this site’s sections and the Visit Orlando listings and give you links. I’m not AI and won’t make up answers.</p><p>Try “concerts this weekend”, “free events in Winter Park”, “how do I get from Miami?”, “which Marriott brands are in Orlando?”, “best time to visit”, “my saved hotels” or “how are rates gathered”.</p>`, events: [] };
     const kh = knowledgeHits(q).filter((r) => r.doc.kind !== "profile");
@@ -288,13 +308,16 @@
     return h.split(/\n{2,}/).map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
   }
   /* the profile summary the proxy may use: ids it can resolve itself, plus saved Visit Orlando events */
-  function profileContext() {
+  /* scope: a section-specific profile question ("my saved hotels") sends only that section; anything else sends all */
+  function profileContext(scope) {
     const P = myProfile();
     if (!P) return null;
+    const only = PROFILE_SCOPES.includes(scope) ? scope : null, want = (k) => !only || only === k;
     return {
-      hotels: P.hotels.slice(0, 20), brands: P.brands.slice(0, 120),
-      events: P.events.filter((e) => e.url).slice(0, 25).map((e) => ({ title: e.title, start_date: e.start_date, end_date: e.end_date, url: e.url })),
-      prefs: P.prefs ? { cats: P.prefs.cats, areas: P.prefs.areas, from: P.prefs.from, to: P.prefs.to, budget: P.prefs.budget, party: P.prefs.party, keywords: P.prefs.keywords, access: P.prefs.access } : null,
+      scope: only || "all",
+      hotels: want("hotels") ? P.hotels.slice(0, 20) : [], brands: want("brands") ? P.brands.slice(0, 120) : [],
+      events: want("events") ? P.events.filter((e) => e.url).slice(0, 25).map((e) => ({ title: e.title, start_date: e.start_date, end_date: e.end_date, url: e.url })) : [],
+      prefs: want("prefs") && P.prefs ? { cats: P.prefs.cats, areas: P.prefs.areas, from: P.prefs.from, to: P.prefs.to, budget: P.prefs.budget, party: P.prefs.party, keywords: P.prefs.keywords, access: P.prefs.access } : null,
     };
   }
   let busy = false;
@@ -307,7 +330,7 @@
     const pending = add("bot", `<p class="as-typing">Isla is thinking…</p>`);
     const g = guideAnswer(q);
     let evs = g.events.slice(0, 20);
-    if (!evs.length) evs = (EV || []).filter((e) => e.end_date >= todayISO).sort((a, b) => (a.runDays > 31) - (b.runDays > 31) || a.start_date.localeCompare(b.start_date)).slice(0, 20);
+    if (!evs.length && !g.profileScope) evs = (EV || []).filter((e) => e.end_date >= todayISO).sort((a, b) => (a.runDays > 31) - (b.runDays > 31) || a.start_date.localeCompare(b.start_date)).slice(0, 20);
     history.push({ role: "user", content: q.slice(0, 500) });
     const body = {
       messages: history.slice(-8),
@@ -315,7 +338,7 @@
         page: PAGE, today: todayISO, calendar_url: calUrl(),
         events: evs.map((e) => ({ title: e.title, start_date: e.start_date, end_date: e.end_date, location: e.location || "", area: e.area, categories: e.categories, url: e.url })),
         knowledge_ids: knowledgeHits(q, 6).filter((r) => r.doc.kind !== "profile").map((r) => r.doc.id),
-        profile: profileContext(),
+        profile: profileContext(g.profileScope),
       },
     };
     const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 25000);

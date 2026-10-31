@@ -86,13 +86,35 @@
     return out.sort((a, b) => b.score - a.score || (a.doc.id < b.doc.id ? -1 : 1));
   }
 
-  const PROFILE_Q = /\b(my|mine|i\s+saved|saved|favou?rites?|starred|profile|shortlist)\b/i;
+  const PAST_I = "(?:did|have)\\s+i\\s+(?:star|save|bookmark|favou?rite|shortlist)|i(?:\\s+have|'ve|\u2019ve)?\\s+(?:starred|saved|bookmarked|favou?rited|shortlisted)";
+  const PROFILE_Q = new RegExp("\\b(?:my|mine|saved|favou?rites?|favou?rited|starred|profile|shortlist|" + PAST_I + ")\\b", "i");
   const isProfileQuery = (q) => PROFILE_Q.test(String(q || ""));
+  const PROFILE_MARK = new RegExp("\\b(?:saved|favou?rites?|favou?rited|starred|bookmarks?|bookmarked|shortlist(?:ed)?|profile|" + PAST_I +
+    "|my\\s+(?:hotels?|events?|brands?|list|pref(?:erence)?s?))\\b", "i");
+  /* profileIntent(q) → null (not about My Profile) | "hotels" | "events" | "brands" | "prefs" (one section asked about) | "all".
+     "my saved hotels", "my favorite hotels", "which hotels did I star" → "hotels"; "my saved events" → "events";
+     "what's in my profile" or several sections → "all". */
+  function profileIntent(q) {
+    const s = String(q || "").toLowerCase();
+    if (!isProfileQuery(s) || !PROFILE_MARK.test(s)) return null;
+    const secs = [];
+    if (/\b(hotels?|stays?|resorts?)\b/.test(s)) secs.push("hotels");
+    if (/\b(events?|concerts?|gigs?|listings?)\b/.test(s)) secs.push("events");
+    if (/\bbrands?\b/.test(s)) secs.push("brands");
+    if (/\b(pref(?:erence)?s?|interests?)\b/.test(s)) secs.push("prefs");
+    return secs.length === 1 ? secs[0] : "all";
+  }
 
-  /* Turns a My Profile object ({events:[{title,start_date,end_date}], hotels:[ids], brands:[ids], prefs:{...}}) into docs. */
-  function profileDocs(ix, profile) {
+  /* Turns a My Profile object ({events:[{title,start_date,end_date}], hotels:[ids], brands:[ids], prefs:{...}}) into docs.
+     scope (from profileIntent) limits it to one section: "hotels" | "events" | "brands" | "prefs"; "all" or none = everything. */
+  function profileDocs(ix, profile, scope) {
     if (!profile || typeof profile !== "object") return [];
     const out = [], L = ix.lookups || {};
+    if (scope && scope !== "all") {
+      const only = { hotels: [], brands: [], events: [], prefs: null };
+      only[scope] = profile[scope];
+      profile = only;
+    }
     const hotels = (Array.isArray(profile.hotels) ? profile.hotels : []).filter((id) => ix.byId.has("hotel:" + id));
     if (hotels.length) {
       out.push({ id: "profile:hotels", kind: "profile", title: "Favourite hotels in your profile", url: "profile/",
@@ -224,7 +246,7 @@
         : ev.hits.concat(others.map((r) => ({ doc: r.doc, score: Math.min(r.score, top ? top * 0.99 : r.score) })));
     }
     if (isProfileQuery(query)) {
-      const mine = profileDocs(ix, o.profile).map((d, i) => ({ doc: d, score: 1000 - i }));
+      const mine = profileDocs(ix, o.profile, profileIntent(query) || "all").map((d, i) => ({ doc: d, score: 1000 - i }));
       const pg = ix.byId.get("page:profile:mine");
       if (pg) mine.push({ doc: pg, score: 999 - mine.length });
       const seen = new Set(mine.map((r) => r.doc.id));
@@ -253,5 +275,5 @@
     return (start > 0 ? "…" : "") + s + (start + s.length < text.length ? "…" : "");
   }
 
-  return { tokens, createIndex, search, eventSearch, parseWhen, profileDocs, isProfileQuery, snippet };
+  return { tokens, createIndex, search, eventSearch, parseWhen, profileDocs, isProfileQuery, profileIntent, snippet };
 });
