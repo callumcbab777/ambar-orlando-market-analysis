@@ -17,6 +17,7 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const D = (iso) => new Date(iso + "T12:00:00");
   const fMD = (iso) => D(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const fMDY = (iso) => D(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   const addDays = (iso, n) => { const d = D(iso); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
   const todayISO = (() => { try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()); } catch (e) { return new Date().toISOString().slice(0, 10); } })();
   const home = (hash) => (PAGE === "home" ? hash : `${ROOT}index.html${hash}`);
@@ -56,6 +57,8 @@
   function norm(raw) {
     return (raw.events || []).filter((e) => e && e.title && e.url).map((e) => ({ ...e, area: e.area || areaOf(e), categories: e.categories || [], runDays: Math.round((D(e.end_date) - D(e.start_date)) / 864e5) + 1 }));
   }
+  /* a knowledge-index event doc → the event shape the guide and the AI context use */
+  const docEvent = (d) => ({ id: String(d.id).replace(/^event:/, ""), title: d.title, start_date: d.start, end_date: d.end, location: d.venue || "", area: d.city || "Other", categories: d.tags || [], url: d.url, runDays: Math.round((D(d.end) - D(d.start)) / 864e5) + 1 });
   function loadEvents() {
     if (EV) return Promise.resolve(EV);
     if (window.AMBAR_EVENTS) { EV = window.AMBAR_EVENTS.events; return Promise.resolve(EV); }
@@ -173,13 +176,32 @@
     const isHelp = /^\s*(help|hi|hello|hey|\?|what can you do)\b/i.test(q);
     if (isHelp) return { html: `<p>I’m the offline site guide: I search this site’s sections and the Visit Orlando listings and give you links. I’m not AI and won’t make up answers.</p><p>Try “concerts this weekend”, “free events in Winter Park”, “how do I get from Miami?”, “which Marriott brands are in Orlando?”, “best time to visit”, “my saved hotels” or “how are rates gathered”.</p>`, events: [] };
     const kh = knowledgeHits(q).filter((r) => r.doc.kind !== "profile");
-    const sections = kh.length
-      ? kh.map((r) => ({ t: r.doc.title, h: siteUrl(r.doc.url), d: window.AMBAR_KNOWLEDGE_SEARCH.snippet(r.doc, q, 200) + (r.doc.as_of ? ` (as of ${r.doc.as_of})` : ""), ext: /^https?:/.test(r.doc.url) }))
-      : searchSections(p, q);
-    const eventIntent = p.from || p.free || p.area || p.terms.length > 0;
-    const res = eventIntent ? searchEvents(p) : { list: [], strict: true };
+    const KS = window.AMBAR_KNOWLEDGE_SEARCH;
+    /* events come from the knowledge index when it's loaded (one doc per Visit Orlando listing, with its source link) */
+    const ES = KX && KS && KS.eventSearch ? KS.eventSearch(KX, q, { today: todayISO, k: 60 }) : null;
+    const siteHits = kh.filter((r) => r.doc.kind !== "event" && r.doc.kind !== "events-meta");
+    const sections = siteHits.length
+      ? siteHits.map((r) => ({ t: r.doc.title, h: siteUrl(r.doc.url), d: KS.snippet(r.doc, q, 200) + (r.doc.as_of ? ` (as of ${r.doc.as_of})` : ""), ext: /^https?:/.test(r.doc.url) }))
+      : (ES ? [] : searchSections(p, q));
+    let res, eventIntent;
+    if (ES) {
+      const named = kh.filter((r) => r.doc.kind === "event");
+      eventIntent = ES.intent || named.length > 0;
+      const hits = ES.intent ? ES.hits : named;
+      res = { list: hits.map((r) => docEvent(r.doc)), strict: true, total: ES.intent ? ES.total : hits.length };
+      if (ES.when) { p.from = ES.when.from; p.to = ES.when.to; }
+    } else {
+      eventIntent = p.from || p.free || p.area || p.terms.length > 0;
+      res = eventIntent ? searchEvents(p) : { list: [], strict: true };
+      res.total = res.list.length;
+    }
     const looksLikeSiteQ = sections.length && !sections.some((s) => /events\/|profile\/|#preferences/i.test(s.h)) && res.list.length && !res.strict;
     const evs = looksLikeSiteQ ? [] : res.list;
+    const cur = ES && ES.currency;
+    const curNote = cur && (evs.length || ES.intent)
+      ? `<p class="as-note">${ES.outside ? "That’s outside the dates this site has listings for. " : ""}Events data: ${esc(cur.source || "Visit Orlando")} listings captured ${esc(fMDY(cur.captured))}, covering ${esc(fMD(cur.window_start))} – ${esc(fMDY(cur.window_end))}. Listings can change, so check each event’s <a href="${esc(cur.calendar_url || calUrl())}" target="_blank" rel="noopener">Visit Orlando</a> link for the latest details.</p>`
+      : "";
+    const aboutData = /\b(data|updated?|current|latest|stale|captured|fresh|up to date)\b/i.test(q);
     let html = "";
     const when = p.from ? (p.from === p.to ? ` on ${fMD(p.from)}` : ` ${fMD(p.from)} – ${fMD(p.to)}`) : "";
     if (evs.length) {
@@ -189,12 +211,13 @@
       if (p.from) qs.set("from", p.from);
       if (p.to) qs.set("to", p.to);
       if (p.free) qs.set("cat", "Free Events");
-      html += `<p>${evs.length} Visit Orlando listing${evs.length === 1 ? "" : "s"}${when}${p.area ? ` in ${esc(p.area)}` : ""}${p.free ? " tagged Free" : ""}${res.strict ? "" : " (closest keyword matches)"}. Top ${Math.min(5, evs.length)}:</p><ul class="as-evs">` +
+      html += `<p>${res.total} Visit Orlando listing${res.total === 1 ? "" : "s"}${when}${p.area ? ` in ${esc(p.area)}` : ""}${p.free ? " tagged Free" : ""}${res.strict ? "" : " (closest keyword matches)"}. Top ${Math.min(5, evs.length)}:</p><ul class="as-evs">` +
         evs.slice(0, 5).map((e) => `<li><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title)}</a><span>${esc(e.start_date === e.end_date ? fMD(e.start_date) : `${fMD(e.start_date)} – ${fMD(e.end_date)}`)} · ${esc([e.location, e.area].filter(Boolean).join(", "))}</span></li>`).join("") +
         `</ul><p><a href="${esc(evPage(qs.toString() ? "?" + qs.toString() : ""))}">See all matches on the events page →</a></p>`;
-    } else if (eventIntent && !sections.length) {
+    } else if (eventIntent && !sections.length && !(ES && aboutData)) {
       html += `<p>I couldn’t find a Visit Orlando listing on this site matching that${when}. Try fewer words, or check the <a href="${esc(calUrl())}" target="_blank" rel="noopener">Visit Orlando calendar</a>.</p>`;
     }
+    html += curNote;
     if (sections.length) html += `<p>${evs.length ? "Related on this site:" : "On this site:"}</p><ul class="as-secs">${sections.map((s) => `<li><a href="${esc(s.h)}"${s.ext ? ' target="_blank" rel="noopener"' : ""}>${esc(s.t)}</a><span>${esc(s.d)}</span></li>`).join("")}</ul>`;
     if (!html) html = `<p>I couldn’t find that on this site. I can point you to events (try “concerts this weekend”), getting here (“how do I get from Miami?”), hotel brands, the week-ahead rates, hotels, demand context, news, sources or your profile.</p>`;
     return { html, events: evs };
