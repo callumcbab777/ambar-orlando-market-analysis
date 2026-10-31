@@ -302,3 +302,45 @@
   .evh,.ev-tabs,#panel-browse,#panel-prefs,.ev-share-actions,.ev-plan,.as-launch,.as-panel,.ev-save,.site-footer{display:none!important}
   .ev-section{padding:0}
 }
+
+/* ---------- Visit AMBAR: one booking CTA, one style (in-person sales center visit on Calendly) ---------- */
+.btn-visit{justify-content:center;min-height:48px;padding:13px 26px;background:var(--amber);color:var(--dark);font-weight:700;letter-spacing:.01em;border:1px solid var(--amber);box-shadow:0 10px 24px -14px rgba(179,125,80,.9)}
+.btn-visit:hover{background:#FFB866;border-color:#FFB866}
+.btn-visit:focus-visible{outline:3px solid var(--forest);outline-offset:3px;box-shadow:0 0 0 2px var(--cream)}
+.btn-visit-sm{min-height:44px;padding:10px 20px;font-size:.9rem}
+.ev-visit-band{position:relative;margin:44px 0 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 40px;align-items:center;padding:30px 36px;border-radius:calc(var(--r) + 6px);background:
+  radial-gradient(60% 120% at 100% 0%,rgba(255,169,74,.22),transparent 60%),var(--forest);color:var(--cream);overflow:hidden}
+.ev-visit-band::after{content:"";position:absolute;right:-60px;bottom:-120px;width:260px;height:300px;border:1px solid rgba(227,198,138,.28);border-radius:130px 130px 0 0;pointer-events:none}
+.ev-visit-band .evh-kicker{color:var(--gold-2)}
+.ev-visit-band h2{color:var(--cream);font-size:clamp(1.8rem,3.2vw,2.5rem);line-height:1.1}
+.ev-visit-band h2 em{color:var(--gold-2)}
+.ev-visit-line1{margin:10px 0 6px;color:#E6DFCF;font-size:1rem;max-width:56ch}
+.ev-visit-addr{margin:0;font-size:.8rem;color:#BFB8A6;letter-spacing:.01em}
+.ev-visit-actions{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px}
+.ev-visit-band .btn-visit:focus-visible{outline-color:var(--gold-2);box-shadow:0 0 0 2px var(--forest)}
+.ev-visit-dir{display:inline-flex;align-items:center;min-height:44px;padding:0 6px;color:var(--gold-2);font-size:.88rem;font-weight:600;text-underline-offset:4px}
+.ev-visit-dir:focus-visible{outline-color:var(--gold-2)}
+.ev-visit-slim{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 16px;margin:0 0 16px;padding:10px 12px 10px 18px;border:1px solid rgba(30,58,44,.18);border-radius:999px;background:#fff;font-size:.92rem;color:var(--forest)}
+.ev-visit-slim[hidden]{display:none}
+.ev-visit-slim span{font-family:var(--serif);font-size:1.15rem}
+.ev-shared .ev-visit-slim{background:rgba(255,255,255,.06);border-color:rgba(227,198,138,.35);color:var(--cream)}
+.ev-shared .ev-visit-slim .btn-visit:focus-visible{outline-color:var(--gold-2);box-shadow:0 0 0 2px var(--forest)}
+.ev-mbar{display:none}
+@media (max-width:760px){
+  .ev-mbar{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:1400;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;border-radius:999px;background:rgba(30,58,44,.96);color:var(--cream);box-shadow:0 14px 30px -12px rgba(15,45,33,.7);border:1px solid rgba(227,198,138,.35)}
+  .ev-mbar[hidden]{display:none}
+  .ev-mbar-t{flex:1 1 auto;margin:0;font-size:.8rem;line-height:1.25;color:#E6DFCF;min-width:0}
+  .ev-mbar .btn-visit{flex:0 0 auto;padding:10px 16px}
+  .ev-mbar .btn-visit:focus-visible{outline-color:var(--gold-2);box-shadow:0 0 0 2px var(--forest)}
+  .ev-mbar-x{flex:0 0 auto;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--cream);font-size:1.5rem;line-height:1;cursor:pointer}
+  .ev-mbar-x:focus-visible{outline:3px solid var(--gold-2);outline-offset:0}
+  html.has-mbar body{padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+  html.has-mbar .as-launch{bottom:calc(84px + env(safe-area-inset-bottom))}
+  .ev-visit-band{grid-template-columns:1fr;padding:24px 22px;margin-top:32px}
+  .ev-visit-actions{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 14px}
+  .ev-visit-band .btn-visit{flex:1 1 auto}
+  .ev-visit-slim{border-radius:16px;padding:12px 14px}
+  .ev-visit-slim .btn-visit{width:100%}
+}
+@media (max-width:360px){.ev-mbar-t{display:none}}
+@media print{.ev-visit-band,.ev-visit-slim,.ev-mbar{display:none!important}}

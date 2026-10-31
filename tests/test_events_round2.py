@@ -83,10 +83,10 @@ class PlanSectionTest(unittest.TestCase):
         self.assertTrue(any(h.startswith("https://www.google.com/travel/flights") for h in links))
 
     def test_booking_cta_in_person_only(self):
-        primary = re.search(r'<a class="btn btn-solid" id="plBook" href="([^"]+)"[^>]*>(.*?)</a>', self.plan, re.S)
+        primary = re.search(r'<a class="btn btn-visit" id="plBook" href="([^"]+)"[^>]*>(.*?)</a>', self.plan, re.S)
         self.assertIsNotNone(primary)
         self.assertEqual(primary.group(1), "https://calendly.com/callum-ambarorlando/meet-us-at-ambar")
-        self.assertIn("Meet us at AMBAR", primary.group(2))
+        self.assertIn("Visit AMBAR", primary.group(2))
         booking = sorted(set(re.findall(r'https://calendly\.com/[^"\s<)`]+', self.plan)))
         self.assertEqual(booking, ["https://calendly.com/callum-ambarorlando/meet-us-at-ambar"])
         self.assertIn("8701 W Irlo Bronson Memorial Hwy, Unit 108", self.plan)
@@ -130,6 +130,84 @@ class PlanSectionTest(unittest.TestCase):
         vals = [int(v) for v in crowd.split(",")]
         self.assertEqual(len(vals), 12)
         self.assertTrue(all(1 <= v <= 5 for v in vals))
+
+
+VISIT_URL = "https://calendly.com/callum-ambarorlando/meet-us-at-ambar"
+
+
+def calendly_anchors(text: str):
+    return re.findall(r'<a\b([^>]*href="https://calendly\.com/[^"]*"[^>]*)>(.*?)</a>', text, re.S)
+
+
+class VisitCtaTest(unittest.TestCase):
+    def setUp(self):
+        self.html = read("events/index.html")
+        self.js = read("assets/js/events.js")
+
+    def test_every_calendly_link_is_the_visit_cta(self):
+        anchors = calendly_anchors(self.html) + calendly_anchors(self.js.replace("${VISIT_URL}", VISIT_URL))
+        self.assertGreaterEqual(len(anchors), 5)
+        for attrs, inner in anchors:
+            self.assertIn(f'href="{VISIT_URL}"', attrs)
+            self.assertIn('target="_blank"', attrs)
+            self.assertIn('rel="noopener"', attrs)
+            self.assertIn("btn-visit", attrs)
+            visible = re.sub(r'<span class="sr-only">.*?</span>', "", inner).strip()
+            self.assertEqual(visible, "Visit AMBAR")
+        self.assertIn(f'const VISIT_URL = "{VISIT_URL}"', self.js)
+        for url in re.findall(r"https://calendly\.com/[A-Za-z0-9_\-/]+", self.html + self.js):
+            self.assertEqual(url, VISIT_URL)
+
+    def test_band_sits_between_picks_and_buckets(self):
+        picks = self.html.index('id="evPicks"')
+        band = self.html.index('id="evVisitBand"')
+        buckets = self.html.index('id="evBucketTiles"')
+        full = self.html.index('id="events"')
+        self.assertLess(picks, band)
+        self.assertLess(band, buckets)
+        self.assertLess(band, full)
+        seg = self.html[band:buckets]
+        self.assertIn("See AMBAR while you’re in", seg)
+        self.assertIn("8701 W Irlo Bronson Memorial Hwy, Unit 108", seg)
+        self.assertIn(">Directions<", seg)
+        self.assertEqual(len(calendly_anchors(seg)), 1)
+        self.assertIsNone(re.search(r"[$£€]\s?\d", seg))
+
+    def test_my_list_and_shared_view_lines(self):
+        i = self.html.index('id="panel-saved"')
+        saved = self.html[i:self.html.index('id="panel-prefs"')]
+        self.assertIn('id="evVisitLine" hidden', saved)
+        self.assertIn('$("#evVisitLine").hidden = !saved.length;', self.js)
+        self.assertIn('visitSlim("evSharedVisit")', self.js)
+
+    def test_mobile_bar(self):
+        self.assertIn('id="evMbar" hidden', self.html)
+        self.assertIn('id="evMbarX"', self.html)
+        self.assertIn("assets/js/visit-cta.js", self.html)
+        js = read("assets/js/visit-cta.js")
+        for needle in ("IntersectionObserver", "sessionStorage", "max-width: 760px", "evVisitBand", '"plan"'):
+            self.assertIn(needle, js)
+        css = read("assets/css/events.css")
+        self.assertIn("safe-area-inset-bottom", css)
+        self.assertIn("html.has-mbar body{padding-bottom", css)
+        self.assertRegex(css, r"\.ev-mbar\{display:none\}")
+
+    def test_no_cta_in_header_hero_cards_or_main_page(self):
+        header = re.search(r"<header class=\"site-header.*?</header>", self.html, re.S).group(0)
+        hero = self.html[self.html.index('class="evh"'):self.html.index('id="evPicks"')]
+        self.assertNotIn("calendly", header + hero)
+        card = self.js[self.js.index("function card("):self.js.index("document.addEventListener", self.js.index("function card("))]
+        self.assertNotIn("VISIT_URL", card)
+        self.assertNotIn("calendly", read("index.html"))
+
+    def test_button_style_contrast_and_target(self):
+        css = read("assets/css/events.css")
+        rule = re.search(r"\.btn-visit\{([^}]*)\}", css).group(1)
+        self.assertIn("background:var(--amber)", rule)
+        self.assertIn("color:var(--dark)", rule)
+        self.assertIn("min-height:48px", rule)
+        self.assertIn("min-height:44px", re.search(r"\.btn-visit-sm\{([^}]*)\}", css).group(1))
+        self.assertIn(".btn-visit:focus-visible{outline:3px solid", css)
 
 
 class NavTest(unittest.TestCase):

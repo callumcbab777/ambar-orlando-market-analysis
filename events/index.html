@@ -99,6 +99,22 @@
       <p class="evh-more"><a href="#events" data-bucket-link="next">See everything this week and next <span aria-hidden="true">→</span></a></p>
     </div>
 
+
+    <div class="wrap">
+      <aside class="ev-visit-band" id="evVisitBand" aria-labelledby="evVisitTitle">
+        <div class="ev-visit-copy">
+          <p class="evh-kicker">Visit AMBAR</p>
+          <h2 id="evVisitTitle">See AMBAR while you’re in <em>Orlando</em></h2>
+          <p class="ev-visit-line1">Book an in-person visit to the sales center and see the residences for yourself.</p>
+          <p class="ev-visit-addr">Sales center · 8701 W Irlo Bronson Memorial Hwy, Unit 108, Kissimmee, FL 34747</p>
+        </div>
+        <div class="ev-visit-actions">
+          <a class="btn btn-visit" id="evVisitBtn" href="https://calendly.com/callum-ambarorlando/meet-us-at-ambar" target="_blank" rel="noopener">Visit AMBAR<span class="sr-only"> (book an in-person visit on Calendly, opens in a new tab)</span></a>
+          <a class="ev-visit-dir" href="https://www.google.com/maps/dir/?api=1&amp;destination=8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Unit%20108%2C%20Kissimmee%2C%20FL%2034747" target="_blank" rel="noopener">Directions<span class="sr-only"> to the sales center (Google Maps, opens in a new tab)</span></a>
+        </div>
+      </aside>
+    </div>
+
     <div class="wrap">
       <nav class="evh-buckets" id="evBucketTiles" aria-label="Browse events by date"></nav>
     </div>
@@ -175,6 +191,7 @@
           </div>
           <p class="ev-status" id="shStatus" role="status" aria-live="polite"></p>
         </div>
+        <p class="ev-visit-slim" id="evVisitLine" hidden><span>Planning your trip? Add a visit to AMBAR.</span> <a class="btn btn-visit btn-visit-sm" href="https://calendly.com/callum-ambarorlando/meet-us-at-ambar" target="_blank" rel="noopener">Visit AMBAR<span class="sr-only"> (book an in-person visit on Calendly, opens in a new tab)</span></a></p>
         <p class="vo-meta" id="savedMeta" aria-live="polite"></p>
         <div class="vo-grid ev-grid" id="savedGrid"></div>
       </div>
@@ -297,10 +314,10 @@
       <div class="ev-panel" role="tabpanel" id="ppanel-visit" aria-labelledby="ptab-visit" tabindex="0" hidden>
         <div class="pl-visit">
           <div class="pl-visit-copy">
-            <h3>Meet us at AMBAR</h3>
-            <p>Book a 45-minute visit to the sales center in Kissimmee to see the residences and talk them through with Callum Brown in person. Pick a time that suits you on Calendly.</p>
+            <h3>Visit the sales center</h3>
+            <p>Book an in-person visit to the sales center in Kissimmee: 45 minutes to see the residences and talk them through with Callum Brown. Pick a time that suits you on Calendly.</p>
             <p class="pl-actions">
-              <a class="btn btn-solid" id="plBook" href="https://calendly.com/callum-ambarorlando/meet-us-at-ambar" target="_blank" rel="noopener">Meet us at AMBAR<span class="sr-only"> (book a sales center visit on Calendly, opens in a new tab)</span></a>
+              <a class="btn btn-visit" id="plBook" href="https://calendly.com/callum-ambarorlando/meet-us-at-ambar" target="_blank" rel="noopener">Visit AMBAR<span class="sr-only"> (book an in-person visit on Calendly, opens in a new tab)</span></a>
               <a class="btn btn-outline" href="https://www.google.com/maps/dir/?api=1&amp;destination=8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Unit%20108%2C%20Kissimmee%2C%20FL%2034747" target="_blank" rel="noopener">Directions to the sales center<span class="sr-only"> (Google Maps, opens in a new tab)</span></a>
             </p>
             <p class="pl-fine">Visits are in person at the sales center. Booking opens Calendly; times are shown in your own time zone.</p>
@@ -314,6 +331,11 @@
       </div>
     </div>
   </section>
+  <div class="ev-mbar" id="evMbar" hidden>
+    <p class="ev-mbar-t">Book an in-person visit to the sales center</p>
+    <a class="btn btn-visit btn-visit-sm" href="https://calendly.com/callum-ambarorlando/meet-us-at-ambar" target="_blank" rel="noopener">Visit AMBAR<span class="sr-only"> (book an in-person visit on Calendly, opens in a new tab)</span></a>
+    <button type="button" class="ev-mbar-x" id="evMbarX" aria-label="Dismiss the Visit AMBAR bar">×</button>
+  </div>
 </main>
 
 <footer class="site-footer ev-footer" id="sources">
@@ -336,6 +358,7 @@
 <script src="../assets/js/events-pdf.js"></script>
 <script src="../assets/js/events.js"></script>
 <script src="../assets/js/plan.js"></script>
+<script src="../assets/js/visit-cta.js"></script>
 <script src="../assets/js/nav.js"></script>
 <script src="../assets/js/assistant-config.js"></script>
 <script src="../assets/js/assistant.js" data-root="../" data-page="events"></script>

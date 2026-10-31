@@ -53,6 +53,9 @@
   const VO_URL = /^https:\/\/www\.visitorlando\.com\//;
   const safeUrl = (u) => (VO_URL.test(u || "") ? u : calUrl);
   const BUCKETS = C.buckets(todayISO);
+  /* the one booking link on this site: in-person visit to the AMBAR sales center */
+  const VISIT_URL = "https://calendly.com/callum-ambarorlando/meet-us-at-ambar";
+  const visitSlim = (id) => `<p class="ev-visit-slim" id="${id}"><span>Planning your trip? Add a visit to AMBAR.</span> <a class="btn btn-visit btn-visit-sm" href="${VISIT_URL}" target="_blank" rel="noopener">Visit AMBAR<span class="sr-only"> (book an in-person visit on Calendly, opens in a new tab)</span></a></p>`;
   const bucketCount = (b) => EVENTS.filter((e) => overlaps(e, b.from, b.to)).length;
   const bRange = (b) => (b.key === "all" ? `From ${fMD(b.from)}` : b.from === b.to ? D(b.from).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) : `${fMD(b.from)} – ${fMD(b.to)}`);
 
@@ -238,6 +241,7 @@
   function paintSaved() {
     const sg = $("#savedGrid");
     $("#evShare").hidden = !saved.length;
+    $("#evVisitLine").hidden = !saved.length;
     if (!saved.length) {
       $("#savedMeta").textContent = "Your list is empty.";
       sg.innerHTML = `<p class="vo-empty">Use <b>Save</b> on any event and it will appear here, ready to share as a PDF or a link. Your list stays in this browser only.</p>`;
@@ -324,6 +328,7 @@
         </div>
       </header>
       <p class="ev-status" id="shSharedStatus" role="status" aria-live="polite"></p>
+      ${evs.length ? visitSlim("evSharedVisit") : ""}
       ${evs.length ? `<div class="vo-grid ev-grid">${evs.map((e) => card(e)).join("")}</div>` : `<p class="vo-empty">Browse <a href="#events" data-bucket-link="all">all upcoming events</a> instead.</p>`}
     </div>`;
     paintSharedActions();
