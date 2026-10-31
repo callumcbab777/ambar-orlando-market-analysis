@@ -254,6 +254,15 @@ class KnowledgeTest(unittest.TestCase):
         self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
         self.assertIn("checks passed", out.stdout)
 
+    def test_assistant_profile_intents_node(self):
+        """'my saved/favourite/favorite hotels', 'which hotels did I star' → hotels only; 'my saved events' → events only;
+        'what's in my profile' → all; empty favourites → how to star; proxy context limited to the asked section."""
+        if not shutil.which("node"):
+            self.skipTest("node not installed")
+        out = node("tests/js/assistant_profile_test.js")
+        self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
+        self.assertIn("assistant profile: 7 checks passed", out.stdout)
+
     def test_proxy_smoke_with_mocked_llm(self):
         if not shutil.which("node"):
             self.skipTest("node not installed")
@@ -262,7 +271,7 @@ class KnowledgeTest(unittest.TestCase):
 
     def test_assistant_uses_index_and_profile_without_a_key(self):
         js = read("assets/js/assistant.js")
-        for needle in ("data/knowledge.js", "assets/js/knowledge.js", "knowledge_ids", "profileContext", "isProfileQuery"):
+        for needle in ("data/knowledge.js", "assets/js/knowledge.js", "knowledge_ids", "profileContext", "profileIntent"):
             self.assertIn(needle, js, needle)
         self.assertNotIn("#history", js)
         for rel in ("assets/js/assistant.js", "assets/js/assistant-config.js", "assets/js/knowledge.js", "data/knowledge.js"):
