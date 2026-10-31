@@ -86,17 +86,19 @@
     return out.sort((a, b) => b.score - a.score || (a.doc.id < b.doc.id ? -1 : 1));
   }
 
-  const PAST_I = "(?:did|have)\\s+i\\s+(?:star|save|bookmark|favou?rite|shortlist)|i(?:\\s+have|'ve|\u2019ve)?\\s+(?:starred|saved|bookmarked|favou?rited|shortlisted)";
-  const PROFILE_Q = new RegExp("\\b(?:my|mine|saved|favou?rites?|favou?rited|starred|profile|shortlist|" + PAST_I + ")\\b", "i");
-  const isProfileQuery = (q) => PROFILE_Q.test(String(q || ""));
-  const PROFILE_MARK = new RegExp("\\b(?:saved|favou?rites?|favou?rited|starred|bookmarks?|bookmarked|shortlist(?:ed)?|profile|" + PAST_I +
-    "|my\\s+(?:hotels?|events?|brands?|list|pref(?:erence)?s?))\\b", "i");
+  /* Profile intent needs an explicit "saved" signal: saved / starred / favourite(s) / favorite(s) / bookmarked /
+     shortlisted, "did I save/star/favourite…", "hotels I starred", or the word "profile". A bare "my hotel" or
+     "my event" ("how far is my hotel from the airport?", "is my hotel near Disney?") is NOT a profile question and
+     goes to normal retrieval. "my brands" / "my preferences" / "my list" only exist in the profile, so they count. */
+  const PAST_I = "(?:did|have)\\s+i\\s+(?:star|save|bookmark|favou?rite|shortlist)|i(?:\\s+have|'ve)?\\s+(?:starred|saved|bookmarked|favou?rited|shortlisted)";
+  const SAVED_W = new RegExp("\\b(?:saved|starred|favou?rites?|favou?rited|bookmarks?|bookmarked|shortlist(?:ed)?|" + PAST_I + ")\\b");
+  const PROFILE_W = /\b(?:profile|my\s+(?:brands?|pref(?:erence)?s?|list|shortlist))\b/;
   /* profileIntent(q) → null (not about My Profile) | "hotels" | "events" | "brands" | "prefs" (one section asked about) | "all".
-     "my saved hotels", "my favorite hotels", "which hotels did I star" → "hotels"; "my saved events" → "events";
-     "what's in my profile" or several sections → "all". */
+     "my saved hotels", "my favorite hotels", "which hotels did I star", "hotels I starred" → "hotels";
+     "my saved events" → "events"; "what's in my profile", "my favourites" or several sections → "all". */
   function profileIntent(q) {
-    const s = String(q || "").toLowerCase();
-    if (!isProfileQuery(s) || !PROFILE_MARK.test(s)) return null;
+    const s = String(q || "").toLowerCase().replace(/[\u2018\u2019]/g, "'");
+    if (!SAVED_W.test(s) && !PROFILE_W.test(s)) return null;
     const secs = [];
     if (/\b(hotels?|stays?|resorts?)\b/.test(s)) secs.push("hotels");
     if (/\b(events?|concerts?|gigs?|listings?)\b/.test(s)) secs.push("events");
@@ -104,6 +106,7 @@
     if (/\b(pref(?:erence)?s?|interests?)\b/.test(s)) secs.push("prefs");
     return secs.length === 1 ? secs[0] : "all";
   }
+  const isProfileQuery = (q) => profileIntent(q) !== null;
 
   /* Turns a My Profile object ({events:[{title,start_date,end_date}], hotels:[ids], brands:[ids], prefs:{...}}) into docs.
      scope (from profileIntent) limits it to one section: "hotels" | "events" | "brands" | "prefs"; "all" or none = everything. */
@@ -233,9 +236,13 @@
      events-data currency doc (capture date + coverage, "check the source link"). */
   function search(ix, query, opts) {
     const o = opts || {}, k = o.k || 5;
-    const ev = eventSearch(ix, query, { today: o.today, k });
+    const pIntent = profileIntent(query);
+    /* "how far is my hotel from the airport?": the visitor's own hotel, not the site's hotels, so "my hotel" / "my event"
+       don't score (unless the question is about saved items, handled below) */
+    const own = (q) => (pIntent ? q : String(q || "").replace(/\bmy\s+(?:hotel|event|stay|resort|room)s?\b/gi, " "));
+    const ev = eventSearch(ix, own(query), { today: o.today, k });
     const today = ev.today;
-    let res = bm25(ix, query).filter((r) => r.doc.kind !== "events-meta")
+    let res = bm25(ix, own(query)).filter((r) => r.doc.kind !== "events-meta")
       .map((r) => (r.doc.kind !== "event" ? r : { doc: r.doc, score: r.score * (r.doc.end < today ? 0.5 : 1) * (ev.intent ? 1 : 0.6) }))
       .sort((a, b) => b.score - a.score || (a.doc.id < b.doc.id ? -1 : 1));
     if (ev.intent) {
@@ -245,8 +252,8 @@
         ? ev.hits.concat(others).sort((a, b) => b.score - a.score)      // a date but no event words: let pages compete
         : ev.hits.concat(others.map((r) => ({ doc: r.doc, score: Math.min(r.score, top ? top * 0.99 : r.score) })));
     }
-    if (isProfileQuery(query)) {
-      const mine = profileDocs(ix, o.profile, profileIntent(query) || "all").map((d, i) => ({ doc: d, score: 1000 - i }));
+    if (pIntent) {
+      const mine = profileDocs(ix, o.profile, pIntent).map((d, i) => ({ doc: d, score: 1000 - i }));
       const pg = ix.byId.get("page:profile:mine");
       if (pg) mine.push({ doc: pg, score: 999 - mine.length });
       const seen = new Set(mine.map((r) => r.doc.id));

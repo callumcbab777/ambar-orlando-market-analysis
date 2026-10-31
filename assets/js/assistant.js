@@ -156,7 +156,7 @@
   function profileScope(q) {
     const KSx = window.AMBAR_KNOWLEDGE_SEARCH;
     if (KSx && KSx.profileIntent) return KSx.profileIntent(q);
-    return /\b(saved|favou?rite|starred|profile|my (hotels?|brands?|events?|list))\b/i.test(q) ? "all" : null;
+    return /\b(saved|starred|favou?rites?|favou?rited|profile|did i (save|star))\b/i.test(q) ? "all" : null;   // no bare "my hotel"
   }
   function profileAnswer(scope) {
     scope = PROFILE_SCOPES.includes(scope) ? scope : "all";
