@@ -77,29 +77,38 @@ class PlanSectionTest(unittest.TestCase):
         for href in links:
             self.assertTrue(href.startswith("https://") or href.startswith("#"), href)
             self.assertNotRegex(href, r"\s")
-        self.assertIn("https://calendly.com/callum-ambarorlando/30min", links)
         self.assertIn("https://calendly.com/callum-ambarorlando/meet-us-at-ambar", links)
         self.assertIn("https://www.google.com/maps/dir/?api=1&amp;destination="
                       "8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Unit%20108%2C%20Kissimmee%2C%20FL%2034747", links)
         self.assertTrue(any(h.startswith("https://www.google.com/travel/flights") for h in links))
 
-    def test_booking_ctas(self):
+    def test_booking_cta_in_person_only(self):
         primary = re.search(r'<a class="btn btn-solid" id="plBook" href="([^"]+)"[^>]*>(.*?)</a>', self.plan, re.S)
         self.assertIsNotNone(primary)
         self.assertEqual(primary.group(1), "https://calendly.com/callum-ambarorlando/meet-us-at-ambar")
         self.assertIn("Meet us at AMBAR", primary.group(2))
-        call = re.search(r'id="plCall" href="([^"]+)"', self.plan)
-        self.assertEqual(call.group(1), "https://calendly.com/callum-ambarorlando/30min")
-        self.assertIn("Can’t come in person?", self.plan)
-        self.assertIn("Introduction to AMBAR", self.plan)
-        # the primary CTA comes before the video-call option
-        self.assertLess(self.plan.index("meet-us-at-ambar"), self.plan.index("/30min"))
+        booking = sorted(set(re.findall(r'https://calendly\.com/[^"\s<)`]+', self.plan)))
+        self.assertEqual(booking, ["https://calendly.com/callum-ambarorlando/meet-us-at-ambar"])
+        self.assertIn("8701 W Irlo Bronson Memorial Hwy, Unit 108", self.plan)
+        self.assertIn("google.com/maps/dir/?api=1", self.plan)
 
-    def test_no_mention_a_tour_copy(self):
-        for rel in ("events/index.html", "index.html", "assets/js/assistant.js", "assets/js/events.js", "README.md"):
-            text = re.sub(r"\s+", " ", read(rel)).lower()
-            self.assertNotIn("mention it when you book", text, rel)
-            self.assertNotIn("mention a tour", text, rel)
+    def test_no_video_call_or_30min_anywhere(self):
+        files = [ROOT / "index.html", ROOT / "README.md"] + sorted((ROOT / "events").rglob("*.html"))
+        files += sorted(p for p in (ROOT / "assets" / "js").glob("*.js"))
+        files += sorted((ROOT / "assets" / "css").glob("*.css"))
+        files += sorted((ROOT / "data").glob("*.js*")) + sorted((ROOT / "assistant-proxy").rglob("*.*"))
+        for f in files:
+            if not f.is_file() or "node_modules" in f.parts:
+                continue
+            text = re.sub(r"\s+", " ", f.read_text(encoding="utf-8", errors="ignore")).lower()
+            for bad in ("calendly.com/callum-ambarorlando/30min", "/30min", "video call", "video-call",
+                        "can’t come in person", "can't come in person", "introduction to ambar",
+                        "mention it when you book", "mention a tour"):
+                self.assertNotIn(bad, text, f"{f.relative_to(ROOT)}: {bad}")
+        # the only Calendly link on the site is the in-person visit
+        for f in [ROOT / "index.html", ROOT / "events" / "index.html", ROOT / "assets" / "js" / "assistant.js", ROOT / "README.md"]:
+            for url in re.findall(r"https://calendly\.com/[A-Za-z0-9_\-/]+", f.read_text(encoding="utf-8")):
+                self.assertEqual(url, "https://calendly.com/callum-ambarorlando/meet-us-at-ambar", f.name)
 
     def test_sources_and_dates(self):
         for needle in ["flymco.com", "flysfb.com", "ncei.noaa.gov", "themeparkdirect.com", "openstreetmap.org",
