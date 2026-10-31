@@ -261,7 +261,7 @@ class KnowledgeTest(unittest.TestCase):
             self.skipTest("node not installed")
         out = node("tests/js/assistant_profile_test.js")
         self.assertEqual(out.returncode, 0, out.stdout + out.stderr)
-        self.assertIn("assistant profile: 7 checks passed", out.stdout)
+        self.assertIn("assistant profile: 10 checks passed", out.stdout)
 
     def test_proxy_smoke_with_mocked_llm(self):
         if not shutil.which("node"):

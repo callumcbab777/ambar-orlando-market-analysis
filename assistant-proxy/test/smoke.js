@@ -63,7 +63,7 @@ const good = { messages: [{ role: "user", content: "jazz this weekend?" }], cont
   assert.ok(g.includes("[brands:marriott]") && g.includes("MY PROFILE") && g.includes("(empty)"), "server retrieval grounds the prompt");
   // section-specific profile questions ground only that section (server re-derives it from the question too)
   const fullProfile = { hotels: ["swan", "conrad-evermore"], brands: ["jw-marriott"], events: [{ title: "Saved Jazz", start_date: "2026-11-02", end_date: "2026-11-02", url: "https://www.visitorlando.com/event/y/2/" }], prefs: { cats: ["Concerts and Live Shows"], budget: "free" } };
-  for (const [q, ip] of [["my favourite hotels", "10.0.2.1"], ["Which hotels did I star?", "10.0.2.2"], ["my favorite hotels", "10.0.2.3"]]) {
+  for (const [q, ip] of [["my favourite hotels", "10.0.2.1"], ["Which hotels did I star?", "10.0.2.2"], ["my favorite hotels", "10.0.2.3"], ["hotels I starred", "10.0.2.8"], ["list my favorites hotels", "10.0.2.9"]]) {
     r = await call({ body: { messages: [{ role: "user", content: q }], context: { page: "home", profile: fullProfile } }, ip });
     assert.strictEqual(r.status, 200);
     g = upstream.init.body.messages[0].content;
@@ -88,6 +88,18 @@ const good = { messages: [{ role: "user", content: "jazz this weekend?" }], cont
   g = upstream.init.body.messages[0].content;
   mb = g.slice(g.indexOf("\nMY PROFILE ("), g.indexOf("Visit Orlando calendar:"));
   assert.ok(mb.includes("Swan") && !mb.includes("Saved Jazz"), "client scope honoured");
+  // bare "my hotel" is not a profile question: normal retrieval (Getting here), no section-only profile block
+  for (const [q, ip] of [["How far is my hotel from the airport?", "10.0.3.1"], ["is my hotel near Disney", "10.0.3.2"], ["when is my event", "10.0.3.3"]]) {
+    r = await call({ body: { messages: [{ role: "user", content: q }], context: { page: "home", profile: fullProfile } }, ip });
+    assert.strictEqual(r.status, 200);
+    g = upstream.init.body.messages[0].content;
+    assert.ok(!/only the (favourite hotels|saved events) section/.test(g), q + ": treated as a profile-section question");
+    assert.ok(!g.includes("[page:profile:mine]"), q + ": profile page doc pulled in");
+  }
+  r = await call({ body: { messages: [{ role: "user", content: "How far is my hotel from the airport?" }], context: { page: "home", profile: fullProfile } }, ip: "10.0.3.4" });
+  g = upstream.init.body.messages[0].content;
+  const kb = g.slice(g.indexOf("SITE KNOWLEDGE"));
+  assert.ok(/^\[page:visit:getting-here/m.test(kb) && kb.indexOf("[page:visit:getting-here") < kb.indexOf("\nMY PROFILE ("), "Getting here grounds the airport question");
   // events: listings from the index are grounded server-side with their Visit Orlando link + the currency doc
   r = await call({ body: { messages: [{ role: "user", content: "Any concerts this weekend?" }], context: { page: "events", today: "2026-10-31", knowledge_ids: ["event:34203"] } }, ip: "10.0.1.4" });
   assert.strictEqual(r.status, 200);

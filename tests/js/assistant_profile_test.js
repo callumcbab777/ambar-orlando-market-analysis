@@ -42,15 +42,20 @@ const FULL = {
   prefs: { cats: ["Concerts and Live Shows"], budget: "free" },
 };
 const EMPTY_HOTELS = { hotels: [], brands: ["jw-marriott"], events: FULL.events, prefs: FULL.prefs };
-const HOTEL_QS = ["my saved hotels", "my favourite hotels", "my favorite hotels", "My favourites hotels?", "show my favorite hotels", "which hotels did I star", "Which hotels have I starred?", "which hotels did I favourite?", "which hotels did I favorite"];
-const EVENT_QS = ["my saved events", "which events did I save?", "my favourite events", "my favorite events", "show my saved events"];
+const HOTEL_QS = ["my saved hotels", "my favourite hotels", "my favorite hotels", "My favourites hotels?", "show my favorite hotels", "which hotels did I star", "Which hotels have I starred?", "which hotels did I favourite?", "which hotels did I favorite",
+  "hotels I starred", "which hotels did I save", "show my starred hotels", "list my favorites hotels", "list my favourites hotels", "hotels I’ve saved"];
+const EVENT_QS = ["my saved events", "which events did I save?", "my favourite events", "my favorite events", "show my saved events", "events I starred"];
+/* bare "my hotel" / "my event" is the visitor's own hotel or plans, not their saved items: normal retrieval */
+const NOT_PROFILE_QS = ["How far is my hotel from the airport?", "how far is my hotel from the airport", "is my hotel near Disney", "Is my hotel near Disney?", "my hotel is the Hilton, what's nearby?",
+  "my hotel is the Hilton, what’s nearby", "my hotels", "my event", "when is my event", "my events", "is my event free?", "how do I star a hotel?", "how do I save an event"];
 const ALL_QS = ["what's in my profile", "What’s in my profile?", "show my profile", "my favourites", "my favorites", "my saved hotels and events"];
 
 t("profileIntent: hotels / events / all, British and American spelling", () => {
   for (const q of HOTEL_QS) assert.strictEqual(K.profileIntent(q), "hotels", q);
   for (const q of EVENT_QS) assert.strictEqual(K.profileIntent(q), "events", q);
   for (const q of ALL_QS) assert.strictEqual(K.profileIntent(q), "all", q);
-  for (const q of ["how do I star a hotel?", "how do I save an event", "concerts this weekend", "How do I get from Miami?", "Which Marriott brands are in Orlando?"]) assert.strictEqual(K.profileIntent(q), null, q);
+  for (const q of NOT_PROFILE_QS.concat(["concerts this weekend", "How do I get from Miami?", "Which Marriott brands are in Orlando?"])) assert.strictEqual(K.profileIntent(q), null, q);
+  for (const q of ["my brands", "my preferences", "what's in my profile", "my favourites", "my favorites"]) assert.ok(K.profileIntent(q), q);
 });
 t("retrieval: hotel-intent profile docs are hotels only; events intent events only; general = all sections", () => {
   const ix = K.createIndex(KNOW);
@@ -107,4 +112,36 @@ t("proxy context: section-specific intents send only that section; general sends
   const other = A._profileContext(A.guideAnswer("concerts this weekend").profileScope);
   assert.ok(other.scope === "all" && other.hotels.length === 2 && other.events.length === 1, "non-profile questions keep the whole profile");
 });
-console.log(`assistant profile: ${n} checks passed`);
+t("retrieval: bare 'my hotel' questions get normal results, no profile docs", () => {
+  const ix = K.createIndex(KNOW);
+  for (const q of NOT_PROFILE_QS) {
+    const r = K.search(ix, q, { k: 6, profile: FULL, today: "2026-10-31" });
+    assert.ok(!r.some((x) => x.doc.kind === "profile" || x.doc.id === "page:profile:mine"), q + " → " + r.map((x) => x.doc.id).join());
+  }
+  const air = K.search(ix, "How far is my hotel from the airport?", { k: 3, profile: FULL }).map((x) => x.doc.id);
+  assert.ok(air[0].startsWith("page:visit:getting-here"), air.join());
+  assert.ok(K.search(ix, "is my hotel near Disney", { k: 3, profile: FULL })[0].doc.id === "brands:disney");
+  assert.ok(K.search(ix, "my hotel is the Hilton, what's nearby?", { k: 3, profile: FULL })[0].doc.id === "brands:hilton");
+});
+(async () => {
+  /* full offline answers with the index loaded */
+  const A = loadAssistant(FULL);
+  await A.loadKnowledge();
+  t("offline guide: 'How far is my hotel from the airport?' answers from Getting here, not favourites", () => {
+    for (const q of ["How far is my hotel from the airport?", "is my hotel near Disney", "my hotel is the Hilton, what's nearby?"]) {
+      const g = A.guideAnswer(q);
+      assert.ok(!g.profileScope && !/Your favourite hotels|Saved events|Open My Profile/.test(g.html), q + " → " + g.html);
+    }
+    const h = A.guideAnswer("How far is my hotel from the airport?").html;
+    assert.ok(/href="visit\/#getting-here"/.test(h) && /Three airports, one destination/.test(h), h);
+    const ctx = A._profileContext(A.guideAnswer("How far is my hotel from the airport?").profileScope);
+    assert.strictEqual(ctx.scope, "all", "not a profile-section question: no section filter sent to the proxy");
+  });
+  t("offline guide with the index: 'hotels I starred' / 'show my starred hotels' still list favourites only", () => {
+    for (const q of ["hotels I starred", "show my starred hotels", "list my favorites hotels", "which hotels did I save"]) {
+      const h = A.guideAnswer(q).html;
+      assert.ok(h.includes("Your favourite hotels (2)") && !/Thriller|Brands you know/.test(h), q + " → " + h);
+    }
+  });
+  console.log(`assistant profile: ${n} checks passed`);
+})().catch((e) => { console.error(e); process.exit(1); });
