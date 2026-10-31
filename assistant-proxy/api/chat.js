@@ -73,6 +73,7 @@ function sanitize(body) {
   const words = (a, n, len) => (Array.isArray(a) ? a : []).filter((x) => typeof x === "string").slice(0, n).map((x) => clip(x, len).replace(/[\n\r]/g, " "));
   const iso = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(v || "") ? v : "");
   const profile = pr ? {
+    scope: ["hotels", "events", "brands", "prefs"].includes(pr.scope) ? pr.scope : "all",
     hotels: [...new Set(words(pr.hotels, 20, 60))].filter((id) => L.hotels && Object.prototype.hasOwnProperty.call(L.hotels, id)),
     brands: [...new Set(words(pr.brands, 120, 60))].filter((id) => L.brands && Object.prototype.hasOwnProperty.call(L.brands, id)),
     events: (Array.isArray(pr.events) ? pr.events : []).slice(0, 25).filter((e) => e && isVO(e.url)).map((e) => ({ title: clip(e.title, 160).replace(/[\n\r]/g, " "), start_date: iso(e.start_date), end_date: iso(e.end_date), url: clip(e.url, 300) })),
@@ -106,10 +107,22 @@ function grounding(ctx, question, site) {
     if (docs.length >= 8) { const drop = docs.map((d) => d.kind).lastIndexOf("page"); docs.splice(drop >= 0 ? drop : docs.length - 1, 1); }
     seen.add(cur.id); docs.push(cur);
   }
-  const mine = ctx.profile ? KS.profileDocs(IX, ctx.profile) : [];
+  /* a section-specific profile question ("my saved hotels", "which hotels did I star") grounds only that section;
+     the server works this out from the question itself and also honours a narrower scope sent by the browser */
+  const asked = KS.profileIntent ? KS.profileIntent(question) : null;
+  const scope = asked && asked !== "all" ? asked : asked ? "all" : (ctx.profile && ctx.profile.scope) || "all";
+  const mine = ctx.profile ? KS.profileDocs(IX, ctx.profile, scope) : [];
   const fmt = (d) => `[${d.id}] ${d.title} | ${abs(d.url, site)}${d.source ? ` | source: ${d.source}` : ""}${d.as_of ? ` | as of ${d.as_of}` : ""}\n${clip(d.text, 900)}`;
-  return { docs: docs.map(fmt), mine: mine.filter((d) => d.kind === "profile").map((d) => `${d.title}: ${clip(d.text, 1200)}`) };
+  return { docs: docs.map(fmt), mine: mine.filter((d) => d.kind === "profile").map((d) => `${d.title}: ${clip(d.text, 1200)}`), scope };
 }
+
+const PROFILE_LABEL = { hotels: "favourite hotels", events: "saved events", brands: "familiar brands", prefs: "event preferences" };
+const PROFILE_EMPTY = {
+  hotels: (site) => `Say they haven't starred any favourite hotels yet; to save one, tap the star on a hotel card in Hotels: ${site}index.html#hotels`,
+  events: (site) => `Say they haven't saved any events yet; tap Save on a listing on the events page: ${site}events/`,
+  brands: (site) => `Say they haven't picked any brands yet; they can in Your brands: ${site}index.html#familiar`,
+  prefs: (site) => `Say they haven't set event preferences yet; see Recommended for you: ${site}events/#preferences`,
+};
 
 function systemPrompt(ctx, g, site) {
   g = g || { docs: [], mine: [] };
@@ -133,8 +146,10 @@ function systemPrompt(ctx, g, site) {
     "SITE KNOWLEDGE (from the site's own index):",
     ...(g.docs.length ? g.docs : ["(no matching docs)"]),
     "",
-    "MY PROFILE (what this visitor saved on their own browser):",
-    ...(g.mine.length ? g.mine : ["(empty)"]),
+    g.scope && g.scope !== "all"
+      ? `MY PROFILE (only the ${PROFILE_LABEL[g.scope]} section: the visitor asked about that, so answer with it alone and don't mention other saved items):`
+      : "MY PROFILE (what this visitor saved on their own browser):",
+    ...(g.mine.length ? g.mine : [g.scope && g.scope !== "all" ? `(none saved yet. ${PROFILE_EMPTY[g.scope](site)})` : "(empty)"]),
     "",
     `Visit Orlando calendar: ${ctx.calendar_url}`,
     ...(ctx.sections.length ? ["Site sections:", ...ctx.sections.map((s) => `- ${s.title}: ${s.url} (${s.about})`)] : []),

@@ -61,6 +61,33 @@ const good = { messages: [{ role: "user", content: "jazz this weekend?" }], cont
   assert.strictEqual(r.status, 200);
   g = upstream.init.body.messages[0].content;
   assert.ok(g.includes("[brands:marriott]") && g.includes("MY PROFILE") && g.includes("(empty)"), "server retrieval grounds the prompt");
+  // section-specific profile questions ground only that section (server re-derives it from the question too)
+  const fullProfile = { hotels: ["swan", "conrad-evermore"], brands: ["jw-marriott"], events: [{ title: "Saved Jazz", start_date: "2026-11-02", end_date: "2026-11-02", url: "https://www.visitorlando.com/event/y/2/" }], prefs: { cats: ["Concerts and Live Shows"], budget: "free" } };
+  for (const [q, ip] of [["my favourite hotels", "10.0.2.1"], ["Which hotels did I star?", "10.0.2.2"], ["my favorite hotels", "10.0.2.3"]]) {
+    r = await call({ body: { messages: [{ role: "user", content: q }], context: { page: "home", profile: fullProfile } }, ip });
+    assert.strictEqual(r.status, 200);
+    g = upstream.init.body.messages[0].content;
+    const mineBlock = g.slice(g.indexOf("\nMY PROFILE ("), g.indexOf("Visit Orlando calendar:"));
+    assert.ok(/only the favourite hotels section/.test(mineBlock) && mineBlock.includes("Walt Disney World Swan"), q);
+    assert.ok(!/Saved Jazz|JW Marriott|preferences/i.test(mineBlock.replace(/^\nMY PROFILE[^\n]*\n/, "")), q + ": other sections leaked");
+  }
+  r = await call({ body: { messages: [{ role: "user", content: "my saved events" }], context: { page: "home", profile: fullProfile } }, ip: "10.0.2.4" });
+  g = upstream.init.body.messages[0].content;
+  let mb = g.slice(g.indexOf("\nMY PROFILE ("), g.indexOf("Visit Orlando calendar:"));
+  assert.ok(/only the saved events section/.test(mb) && mb.includes("Saved Jazz") && !/Swan|JW Marriott/.test(mb), "events only");
+  r = await call({ body: { messages: [{ role: "user", content: "my saved hotels" }], context: { page: "home", profile: { hotels: [], brands: ["jw-marriott"], events: fullProfile.events } } }, ip: "10.0.2.5" });
+  g = upstream.init.body.messages[0].content;
+  mb = g.slice(g.indexOf("\nMY PROFILE ("), g.indexOf("Visit Orlando calendar:"));
+  assert.ok(/none saved yet/.test(mb) && /tap the star on a hotel card/.test(mb) && mb.includes("index.html#hotels") && !/Saved Jazz/.test(mb), "empty favourites guidance");
+  r = await call({ body: { messages: [{ role: "user", content: "What's in my profile?" }], context: { page: "home", profile: fullProfile } }, ip: "10.0.2.6" });
+  g = upstream.init.body.messages[0].content;
+  mb = g.slice(g.indexOf("\nMY PROFILE ("), g.indexOf("Visit Orlando calendar:"));
+  assert.ok(mb.includes("Swan") && mb.includes("Saved Jazz") && mb.includes("JW Marriott") && /preferences/i.test(mb), "general profile question keeps all sections");
+  // a browser-sent narrower scope is honoured when the question itself isn't section-specific
+  r = await call({ body: { messages: [{ role: "user", content: "and those?" }], context: { page: "home", profile: Object.assign({ scope: "hotels" }, fullProfile) } }, ip: "10.0.2.7" });
+  g = upstream.init.body.messages[0].content;
+  mb = g.slice(g.indexOf("\nMY PROFILE ("), g.indexOf("Visit Orlando calendar:"));
+  assert.ok(mb.includes("Swan") && !mb.includes("Saved Jazz"), "client scope honoured");
   // events: listings from the index are grounded server-side with their Visit Orlando link + the currency doc
   r = await call({ body: { messages: [{ role: "user", content: "Any concerts this weekend?" }], context: { page: "events", today: "2026-10-31", knowledge_ids: ["event:34203"] } }, ip: "10.0.1.4" });
   assert.strictEqual(r.status, 200);
