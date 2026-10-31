@@ -1,8 +1,11 @@
-/* AMBAR Orlando · site assistant widget (events page + main site).
-   - AI mode: only when window.AMBAR_ASSISTANT_CONFIG.proxyUrl is set. Messages go to that proxy (assistant-proxy/),
-     which holds the LLM key server-side. No API key is ever in this file or this repo.
-   - Offline "site guide" mode (default): local keyword search over the site's sections and the Visit Orlando
-     events data. It returns links only and never makes up answers. It is labelled as not AI. */
+/* AMBAR Orlando · site assistant widget (every page).
+   - Knowledge: data/knowledge.json (built by tools/build_knowledge.py from the site's own pages and data) is searched
+     in the browser with assets/js/knowledge.js (BM25). Both are loaded lazily the first time the widget opens.
+   - AI mode: only when window.AMBAR_ASSISTANT_CONFIG.proxyUrl is set. The question, the ids of the best-matching
+     knowledge docs, the matching Visit Orlando events and a summary of My Profile go to that proxy (assistant-proxy/),
+     which holds the LLM key and builds the grounded prompt from its own copy of the index. No key is in this repo.
+   - Offline "site guide" mode (default): the same retrieval plus the events search, answered with links and short
+     quotes from the site only. It never makes up answers and is labelled as not AI. */
 (function () {
   "use strict";
   const me = document.currentScript;
@@ -18,23 +21,30 @@
   const todayISO = (() => { try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()); } catch (e) { return new Date().toISOString().slice(0, 10); } })();
   const home = (hash) => (PAGE === "home" ? hash : `${ROOT}index.html${hash}`);
   const evPage = (qs = "", hash = "") => `${ROOT}events/index.html${qs}${hash}`;
+  const visit = (hash = "") => (PAGE === "visit" ? hash || "#top" : `${ROOT}visit/${hash}`);
+  const profilePage = (hash = "") => (PAGE === "profile" ? hash || "#top" : `${ROOT}profile/${hash}`);
+  /* knowledge URLs are relative to the site root ("index.html#hotels", "visit/#brightline") or absolute */
+  const siteUrl = (u) => (/^https?:\/\//.test(u) ? u : u.startsWith("index.html") ? home(u.slice(10) || "#top") : ROOT + u);
 
   /* ---------- site map (what the guide can point to) ---------- */
   const SECTIONS = [
     { t: "Week ahead · nightly rates", h: home("#week-ahead"), d: "Lowest public nightly rates for each tracked hotel, by night.", k: "rate rates nightly night price prices cheapest tonight week ahead grid hotel heatmap" },
     { t: "Residences · the week ahead", h: home("#residences-week"), d: "Labelled estimates of ADR and RevPAU for each AMBAR floor plan.", k: "residence residences ambar adr revpar revpau estimate estimates floor plan studio bedroom owner economics cap occupancy" },
-    { t: "History · how rates moved", h: home("#history"), d: "Week-over-week rate chart and per-hotel charts.", k: "history chart trend trends moved change week over" },
+    { t: "Your brands · hotel brands in Orlando", h: home("#familiar"), d: "Pick the hotel companies and brands you know; verified Orlando-area brands, saved to My Profile.", k: "brand brands familiar company companies parent hilton hyatt ihg wyndham disney universal loews choice accor best western four seasons marriott" },
     { t: "Marriott brand matrix", h: home("#brands"), d: "Where AMBAR and the Marriott hotels sit in the Marriott portfolio.", k: "marriott brand brands matrix tier portfolio autograph premium luxury bonvoy" },
     { t: "The hotels + map", h: home("#hotels"), d: "The comparable hotels, their locations and distances.", k: "hotels hotel map location locations distance jw ritz swan dolphin gaylord hyatt conrad wyndham ette comparable comps" },
+    { t: "By hotel · how rates moved, and favourites", h: home("#byHotel"), d: "A small chart per hotel; star hotels to keep them in My Profile.", k: "history chart trend trends moved change favourite favourites favorite favorites star starred by hotel" },
     { t: "Demand context", h: home("#demand"), d: "Conventions, Disney calendars and notes from the weekly briefs; metro occupancy.", k: "demand convention conventions disney occupancy market context brief briefs" },
     { t: "Orlando & hospitality news", h: home("#news"), d: "Marriott, wider Orlando and hospitality-media headlines.", k: "news headlines headline hospitality media article articles" },
     { t: "Sources & methodology", h: home("#sources"), d: "How the figures are gathered, caveats and sources.", k: "source sources methodology method caveat caveats data how gathered disclaimer" },
     { t: "Orlando events (Visit Orlando)", h: evPage(), d: "Browse and filter Visit Orlando listings by date, category and area.", k: "event events whats what's on things do calendar concert concerts festival festivals show shows visit orlando activities activity" },
-    { t: "My list (saved events) · Share my list", h: evPage("", "#saved"), d: "Events you saved on this browser; download them as a PDF or share a link with friends and family.", k: "saved save bookmark bookmarks favourite favourites favorite favorites share sharing pdf link send list friends family" },
-    { t: "Getting here: MCO and SFB airports", h: evPage("", "#getting-here"), d: "Nonstop routes from the UK and other markets, drive times from AMBAR, and a Google Flights link.", k: "flight flights fly airport airports mco sanford sfb getting here travel uk london gatwick heathrow manchester edinburgh drive airline airlines" },
-    { t: "Best time to visit Orlando", h: evPage("", "#best-time"), d: "Average high/low temperatures by month (NOAA) and typical crowd levels.", k: "best time when weather temperature temperatures climate crowd crowds busy quiet season seasons month months" },
-    { t: "Visit AMBAR: meet us at the sales center", h: evPage("", "#visit-ambar"), d: "Book an in-person visit to the AMBAR sales center in Kissimmee, plus directions.", k: "book booking meet in person tour visit sales center centre appointment meeting address directions calendly contact" },
     { t: "My preferences → Recommended for you", h: evPage("", "#preferences"), d: "Set interests, areas, dates and budget to get a ranked shortlist.", k: "preference preferences recommend recommended recommendation recommendations personalise personalize interests for me" },
+    { t: "My Profile · saved events, hotels and brands", h: profilePage(), d: "Everything you saved on this browser; download a PDF or share a read-only link.", k: "profile saved save bookmark bookmarks share sharing pdf link send list friends family mine" },
+    { t: "Getting here: MCO, SFB and MLB airports", h: visit("#getting-here"), d: "Direct routes from the UK and other markets, seasonal routes marked, with official sources.", k: "flight flights fly airport airports mco sanford sfb melbourne mlb getting here travel uk london gatwick heathrow manchester edinburgh airline airlines direct nonstop" },
+    { t: "Brightline from Miami and South Florida", h: visit("#brightline"), d: "Brightline stations from MiamiCentral to Orlando (at MCO), with a link to gobrightline.com.", k: "brightline train rail miami fort lauderdale aventura boca west palm beach south florida" },
+    { t: "Drive times from AMBAR", h: visit("#drive-times"), d: "Approximate drive times to the airports and the Brightline station, with no traffic.", k: "drive driving car distance far minutes miles route directions" },
+    { t: "Best time to visit Orlando", h: visit("#best-time"), d: "Average high/low temperatures by month (NOAA) and typical crowd levels.", k: "best time when weather temperature temperatures climate crowd crowds busy quiet season seasons month months" },
+    { t: "Visit AMBAR: meet us in person", h: visit("#visit-ambar"), d: "Book an in-person visit to AMBAR in Kissimmee, plus directions.", k: "book booking meet in person tour visit sales center centre appointment meeting address directions calendly contact" },
   ];
   const STOP = new Set("a an and are any at be can do does for from get give have how i in is it me my near of on or please show tell that the there this to up us we what whats when where which who will with you your about find looking look want some".split(" "));
   const SYN = { music: ["music", "concert", "live"], concert: ["concert", "music"], theatre: ["theatre", "theater"], theater: ["theater", "theatre"], kid: ["kid", "family", "children"], kids: ["kid", "family", "children"], family: ["family", "kid", "children"], sport: ["sport"], sports: ["sport"], art: ["art"], arts: ["art"], halloween: ["halloween"], thanksgiving: ["thanksgiving"], christmas: ["christmas", "holiday"], holiday: ["holiday"], holidays: ["holiday"], outdoor: ["outdoor"], outdoors: ["outdoor"] };
@@ -59,6 +69,28 @@
     });
   }
   const calUrl = () => (window.VO_EVENTS_DATA && window.VO_EVENTS_DATA.calendar_url) || "https://www.visitorlando.com/events/";
+
+  /* ---------- site knowledge (lazy: data/knowledge.js + assets/js/knowledge.js) ---------- */
+  let KX = null, kxLoading = null;
+  const addScript = (src) => new Promise((res) => { const s = document.createElement("script"); s.src = src; s.onload = () => res(true); s.onerror = () => res(false); document.body.appendChild(s); });
+  function loadKnowledge() {
+    if (KX) return Promise.resolve(KX);
+    if (!kxLoading) kxLoading = Promise.all([
+      window.AMBAR_KNOWLEDGE ? true : addScript(`${ROOT}data/knowledge.js`),
+      window.AMBAR_KNOWLEDGE_SEARCH ? true : addScript(`${ROOT}assets/js/knowledge.js`),
+    ]).then(() => {
+      if (window.AMBAR_KNOWLEDGE && window.AMBAR_KNOWLEDGE_SEARCH) KX = window.AMBAR_KNOWLEDGE_SEARCH.createIndex(window.AMBAR_KNOWLEDGE);
+      return KX;
+    });
+    return kxLoading;
+  }
+  const myProfile = () => { try { return window.AMBAR_PROFILE ? window.AMBAR_PROFILE.get() : null; } catch (e) { return null; } };
+  function knowledgeHits(q, k = 4) {
+    if (!KX) return [];
+    const hits = window.AMBAR_KNOWLEDGE_SEARCH.search(KX, q, { k: k + 2, profile: myProfile() });
+    const top = hits.length ? hits[0].score : 0;
+    return hits.filter((r) => r.doc.kind === "profile" || (top >= 2 && r.score >= top * 0.4)).slice(0, k);
+  }
 
   /* ---------- offline guide: parse + search ---------- */
   function parse(q) {
@@ -116,14 +148,37 @@
       return { x, s };
     }).filter((r) => r.s > 0).sort((a, b) => b.s - a.s).slice(0, 3).map((r) => r.x);
   }
+  function profileAnswer() {
+    const P = myProfile(), L = (window.AMBAR_KNOWLEDGE && window.AMBAR_KNOWLEDGE.lookups) || {};
+    const link = `<a href="${esc(profilePage())}">Open My Profile →</a>`;
+    if (!P || (!P.events.length && !P.hotels.length && !P.brands.length && !P.prefs)) {
+      return `<p>Your profile on this browser is empty so far. Star hotels in <a href="${esc(home("#hotels"))}">Hotels</a>, pick brands in <a href="${esc(home("#familiar"))}">Your brands</a> and save events on the <a href="${esc(evPage())}">events page</a>; they all show up in ${link.replace("Open My Profile →", "My Profile")}.</p>`;
+    }
+    let h = "";
+    if (P.hotels.length) h += `<p>Your favourite hotels:</p><ul class="as-secs">${P.hotels.map((id) => `<li><a href="${esc(home("#hotel-" + id))}">${esc((L.hotels && L.hotels[id]) || id)}</a></li>`).join("")}</ul>`;
+    if (P.brands.length) {
+      const by = {};
+      for (const id of P.brands) { const b = L.brands && L.brands[id]; if (b) (by[b.parent] = by[b.parent] || []).push(b.name); }
+      h += `<p>Brands you know: ${Object.keys(by).map((k) => `<b>${esc(k)}</b>: ${esc(by[k].join(", "))}`).join("; ")}.</p>`;
+    }
+    if (P.events.length) h += `<p>Saved events:</p><ul class="as-evs">${P.events.slice(0, 8).map((e) => `<li>${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.title || "Event")}</a>` : esc(e.title || "Event")}${e.start_date ? `<span>${esc(e.start_date === e.end_date || !e.end_date ? fMD(e.start_date) : `${fMD(e.start_date)} – ${fMD(e.end_date)}`)}</span>` : ""}</li>`).join("")}</ul>${P.events.length > 8 ? `<p>…and ${P.events.length - 8} more.</p>` : ""}`;
+    if (P.prefs) h += `<p>You have event preferences saved; see <a href="${esc(evPage("", "#preferences"))}">Recommended for you</a>.</p>`;
+    return h + `<p>${link}</p>`;
+  }
   function guideAnswer(q) {
     const p = parse(q);
+    if (window.AMBAR_KNOWLEDGE_SEARCH && window.AMBAR_KNOWLEDGE_SEARCH.isProfileQuery(q) && /\b(saved|favou?rite|starred|profile|my (hotels?|brands?|events?|list))\b/i.test(q)) {
+      return { html: profileAnswer(), events: [] };
+    }
     const isHelp = /^\s*(help|hi|hello|hey|\?|what can you do)\b/i.test(q);
-    if (isHelp) return { html: `<p>I’m the offline site guide: I search this site’s sections and the Visit Orlando listings and give you links. I’m not AI and won’t make up answers.</p><p>Try “concerts this weekend”, “free events in Winter Park”, “family events Nov 7”, “brand matrix” or “how are rates gathered”.</p>`, events: [] };
-    const sections = searchSections(p, q);
+    if (isHelp) return { html: `<p>I’m the offline site guide: I search this site’s sections and the Visit Orlando listings and give you links. I’m not AI and won’t make up answers.</p><p>Try “concerts this weekend”, “free events in Winter Park”, “how do I get from Miami?”, “which Marriott brands are in Orlando?”, “best time to visit”, “my saved hotels” or “how are rates gathered”.</p>`, events: [] };
+    const kh = knowledgeHits(q).filter((r) => r.doc.kind !== "profile");
+    const sections = kh.length
+      ? kh.map((r) => ({ t: r.doc.title, h: siteUrl(r.doc.url), d: window.AMBAR_KNOWLEDGE_SEARCH.snippet(r.doc, q, 200) + (r.doc.as_of ? ` (as of ${r.doc.as_of})` : ""), ext: /^https?:/.test(r.doc.url) }))
+      : searchSections(p, q);
     const eventIntent = p.from || p.free || p.area || p.terms.length > 0;
     const res = eventIntent ? searchEvents(p) : { list: [], strict: true };
-    const looksLikeSiteQ = sections.length && !sections.some((s) => /events|saved|preferences/i.test(s.t)) && res.list.length && !res.strict;
+    const looksLikeSiteQ = sections.length && !sections.some((s) => /events\/|profile\/|#preferences/i.test(s.h)) && res.list.length && !res.strict;
     const evs = looksLikeSiteQ ? [] : res.list;
     let html = "";
     const when = p.from ? (p.from === p.to ? ` on ${fMD(p.from)}` : ` ${fMD(p.from)} – ${fMD(p.to)}`) : "";
@@ -140,8 +195,8 @@
     } else if (eventIntent && !sections.length) {
       html += `<p>I couldn’t find a Visit Orlando listing on this site matching that${when}. Try fewer words, or check the <a href="${esc(calUrl())}" target="_blank" rel="noopener">Visit Orlando calendar</a>.</p>`;
     }
-    if (sections.length) html += `<p>${evs.length ? "Related on this site:" : "On this site:"}</p><ul class="as-secs">${sections.map((s) => `<li><a href="${esc(s.h)}">${esc(s.t)}</a><span>${esc(s.d)}</span></li>`).join("")}</ul>`;
-    if (!html) html = `<p>I couldn’t find that on this site. I can point you to events (try “concerts this weekend”) or sections like the week-ahead rates, brand matrix, hotels, demand context, news or sources.</p>`;
+    if (sections.length) html += `<p>${evs.length ? "Related on this site:" : "On this site:"}</p><ul class="as-secs">${sections.map((s) => `<li><a href="${esc(s.h)}"${s.ext ? ' target="_blank" rel="noopener"' : ""}>${esc(s.t)}</a><span>${esc(s.d)}</span></li>`).join("")}</ul>`;
+    if (!html) html = `<p>I couldn’t find that on this site. I can point you to events (try “concerts this weekend”), getting here (“how do I get from Miami?”), hotel brands, the week-ahead rates, hotels, demand context, news, sources or your profile.</p>`;
     return { html, events: evs };
   }
 
@@ -164,13 +219,13 @@
     <div class="as-log" id="asLog" role="log" aria-live="polite" aria-relevant="additions" tabindex="0"></div>
     <div class="as-suggest" role="group" aria-label="Suggested questions">
       <button type="button" data-ask="Concerts this weekend">Concerts this weekend</button>
-      <button type="button" data-ask="Free events">Free events</button>
-      <button type="button" data-ask="Family events in Winter Park">Family · Winter Park</button>
-      <button type="button" data-ask="Where are the hotel rates?">Hotel rates</button>
+      <button type="button" data-ask="How do I get from Miami?">From Miami</button>
+      <button type="button" data-ask="Which Marriott brands are in Orlando?">Marriott brands</button>
+      <button type="button" data-ask="My saved hotels">My saved hotels</button>
     </div>
     <form class="as-form" id="asForm">
       <label for="asInput" class="sr-only">Ask ${AI ? "Isla" : "the site guide"} a question</label>
-      <input id="asInput" type="text" maxlength="500" autocomplete="off" placeholder="${AI ? "Ask about Orlando events or this site" : "Search events or this site"}">
+      <input id="asInput" type="text" maxlength="500" autocomplete="off" placeholder="${AI ? "Ask about Orlando, your visit or this site" : "Search events, your visit or this site"}">
       <button type="submit" class="as-send">Send</button>
     </form>
     <p class="as-foot">${AI ? "AI answers use this site’s data and can be wrong. Check each Visit Orlando source link." : `Answers are links from this site and <a href="${esc(calUrl())}" target="_blank" rel="noopener">Visit Orlando</a>.`}</p>`;
@@ -189,10 +244,10 @@
     panel.hidden = false; launcher.setAttribute("aria-expanded", "true"); launcher.hidden = true;
     if (!greeted) {
       greeted = true;
-      add("bot", AI ? `<p>Hi, I’m Isla. Ask me about Orlando events on this site or where to find something here. I only use this site’s data and link to Visit Orlando for every event.</p>`
-        : `<p>Hi! I’m the offline site guide. I search this site’s sections and the Visit Orlando listings and reply with links. I’m not AI, so I won’t make up answers. Type “help” for examples.</p>`);
+      add("bot", AI ? `<p>Hi, I’m Isla. Ask me about Orlando events, getting here, hotel brands, your profile or where to find something here. I only use this site’s data, cite its sources and never quote fares or invent rates.</p>`
+        : `<p>Hi! I’m the offline site guide. I search this site’s pages and data and the Visit Orlando listings and reply with links and short quotes. I’m not AI, so I won’t make up answers. Type “help” for examples.</p>`);
     }
-    loadEvents();
+    loadEvents(); loadKnowledge();
     input.focus();
   }
   function close() { panel.hidden = true; launcher.hidden = false; launcher.setAttribute("aria-expanded", "false"); launcher.focus(); }
@@ -209,11 +264,21 @@
     h = h.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, (m, pre, u) => `${pre}<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
     return h.split(/\n{2,}/).map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
   }
+  /* the profile summary the proxy may use: ids it can resolve itself, plus saved Visit Orlando events */
+  function profileContext() {
+    const P = myProfile();
+    if (!P) return null;
+    return {
+      hotels: P.hotels.slice(0, 20), brands: P.brands.slice(0, 120),
+      events: P.events.filter((e) => e.url).slice(0, 25).map((e) => ({ title: e.title, start_date: e.start_date, end_date: e.end_date, url: e.url })),
+      prefs: P.prefs ? { cats: P.prefs.cats, areas: P.prefs.areas, from: P.prefs.from, to: P.prefs.to, budget: P.prefs.budget, party: P.prefs.party, keywords: P.prefs.keywords, access: P.prefs.access } : null,
+    };
+  }
   let busy = false;
   async function ask(q) {
     if (busy) return;
     add("user", esc(q));
-    await loadEvents();
+    await Promise.all([loadEvents(), loadKnowledge()]);
     if (!AI) { add("bot", guideAnswer(q).html); return; }
     busy = true; form.querySelector(".as-send").disabled = true;
     const pending = add("bot", `<p class="as-typing">Isla is thinking…</p>`);
@@ -225,8 +290,9 @@
       messages: history.slice(-8),
       context: {
         page: PAGE, today: todayISO, calendar_url: calUrl(),
-        sections: SECTIONS.map((s) => ({ title: s.t, url: new URL(s.h, location.href).href, about: s.d })),
         events: evs.map((e) => ({ title: e.title, start_date: e.start_date, end_date: e.end_date, location: e.location || "", area: e.area, categories: e.categories, url: e.url })),
+        knowledge_ids: knowledgeHits(q, 6).filter((r) => r.doc.kind !== "profile").map((r) => r.doc.id),
+        profile: profileContext(),
       },
     };
     const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), 25000);
@@ -241,5 +307,5 @@
       pending.innerHTML = `<span class="sr-only">Site guide: </span><p class="as-warn">Isla isn’t reachable right now, so here’s the offline site guide (keyword search, not AI):</p>${g.html}`;
     } finally { clearTimeout(t); busy = false; form.querySelector(".as-send").disabled = false; log.scrollTop = log.scrollHeight; }
   }
-  window.AMBAR_ASSISTANT = { mode: AI ? "ai" : "guide", open, close, ask, guideAnswer, _parse: parse };
+  window.AMBAR_ASSISTANT = { mode: AI ? "ai" : "guide", open, close, ask, guideAnswer, loadKnowledge, _parse: parse, _profileContext: profileContext };
 })();

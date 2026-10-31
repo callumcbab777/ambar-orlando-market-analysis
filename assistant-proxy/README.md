@@ -12,7 +12,7 @@ What it does:
 - **Key stays server-side** in Vercel environment variables. Nothing secret is in the repo or the browser.
 - **CORS locked** to `ALLOWED_ORIGINS` (default: `https://callumcbab777.github.io`, `http://localhost:8000`, `http://127.0.0.1:8000`). Requests with no or another `Origin` get 403.
 - **Limits:** POST + JSON only; body ≤ `MAX_BODY_BYTES` (24 KB); last 8 messages, user turns ≤ 500 chars; ≤ 25 events, and only `https://www.visitorlando.com/` URLs are passed through; best-effort `RATE_LIMIT_PER_MIN` (10) per IP per warm instance; 20 s upstream timeout; `max_tokens` 400.
-- **Grounded prompt:** the site sends its section list and the Visit Orlando events that its own local search matched; the system prompt tells the model to use only that context, link every event's Visit Orlando URL, never invent events/prices/times/rates, and not give financial advice.
+- **Grounded prompt, built server-side:** `knowledge.json` (copied here by `tools/build_knowledge.py`) is the site's own index. The browser sends only doc ids (≤ 8; ids not in the index are dropped) and the server adds its own BM25 retrieval (`lib/knowledge-search.js`) for the latest question. My Profile arrives as hotel and brand ids (resolved against the index; unknown ids dropped), saved Visit Orlando events (≤ 25, Visit Orlando URLs only) and sanitised preferences. The system prompt requires a link and source/"as of" for every fact, never invents or estimates rates, prices, fares or schedules (fares: point to airlines/Google Flights or gobrightline.com), links every event's Visit Orlando URL and gives no financial advice. Redeploy after the index changes (Vercel redeploys on push to `main` if the project is connected).
 - If the proxy is down or errors, the widget falls back to the offline site guide and says so.
 
 ## Environment variables
@@ -26,6 +26,7 @@ What it does:
 | `ALLOWED_ORIGINS` | no | see above | Comma-separated origins, no paths. Add `https://raw.githack.com` only temporarily if you want AI on a branch preview. |
 | `RATE_LIMIT_PER_MIN` | no | `10` | Per IP, per warm instance. For a hard global cap add a Vercel Firewall rate-limit rule on `/api/chat`. |
 | `MAX_BODY_BYTES` | no | `24000` | |
+| `SITE_URL` | no | `https://callumcbab777.github.io/ambar-orlando-market-analysis/` | Base for the absolute links in the prompt. |
 
 Provider options:
 - **xAI (default):** key from https://console.x.ai → API Keys. Base URL `https://api.x.ai/v1`. `LLM_PROVIDER=xai`, `LLM_API_KEY=<xAI key>`.
@@ -55,5 +56,5 @@ Other hosts: the handler is a plain Node `(req, res)` function, so it also runs 
 ## Test locally (no key, no network)
 
 ```bash
-node assistant-proxy/test/smoke.js   # stubs the provider; checks CORS, limits, sanitising, 503 without a key
+node assistant-proxy/test/smoke.js   # mocked LLM; checks CORS, limits, sanitising, grounding from the server index, 503 without a key
 ```
