@@ -5,7 +5,9 @@ Static, single-folder site. Open `index.html` directly (works offline, except ma
 Marriott brands are the main focus (AMBAR is part of the Marriott family); key non-Marriott upper-upscale and luxury hotels are included for a fuller picture. The Marriott Brand Matrix section stays Marriott-only.
 
 ## Structure
-- `index.html`: page shell
+- `index.html`: page shell (hotel / ADR / market data)
+- `events/index.html`: Orlando events page (this week’s picks, date buckets, My list + Share, My preferences, Plan your visit)
+- `assistant-proxy/`: optional serverless proxy for the AI assistant (deploy separately; see its README)
 - `assets/css/styles.css`, `assets/js/app.js`: design and rendering. All content comes from `data/comps.json`
 - `assets/ambar-logo.png`: AMBAR logo cropped from Callum's brand graphic
 - `assets/fonts/`: self-hosted Cormorant Garamond + DM Sans (SIL OFL)
@@ -69,13 +71,27 @@ date,property,unit_type,bedrooms,sqft,rate,min_stay,is_booked
 
 Securities counsel should review the section wording before any of it goes into broker or investor materials, since AMBAR may involve a fund or tokenized structure and live revenue estimates can be forward-looking statements.
 
-## Visit Orlando events
+## Orlando events page (`events/index.html`)
 
-The **Orlando events** section (`#orlando-events`) is fed by `data/visitorlando_events.json` (mirrored as `data/visitorlando_events.js`). Refresh with:
+The Visit Orlando calendar lives on its own page, **`events/index.html`**, so the main page stays focused on hotel, ADR and market data. The two pages cross-link in the header nav (main: “Events →”; events: “← Market landscape”). At 1180px and below the header links fold into a **Menu** button (`assets/js/nav.js`), and the Demand section links to it.
 
-```bash
-python3 scripts/fetch_visitorlando_events.py --start YYYY-MM-DD --end YYYY-MM-DD
-```
+- **Data:** `data/visitorlando_events.json`, loaded through its mirror `data/visitorlando_events.js` (so `file://` works). Refresh with:
+  ```bash
+  python3 scripts/fetch_visitorlando_events.py --start YYYY-MM-DD --end YYYY-MM-DD
+  ```
+  Visit Orlando’s Simpleview REST API is often blocked by Akamai for non-browser clients. The script tries REST first, then falls back to the public sitemap + event page JSON-LD (warm a session on `/` and `/events/all/` first). Do not invent events; attribute Visit Orlando and link out to the calendar.
+- **Landing:** an editorial hero (inline SVG, AMBAR palette, no photos), **This week’s picks** (up to 6 short-run events in the next 7 days, max 2 per category; 4 on phones) and **Browse by date** tiles. Imagery is drawn, not photographed: the Visit Orlando data has no image URLs we can reuse, and we do not hotlink event photos. Licensed AMBAR lifestyle photography would be a good follow-up.
+- **Date buckets** (`assets/js/events-core.js`, unit-tested in `tests/js/events_core_test.js`): *Today*, *This weekend* (Fri–Sun, from today), *Next week* (the Mon–Sun after this weekend), *Later this month* (to month end; rolls to the next month near month end) and *All*. Computed from the visitor’s **local** date. Empty buckets say so and point to the next ones.
+- **Browse** (`assets/js/events.js`, `assets/css/events.css`): bucket buttons, search, and *More filters* (category, area, from/to, sort). Every card shows a **“Source: Visit Orlando listing”** link (only `https://www.visitorlando.com/` URLs are linked). Deep links: `events/index.html?when=weekend`, `?q=jazz&area=Winter%20Park&from=2026-11-01&to=2026-11-08&cat=Free%20Events`, `#saved`, `#preferences`, `#getting-here`, `#best-time`, `#visit-ambar`.
+- **Visit AMBAR (booking CTA):** visits are in person only, and there is one booking link, `https://calendly.com/callum-ambarorlando/meet-us-at-ambar`, always labelled **Visit AMBAR** with the `.btn-visit` style (amber on dark text, 44px+ target, visible focus ring; opens in a new tab with `rel="noopener"`). It appears in exactly four places on the events page: the editorial band right after *This week’s picks*; a slim line in *My list* (only when the list has saved events) and in the read-only shared view; a phone-only sticky bar (`assets/js/visit-cta.js`, ≤760px, appears after the hero, hides while the band or *Plan your visit* is on screen, dismissible for the session, respects the safe-area inset); and the *Plan your visit → Visit AMBAR* tab. No CTA in the header, hero, event cards or the main page, and no popups.
+- **Share my list** (on *My list*): **Download PDF** builds a branded Letter PDF in the browser (vendored `assets/vendor/jspdf.umd.min.js`, MIT, plus `assets/vendor/pdf-fonts.js`: DM Sans and Cormorant Garamond subset from the site’s own OFL fonts; both lazy-loaded only when the button is pressed). Each entry has name, dates, place and a clickable Visit Orlando link; the PDF also links back to the list online. **Copy share link** puts `events/index.html?shared=ID.ID.ID` on the clipboard (with a confirmation); on phones a **Share…** button opens the system share sheet. Recipients get a read-only *Shared with you* view with **Save all to my list**; incoming IDs are sanitised (digits only, max 60) and unknown IDs are ignored and counted.
+- **Plan your visit** (`assets/js/plan.js`): tabs for *Getting here* (MCO and SFB nonstop routes from the UK and key markets, from flymco.com and flysfb.com, dated “as of”; seasonal routes marked; free-flow drive estimates from OpenStreetMap/OSRM; Google Flights links; **no fares on the page**), *Best time to visit* (NOAA NCEI 1991–2020 monthly normals for Orlando Intl, station USW00012815; qualitative crowd levels from the Theme Park Direct crowd calendar) and *Visit AMBAR* (sales center address, directions and the booking button). Re-check routes each season.
+- **Saved:** a Save toggle on each card; the **My list** tab lists them. Stored in `localStorage` (`ambar.events.saved.v1`) with a small snapshot (title, dates, URL) so events that later drop out of the data still show as “No longer listed” with their original link and a Remove button. No login.
+- **My preferences:** interests (categories), areas, dates, budget (any / free only — listings have no prices, so this uses Visit Orlando’s *Free Events* tag), who’s going, keywords and accessibility. Stored in `localStorage` (`ambar.events.prefs.v1`). Once saved, **“Recommended for you”** with the tagline **“Powered by Isla AI - ABI Group”** appears at the top of *All events*: up to 6 events ranked in the browser by a transparent score (+3 per matching interest, +2 area, +2 per keyword up to +4, +2 family wording when “Family with kids”, +2 accessibility wording, +1 runs of 7 days or fewer; outside the dates or non-free when “Free only” are excluded). The rules are shown on the page under “How this is ranked”. Edit or Clear at any time.
 
-Visit Orlando’s Simpleview REST API is often blocked by Akamai for non-browser clients. The script tries REST first, then falls back to the public sitemap + event page JSON-LD (warm a session on `/` and `/events/all/` first). Do not invent events; attribute Visit Orlando and link out to the calendar.
+## Site assistant (chat widget)
 
+`assets/js/assistant.js` + `assets/css/assistant.css`, on both pages (bottom-right button).
+
+- **Offline site guide (default):** with `proxyUrl` empty in `assets/js/assistant-config.js`, the widget is labelled “Offline site guide · keyword search, not AI”. It parses dates (“today”, “this weekend”, “Nov 7”), “free”, areas and keywords, searches the site’s sections and the Visit Orlando data locally, and answers with links only.
+- **AI mode (Isla):** set `proxyUrl` to a deployed `assistant-proxy/` endpoint. The widget sends the conversation plus the site’s section list and the events its local search matched; the proxy adds the key and a grounded system prompt. If the proxy fails, it falls back to the offline guide. **No API key is ever in the client or this repo.** Setup: `assistant-proxy/README.md`.
