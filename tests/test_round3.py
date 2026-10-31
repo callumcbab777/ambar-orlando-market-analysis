@@ -193,6 +193,48 @@ class KnowledgeTest(unittest.TestCase):
         kinds = {d["kind"] for d in k["docs"]}
         self.assertTrue({"page", "hotel", "brands", "matrix", "ambar", "method", "climate"} <= kinds, kinds)
 
+    def test_events_chunks_and_currency(self):
+        k = json.loads(read("data/knowledge.json"))
+        raw = json.loads(read("data/visitorlando_events.json"))
+        evs = {d["id"]: d for d in k["docs"] if d["kind"] == "event"}
+        self.assertEqual(len(evs), len(raw["events"]), "one chunk per Visit Orlando listing")
+        months = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
+        nice = lambda iso: f"{months[int(iso[5:7]) - 1]} {int(iso[8:])}, {iso[:4]}"
+        for e in raw["events"]:
+            d = evs["event:" + e["id"]]
+            end = e.get("end_date") or e["start_date"]
+            self.assertEqual((d["title"], d["url"], d["start"], d["end"]), (e["title"], e["url"], e["start_date"], end))
+            rng = nice(e["start_date"]) if end == e["start_date"] else f"{nice(e['start_date'])} – {nice(end)}"
+            self.assertIn(rng, d["text"], d["id"])                        # human date range (start–end)
+            self.assertIn(e["url"], d["text"], d["id"])                   # source link travels with the chunk
+            self.assertIn(e["location"], d["text"], d["id"])              # venue
+            for c in e.get("categories") or []:
+                self.assertIn(c, d["text"])
+            self.assertEqual((d["source"], d["as_of"]), ("Visit Orlando", raw["fetched_at"][:10]))
+            self.assertLessEqual(len(d["text"]), 900)
+        cur = next(d for d in k["docs"] if d["id"] == "events:currency")
+        self.assertIn(f"captured on {nice(raw['fetched_at'][:10])}", cur["text"])
+        self.assertIn(f"from {nice(raw['window_start'])} to {nice(raw['window_end'])}", cur["text"])
+        self.assertIn("check each event's Visit Orlando link", cur["text"])
+        self.assertEqual((cur["window_start"], cur["window_end"]), (raw["window_start"], raw["window_end"]))
+        # week-ahead estimates stay out of the index; sizes stay sane
+        self.assertFalse(any(d["kind"].startswith("week") or d["id"].startswith("week") for d in k["docs"]))
+        self.assertNotIn("data/week_ahead.json", k["inputs"])
+        self.assertIn("data/visitorlando_events.json", k["inputs"])
+        self.assertLess(len(read("data/knowledge.json").encode()), 600_000)
+        self.assertLess(len(read("data/knowledge.js").encode()), 550_000)
+
+    def test_events_on_the_proxy_and_guide(self):
+        chat = read("assistant-proxy/api/chat.js")
+        self.assertIn("events:currency", chat)
+        self.assertIn("may be stale", chat)
+        self.assertIn("today })", chat)
+        guide = read("assets/js/assistant.js")
+        for needle in ("eventSearch", "docEvent", "curNote", "Events data:"):
+            self.assertIn(needle, guide)
+        wf = read(".github/workflows/knowledge.yml")
+        self.assertIn("data/visitorlando_events.json", wf)
+
     def test_local_doc_links_resolve(self):
         k = json.loads(read("data/knowledge.json"))
         for d in k["docs"]:

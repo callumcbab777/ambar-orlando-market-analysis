@@ -15,6 +15,7 @@ on:
       - "profile/**"
       - "data/comps.json"
       - "data/brands.json"
+      - "data/visitorlando_events.json"
       - "assets/js/plan.js"
       - "assets/js/knowledge.js"
       - "tools/build_knowledge.py"
