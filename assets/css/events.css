@@ -242,6 +242,9 @@
 .pl-visit-copy{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:24px 26px;box-shadow:var(--shadow)}
 .pl-visit-copy h3{font-size:1.9rem;margin:0 0 10px}
 .pl-visit-copy p{color:#3d3f36;margin:0}
+.pl-alt{margin:18px 0 0;padding:14px 16px;border-radius:10px;background:var(--cream);border-left:3px solid var(--gold)}
+.pl-alt p{margin:0 0 6px!important;font-size:.92rem}
+.pl-alt-link{font-weight:600;color:var(--forest);padding:0}
 .pl-fine{margin-top:12px!important;font-size:.8rem;color:var(--muted)!important}
 .pl-address{font-style:normal;background:var(--forest);color:var(--cream);border-radius:var(--r);padding:24px 26px;display:flex;flex-direction:column;gap:6px;justify-content:center;line-height:1.5}
 .pl-address .pl-code{color:var(--gold-2)}

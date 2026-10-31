@@ -78,9 +78,28 @@ class PlanSectionTest(unittest.TestCase):
             self.assertTrue(href.startswith("https://") or href.startswith("#"), href)
             self.assertNotRegex(href, r"\s")
         self.assertIn("https://calendly.com/callum-ambarorlando/30min", links)
+        self.assertIn("https://calendly.com/callum-ambarorlando/meet-us-at-ambar", links)
         self.assertIn("https://www.google.com/maps/dir/?api=1&amp;destination="
                       "8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Unit%20108%2C%20Kissimmee%2C%20FL%2034747", links)
         self.assertTrue(any(h.startswith("https://www.google.com/travel/flights") for h in links))
+
+    def test_booking_ctas(self):
+        primary = re.search(r'<a class="btn btn-solid" id="plBook" href="([^"]+)"[^>]*>(.*?)</a>', self.plan, re.S)
+        self.assertIsNotNone(primary)
+        self.assertEqual(primary.group(1), "https://calendly.com/callum-ambarorlando/meet-us-at-ambar")
+        self.assertIn("Meet us at AMBAR", primary.group(2))
+        call = re.search(r'id="plCall" href="([^"]+)"', self.plan)
+        self.assertEqual(call.group(1), "https://calendly.com/callum-ambarorlando/30min")
+        self.assertIn("Can’t come in person?", self.plan)
+        self.assertIn("Introduction to AMBAR", self.plan)
+        # the primary CTA comes before the video-call option
+        self.assertLess(self.plan.index("meet-us-at-ambar"), self.plan.index("/30min"))
+
+    def test_no_mention_a_tour_copy(self):
+        for rel in ("events/index.html", "index.html", "assets/js/assistant.js", "assets/js/events.js", "README.md"):
+            text = re.sub(r"\s+", " ", read(rel)).lower()
+            self.assertNotIn("mention it when you book", text, rel)
+            self.assertNotIn("mention a tour", text, rel)
 
     def test_sources_and_dates(self):
         for needle in ["flymco.com", "flysfb.com", "ncei.noaa.gov", "themeparkdirect.com", "openstreetmap.org",
