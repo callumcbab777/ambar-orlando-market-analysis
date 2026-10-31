@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Profile · AMBAR Orlando</title>
+<meta name="description" content="My Profile on the AMBAR Orlando site: saved Orlando events, favourite hotels, hotel brands you know and your event preferences, kept in this browser. Share it as a link or a branded PDF.">
+<meta name="theme-color" content="#1E3A2C">
+<link rel="icon" href="../assets/ambar-logo.png">
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/css/styles.css">
+<link rel="stylesheet" href="../assets/css/events.css">
+<link rel="stylesheet" href="../assets/css/visit.css">
+<link rel="stylesheet" href="../assets/css/profile.css">
+<link rel="stylesheet" href="../assets/css/assistant.css">
+</head>
+<body class="events-page profile-page">
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="brand-mark" href="../index.html" aria-label="AMBAR Orlando Market Landscape, home">
+      <img src="../assets/ambar-logo.png" alt="AMBAR Residences · Orlando" width="156" height="66">
+    </a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">← Market landscape</a>
+      <a href="../index.html#week-ahead">Week ahead</a>
+      <a href="../index.html#hotels">Hotels</a>
+      <a href="../events/">Orlando events</a>
+      <a href="../visit/">Plan your visit</a>
+      <a href="index.html" class="nav-profile active" aria-current="page" data-profile-label>My Profile <span class="nav-count" data-profile-count hidden></span></a>
+    </nav>
+    <span class="update-pill">Saved in this browser</span>
+  </div>
+</header>
+
+<main id="main">
+  <section class="evh pf-hero" id="top" aria-labelledby="pfTitle">
+    <div class="wrap evh-grid">
+      <div class="evh-copy">
+        <p class="evh-dateline"><span>AMBAR Orlando</span><span aria-hidden="true"> · </span>Kept in this browser</p>
+        <h1 id="pfTitle">My <em>Profile</em></h1>
+        <p class="evh-lede">The events you’ve saved, your favourite hotels, the hotel brands you know and your event preferences, all in one place. It stays in this browser; nothing is sent anywhere unless you share it.</p>
+        <p class="pf-summary" id="pfSummary" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- read-only view of a shared profile (?p=) -->
+  <section class="ev-shared pf-shared" id="pfShared" aria-labelledby="pfSharedTitle" hidden>
+    <div class="wrap">
+      <p class="evh-kicker">Shared with you · read-only</p>
+      <h2 id="pfSharedTitle">A shared Orlando profile</h2>
+      <p class="pf-shared-sub" id="pfSharedSub">You’re looking at a read-only copy. Nothing changes in your own profile unless you choose to save it.</p>
+      <div id="pfSharedBody" class="pf-sections pf-on-dark"></div>
+      <p class="pf-shared-actions">
+        <button type="button" class="btn btn-solid" id="pfSaveShared">Save to my profile</button>
+        <a class="ev-link-btn" href="index.html">View my own profile</a>
+      </p>
+      <p class="pf-status" id="pfSharedStatus" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="section pf-mine" id="mine" aria-labelledby="pfMineTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">Your profile</p>
+        <h2 id="pfMineTitle">What you’ve saved</h2>
+      </header>
+      <div class="ev-share pf-share" id="pfShare" hidden>
+        <div>
+          <h3>Share my profile</h3>
+          <p>Send it as a branded PDF or a link. A link opens a read-only copy here; empty sections are left out.</p>
+        </div>
+        <div class="ev-share-actions">
+          <button type="button" class="btn btn-solid" id="pfPdf">Download PDF</button>
+          <button type="button" class="btn btn-outline" id="pfCopy">Copy share link</button>
+          <button type="button" class="btn btn-outline" id="pfNative" hidden>Share…</button>
+        </div>
+        <p class="ev-status" id="pfStatus" role="status" aria-live="polite"></p>
+      </div>
+      <div class="pf-sections" id="pfSections">
+        <p class="pf-loading">Loading your profile…</p>
+      </div>
+      <p class="pf-clear"><button type="button" class="ev-link-btn" id="pfClear" hidden>Clear my whole profile</button></p>
+    </div>
+  </section>
+
+  <section class="section vh-end" aria-labelledby="evVisitTitle">
+    <div class="wrap">
+      <aside class="ev-visit-band" id="evVisitBand" aria-labelledby="evVisitTitle">
+        <div class="ev-visit-copy">
+          <p class="evh-kicker">Visit AMBAR</p>
+          <h2 id="evVisitTitle">See AMBAR while you’re in <em>Orlando</em></h2>
+          <p class="ev-visit-line1">Book an in-person visit to the sales center and see the residences for yourself.</p>
+          <p class="ev-visit-addr">Sales center · 8701 W Irlo Bronson Memorial Hwy, Unit 108, Kissimmee, FL 34747</p>
+        </div>
+        <div class="ev-visit-actions">
+          <a class="btn btn-visit" id="pfVisitBtn" href="https://calendly.com/callum-ambarorlando/meet-us-at-ambar" target="_blank" rel="noopener">Visit AMBAR<span class="sr-only"> (book an in-person visit on Calendly, opens in a new tab)</span></a>
+          <a class="ev-visit-dir" href="../visit/">Plan your visit</a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="ev-mbar" id="evMbar" hidden>
+    <p class="ev-mbar-t">Book an in-person visit to the sales center</p>
+    <a class="btn btn-visit btn-visit-sm" href="https://calendly.com/callum-ambarorlando/meet-us-at-ambar" target="_blank" rel="noopener">Visit AMBAR<span class="sr-only"> (book an in-person visit on Calendly, opens in a new tab)</span></a>
+    <button type="button" class="ev-mbar-x" id="evMbarX" aria-label="Dismiss the Visit AMBAR bar">×</button>
+  </div>
+</main>
+
+<footer class="site-footer ev-footer">
+  <div class="wrap">
+    <p class="disclaimer">My Profile is stored only in this browser (localStorage) and is never sent to a server. Share links carry only short ids (events, hotels, brand codes) and your preferences; a shared link opens read-only. Events come from the <a href="../events/">Visit Orlando calendar</a>; hotels and brands from the <a href="../index.html">AMBAR Orlando Market Landscape</a>.</p>
+    <p class="fineprint on-dark">Compiled by Callum Brown · Headings in Cormorant Garamond, body in DM Sans (SIL Open Font License)</p>
+  </div>
+</footer>
+
+<script src="../assets/js/profile.js"></script>
+<script src="../assets/js/events-pdf.js"></script>
+<script src="../assets/js/profile-share.js"></script>
+<script src="../assets/js/profile-page.js" data-root="../"></script>
+<script src="../assets/js/visit-cta.js"></script>
+<script src="../assets/js/nav.js"></script>
+<script src="../assets/js/assistant-config.js"></script>
+<script src="../assets/js/assistant.js" data-root="../" data-page="profile"></script>
+</body>
+</html>
