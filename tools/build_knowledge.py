@@ -6,6 +6,7 @@ Reads the site's own content only:
   - data/comps.json (hotels, brand matrix, methodology, demand context, news)
   - data/brands.json (Orlando-area hotel brands, verified, with an as-of date)
   - assets/js/plan.js (NOAA monthly normals and crowd levels)
+  - data/visitorlando_events.json (Visit Orlando listings: one doc per event + an "events data currency" doc)
 Writes (deterministic: same inputs -> byte-identical outputs, no timestamps):
   - data/knowledge.json            the index (docs + small lookups)
   - data/knowledge.js              window.AMBAR_KNOWLEDGE mirror, so file:// works
@@ -27,7 +28,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PAGES = [("index.html", "index.html", "Market landscape"), ("events/index.html", "events/", "Orlando events"),
          ("visit/index.html", "visit/", "Plan your visit"), ("profile/index.html", "profile/", "My Profile")]
-DATA = ["data/comps.json", "data/brands.json", "assets/js/plan.js"]
+DATA = ["data/comps.json", "data/brands.json", "assets/js/plan.js", "data/visitorlando_events.json"]
 OUT_JSON, OUT_JS, OUT_PROXY, OUT_BRANDS_JS = "data/knowledge.json", "data/knowledge.js", "assistant-proxy/knowledge.json", "data/brands.js"
 SEARCH_SRC, OUT_PROXY_SEARCH = "assets/js/knowledge.js", "assistant-proxy/lib/knowledge-search.js"
 CHUNK = 900
@@ -235,10 +236,54 @@ def climate_doc() -> list[dict]:
                 kind="climate", source="NOAA NCEI U.S. Climate Normals; Theme Park Direct")]
 
 
+def city(e: dict) -> str:
+    c = re.sub(r",\s*FL$", "", str(e.get("city") or ""), flags=re.I).strip()
+    return c.title() if c and c == c.upper() else c
+
+
+def date_range(a: str, b: str) -> str:
+    return fmd(a) if not b or a == b else f"{fmd(a)} – {fmd(b)}"
+
+
+def event_docs(data: dict) -> list[dict]:
+    """One doc per Visit Orlando listing (name, start–end, venue, city, categories, source link) plus one doc stating
+    when the listings were captured and the window they cover. Week-ahead estimates are not indexed."""
+    captured = str(data.get("fetched_at") or "")[:10]
+    ws_, we_ = data.get("window_start", ""), data.get("window_end", "")
+    attribution = data.get("attribution") or "Visit Orlando"
+    events = [e for e in data.get("events", []) if e.get("id") and e.get("title") and e.get("url") and e.get("start_date")]
+    docs = [doc("events:currency", "Orlando events data: when it was captured and what it covers", "events/",
+                f"The Orlando events on this site are {len(events)} {attribution} listings captured on {fmd(captured)}, covering events "
+                f"from {fmd(ws_)} to {fmd(we_)}. Events outside those dates are not listed here, and listings can change or be "
+                f"cancelled after capture: check each event's {attribution} link, or the {attribution} calendar "
+                f"({data.get('calendar_url') or data.get('source')}), for the latest dates, times and details. "
+                "The listings have no prices or start times.",
+                kind="events-meta", source=attribution, as_of=captured,
+                tags=["events", "data", "captured", "updated", "coverage", "latest", "current", "stale"])]
+    docs[0].update({"captured": captured, "window_start": ws_, "window_end": we_, "calendar_url": data.get("calendar_url") or data.get("source", "")})
+    for e in sorted(events, key=lambda e: (e["start_date"], e["title"], str(e["id"]))):
+        end = e.get("end_date") or e["start_date"]
+        cats = [c for c in e.get("categories") or [] if c]
+        where = ", ".join(x for x in (ws(e.get("location") or ""), city(e)) if x)
+        desc = ws(e.get("description") or "")
+        if len(desc) > 110:
+            desc = desc[:110].rsplit(" ", 1)[0].rstrip(" ,;:.…") + "…"
+        text = (f"{e['title']}: {date_range(e['start_date'], end)} ({e['start_date'] if end == e['start_date'] else e['start_date'] + ' to ' + end})"
+                + (f" at {where}" if where else "") + "."
+                + (f" Categories: {', '.join(cats)}." if cats else "")
+                + (f" {desc}" if desc else "")
+                + f" Source: {attribution} listing {e['url']} (captured {fmd(captured)}).")
+        d = doc(f"event:{e['id']}", e["title"], e["url"], text, kind="event", source=attribution, as_of=captured, tags=cats or None)
+        d.update({"start": e["start_date"], "end": end, "venue": ws(e.get("location") or ""), "city": city(e)})
+        docs.append(d)
+    return docs
+
+
 def build() -> dict:
     comps = json.loads((ROOT / "data/comps.json").read_text(encoding="utf-8"))
     brands = json.loads((ROOT / "data/brands.json").read_text(encoding="utf-8"))
-    docs = page_docs() + comps_docs(comps) + brand_docs(brands) + climate_doc()
+    events = json.loads((ROOT / "data/visitorlando_events.json").read_text(encoding="utf-8"))
+    docs = page_docs() + comps_docs(comps) + brand_docs(brands) + climate_doc() + event_docs(events)
     ids = [d["id"] for d in docs]
     dup = {i for i in ids if ids.count(i) > 1}
     if dup:

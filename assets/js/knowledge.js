@@ -1,7 +1,11 @@
 /* AMBAR Orlando · site knowledge retrieval (BM25 over data/knowledge.json, built by tools/build_knowledge.py).
    Used by the offline site guide and to pick the context the AI assistant is grounded in; the same file is mirrored to
    assistant-proxy/lib/knowledge-search.js so the server ranks the same way. Pure functions, no DOM, UMD:
-   window.AMBAR_KNOWLEDGE_SEARCH in the browser, module.exports in Node. */
+   window.AMBAR_KNOWLEDGE_SEARCH in the browser, module.exports in Node.
+   Events: Visit Orlando listings are docs of kind "event" with start/end dates. Event questions ("what's on this
+   weekend", "concerts in November", a named event) are answered by eventSearch: dates in the question become a window
+   (relative to opts.today), only listings overlapping it are kept, keyword matches rank first and short runs beat
+   season-long ones. The "events:currency" doc (capture date + coverage) rides along with any event answer. */
 (function (root, factory) {
   const api = factory();
   if (typeof module === "object" && module.exports) module.exports = api;
@@ -19,9 +23,11 @@
     warm: "temperature", cold: "temperature", busy: "crowd", quiet: "crowd", favourite: "favorite", fave: "favorite",
     stay: "hotel", resort: "hotel", price: "rate", cost: "rate", night: "nightly", uk: "kingdom", britain: "kingdom",
     london: "gatwick", visit: "visit", tour: "visit", viewing: "visit", appointment: "visit",
+    gig: "concert", band: "concert", theatre: "theater", play: "theater", musical: "theater", festival: "festival",
+    kid: "family", children: "family", child: "family", sport: "sporting", game: "sporting",
   };
   const FIELD_W = { title: 3, tags: 3, text: 1 };
-  const KIND_W = { news: 0.75, demand: 0.85, ambar: 1.4 };
+  const KIND_W = { news: 0.75, demand: 0.85, ambar: 1.4, "events-meta": 0.6 };
   const K1 = 1.2, B = 0.75;
 
   const fold = (s) => String(s == null ? "" : s).normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -60,7 +66,7 @@
   const idf = (ix, t) => { const n = ix.df.get(t) || 0; return Math.log(1 + (ix.N - n + 0.5) / (n + 0.5)); };
 
   function bm25(ix, q) {
-    const qt = [...new Set(tokens(q))];
+    const qt = [...new Set(Array.isArray(q) ? q : tokens(q))];
     if (!qt.length) return [];
     const out = [];
     ix.docs.forEach((d, i) => {
@@ -120,10 +126,102 @@
     return out;
   }
 
-  /* search(index, query, {k, profile}) → [{doc, score}] best first. Profile questions put the profile's own docs first. */
+  /* ---------- events: dates in the question → a window ---------- */
+  const MON = { jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5, jul: 6, aug: 7, sep: 8, sept: 8, oct: 9, nov: 10, dec: 11 };
+  const MON_RE = "(jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sept?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)";
+  const pad = (n) => String(n).padStart(2, "0");
+  const iso = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
+  const utc = (s) => new Date(s + "T00:00:00Z");
+  const addDays = (s, n) => { const d = utc(s); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  const monthEnd = (y, m) => iso(y, m, new Date(Date.UTC(y, m + 1, 0)).getUTCDate());
+  const localToday = () => { const d = new Date(); return iso(d.getFullYear(), d.getMonth(), d.getDate()); };
+  /* parseWhen("concerts this weekend", "2026-10-31") → {from:"2026-10-31", to:"2026-11-01", rest:"concerts"}; null if no date */
+  function parseWhen(query, today) {
+    const t = /^\d{4}-\d{2}-\d{2}$/.test(today || "") ? today : localToday();
+    const ty = +t.slice(0, 4), tm = +t.slice(5, 7) - 1, dow = utc(t).getUTCDay();
+    let s = " " + fold(query).replace(/['’]/g, "") + " ", from = null, to = null;
+    const take = (re) => { const m = s.match(re); if (m) s = s.replace(re, " "); return m; };
+    const yearFor = (m) => (m < tm ? ty + 1 : ty);
+    let m;
+    if (take(/\b(today|tonight|this evening)\b/)) { from = to = t; }
+    else if (take(/\btomorrow( night)?\b/)) { from = to = addDays(t, 1); }
+    else if (take(/\bnext weekend\b/)) { const sat = addDays(t, dow === 0 ? 6 : 6 - dow + 7); from = sat; to = addDays(sat, 1); }
+    else if (take(/\b(this )?weekend\b/)) {
+      if (dow === 6) { from = t; to = addDays(t, 1); } else if (dow === 0) { from = to = t; }
+      else if (dow === 5) { from = t; to = addDays(t, 2); } else { from = addDays(t, 6 - dow); to = addDays(from, 1); }
+    }
+    else if (take(/\bnext week\b/)) { from = addDays(t, ((8 - dow) % 7) || 7); to = addDays(from, 6); }
+    else if (take(/\bthis week\b/)) { from = t; to = addDays(t, dow === 0 ? 0 : 7 - dow); }
+    else if (take(/\bthis month\b/)) { from = t; to = monthEnd(ty, tm); }
+    else if (take(/\bnext month\b/)) { const y = tm === 11 ? ty + 1 : ty, mm = (tm + 1) % 12; from = iso(y, mm, 1); to = monthEnd(y, mm); }
+    else if ((m = take(/\b(\d{4})-(\d{2})-(\d{2})\b/))) { from = to = `${m[1]}-${m[2]}-${m[3]}`; }
+    else if ((m = take(new RegExp(`\\b${MON_RE}\\.?\\s+(\\d{1,2})(?:st|nd|rd|th)?\\b`)))) { const mm = MON[m[1].slice(0, 4) === "sept" ? "sept" : m[1].slice(0, 3)]; from = to = iso(yearFor(mm), mm, +m[2]); }
+    else if ((m = take(/\b(\d{1,2})\/(\d{1,2})\b/))) { const mm = +m[1] - 1; from = to = iso(yearFor(mm), mm, +m[2]); }
+    else if ((m = take(new RegExp(`\\b(?:in|during|for|of|over|through|throughout)\\s+(?:early\\s+|late\\s+|mid\\s+)?${MON_RE}\\b`))) ||
+             (m = take(new RegExp(`\\b(?!may\\b)${MON_RE}\\b`)))) {
+      const mm = MON[m[1].slice(0, 3)], y = yearFor(mm);
+      from = mm === tm && y === ty ? t : iso(y, mm, 1); to = monthEnd(y, mm);
+    }
+    if (!from) return null;
+    if (to < from) to = from;
+    return { from, to, rest: s.replace(/\s+/g, " ").trim() };
+  }
+  const EVENT_Q = /\b(events?|whats on|what is on|on this|happening|going on|things to do|to do|concerts?|gigs?|live music|music|shows|festivals?|theat(?:er|re)|plays|musicals?|comedy|sports?|sporting|games|exhibits?|exhibitions?|halloween|christmas|holidays?|thanksgiving|parades?|fireworks|tickets?|performances?|fairs?|markets?|free things)\b/;
+  /* words that only say "an event" and shouldn't have to match a listing's text */
+  const EV_GENERIC = new Set(["event", "happening", "thing", "on", "going", "orlando", "area", "near", "around", "list", "upcoming", "coming", "up", "anything", "fun", "local", "visitor", "listing", "week", "weekend", "month", "date", "time", "night", "nightly", "day", "early", "late", "mid"]);
+  const runDays = (d) => Math.round((utc(d.end) - utc(d.start)) / 864e5) + 1;
+  const runW = (d) => { const n = runDays(d); return n <= 3 ? 1 : n <= 14 ? 0.85 : n <= 45 ? 0.7 : 0.5; };
+  /* eventSearch(index, query, {today, k}) → {intent, when, hits:[{doc,score}], total, currency, outside}
+     intent: the question is about events (event words or a date window). when: {from,to} or null. */
+  function eventSearch(ix, query, opts) {
+    const o = opts || {}, k = o.k || 5;
+    const today = /^\d{4}-\d{2}-\d{2}$/.test(o.today || "") ? o.today : localToday();
+    const q = String(query || "");
+    const when = parseWhen(q, today);
+    const words = fold(q).replace(/['’]/g, "");
+    const intent = !!when || EVENT_Q.test(words);
+    const currency = ix.byId.get("events:currency") || null;
+    const evs = ix.docs.filter((d) => d.kind === "event" && d.start && d.end);
+    const qt = [...new Set(tokens(when ? when.rest : q).filter((t) => !EV_GENERIC.has(t)))];
+    const kw = qt.length ? new Map(bm25(ix, qt).filter((r) => r.doc.kind === "event").map((r) => [r.doc.id, r.score])) : null;
+    const from = when ? when.from : today, to = when ? when.to : null;
+    const hits = [];
+    for (const d of evs) {
+      const inWin = d.end >= from && (!to || d.start <= to);
+      let s;
+      if (kw) {
+        const b = kw.get(d.id); if (!b) continue;
+        if (!inWin) { if (when || !intent) continue; s = b * 0.5; }   // a named past listing still shows, lower
+        else s = b * (0.6 + 0.4 * runW(d)) + (when ? 2 : 1);
+      } else {
+        if (!intent || !inWin) continue;
+        s = 3 * runW(d);
+      }
+      hits.push({ doc: d, score: s });
+    }
+    const startKey = (d) => (d.start < from ? from : d.start);
+    hits.sort((a, b) => b.score - a.score || startKey(a.doc).localeCompare(startKey(b.doc)) || (a.doc.title < b.doc.title ? -1 : 1));
+    const outside = !!(when && currency && (when.to < currency.window_start || when.from > currency.window_end));
+    return { intent, when, hits: hits.slice(0, k), total: hits.length, currency, outside, today };
+  }
+
+  /* search(index, query, {k, profile, today}) → [{doc, score}] best first.
+     Profile questions put the profile's own docs first. Event questions put the matching listings first and add the
+     events-data currency doc (capture date + coverage, "check the source link"). */
   function search(ix, query, opts) {
     const o = opts || {}, k = o.k || 5;
-    let res = bm25(ix, query);
+    const ev = eventSearch(ix, query, { today: o.today, k });
+    const today = ev.today;
+    let res = bm25(ix, query).filter((r) => r.doc.kind !== "events-meta")
+      .map((r) => (r.doc.kind !== "event" ? r : { doc: r.doc, score: r.score * (r.doc.end < today ? 0.5 : 1) * (ev.intent ? 1 : 0.6) }))
+      .sort((a, b) => b.score - a.score || (a.doc.id < b.doc.id ? -1 : 1));
+    if (ev.intent) {
+      const top = ev.hits.length ? ev.hits[0].score : 0;
+      const others = res.filter((r) => r.doc.kind !== "event");
+      res = ev.when && !EVENT_Q.test(fold(query).replace(/['’]/g, ""))
+        ? ev.hits.concat(others).sort((a, b) => b.score - a.score)      // a date but no event words: let pages compete
+        : ev.hits.concat(others.map((r) => ({ doc: r.doc, score: Math.min(r.score, top ? top * 0.99 : r.score) })));
+    }
     if (isProfileQuery(query)) {
       const mine = profileDocs(ix, o.profile).map((d, i) => ({ doc: d, score: 1000 - i }));
       const pg = ix.byId.get("page:profile:mine");
@@ -131,7 +229,14 @@
       const seen = new Set(mine.map((r) => r.doc.id));
       res = mine.concat(res.filter((r) => !seen.has(r.doc.id)));
     }
-    return res.slice(0, k);
+    res = res.slice(0, k);
+    const cur = ev.currency;
+    if (cur && (res.some((r) => r.doc.kind === "event") || (ev.intent && (ev.outside || !ev.hits.length)))) {
+      const c = { doc: cur, score: res.length ? res[res.length - 1].score : 1 };
+      if (ev.outside || !ev.hits.length) res.unshift(c); else res.push(c);
+      if (res.length > k + 1) res.length = k + 1;
+    }
+    return res;
   }
 
   function snippet(doc, query, n) {
@@ -147,5 +252,5 @@
     return (start > 0 ? "…" : "") + s + (start + s.length < text.length ? "…" : "");
   }
 
-  return { tokens, createIndex, search, profileDocs, isProfileQuery, snippet };
+  return { tokens, createIndex, search, eventSearch, parseWhen, profileDocs, isProfileQuery, snippet };
 });
