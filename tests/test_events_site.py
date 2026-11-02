@@ -34,7 +34,8 @@ class EventsPageTest(unittest.TestCase):
         self.assertIn("Recommended for you", js)
         self.assertIn("Powered by Isla AI - ABI Group", js)
         self.assertIn("Source: Visit Orlando listing", js)
-        self.assertIn("localStorage", js)
+        self.assertIn("window.AMBAR_PROFILE", js)
+        self.assertIn("localStorage", (ROOT / "assets" / "js" / "profile.js").read_text())
 
 
 class AssistantTest(unittest.TestCase):

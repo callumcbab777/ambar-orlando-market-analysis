@@ -2,7 +2,7 @@
 # The page itself computes the residence cards live in the browser from data/comps.json.
 # On every push to main that changes data/comps.json (or the engine/assumptions), it runs the
 # tests, regenerates data/week_ahead.json + .js + data/week_ahead_nights.json and commits them if they changed.
-# On pull requests it only runs the tests and checks the generated files are up to date.
+# On pull requests it only runs the tests and checks the generated files (week-ahead and the assistant's knowledge index) are up to date.
 name: week-ahead
 on:
   push:
@@ -24,6 +24,10 @@ on:
       - "assets/css/week-ahead.css"
       - "index.html"
       - "events/**"
+      - "visit/**"
+      - "profile/**"
+      - "tools/**"
+      - ".github/**"
       - "assets/js/**"
       - "assets/css/**"
       - "assets/vendor/**"
@@ -50,6 +54,9 @@ jobs:
       - name: Check generated data (pull requests)
         if: github.event_name == 'pull_request'
         run: python3 update_week_ahead.py --check
+      - name: Check knowledge index is fresh (pull requests)
+        if: github.event_name == 'pull_request'
+        run: python3 tools/build_knowledge.py --check
       - name: Regenerate and commit (main)
         if: github.event_name != 'pull_request'
         run: |
@@ -61,4 +68,5 @@ jobs:
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git add data/week_ahead.json data/week_ahead.js data/week_ahead_nights.json
           git commit -m "Regenerate week-ahead estimates from comparable rates"
+          git pull --rebase origin main
           git push

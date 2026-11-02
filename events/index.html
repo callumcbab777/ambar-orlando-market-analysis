@@ -26,7 +26,8 @@
       <a href="../index.html#hotels">Hotels</a>
       <a href="../index.html#demand">Demand</a>
       <a href="index.html" class="active" aria-current="page">Orlando events</a>
-      <a href="#plan">Plan your visit</a>
+      <a href="../visit/">Plan your visit</a>
+      <a href="../profile/" class="nav-profile" data-profile-label>My Profile <span class="nav-count" data-profile-count hidden></span></a>
     </nav>
     <span class="update-pill" id="evUpdatePill">Visit Orlando calendar</span>
   </div>
@@ -45,7 +46,7 @@
         <p class="evh-lede">A calm edit of the days ahead: festivals, music, theatre and the city’s long-running seasons, drawn from the official <a href="https://www.visitorlando.com/events/" target="_blank" rel="noopener">Visit Orlando</a> calendar.</p>
         <div class="evh-cta">
           <a class="btn evh-btn" href="#events">See all events</a>
-          <a class="btn evh-btn-line" href="#plan">Plan your visit</a>
+          <a class="btn evh-btn-line" href="../visit/">Plan your visit</a>
         </div>
       </div>
       <figure class="evh-art" aria-hidden="true">
@@ -126,12 +127,12 @@
       <header class="section-head">
         <p class="kicker">The full calendar</p>
         <h2 id="evTitle">Browse, save and share</h2>
-        <p class="section-sub">Every card links to its official Visit Orlando listing. Save events to build your own list (kept in this browser only, no login), share it with friends and family, or fill in <em>My preferences</em> for a ranked shortlist.</p>
+        <p class="section-sub">Every card links to its official Visit Orlando listing. Save events to <em>My Profile</em> (kept in this browser only, no login) alongside your favourite hotels and brands, share it with friends and family, or fill in <em>My preferences</em> for a ranked shortlist.</p>
       </header>
 
       <div class="ev-tabs" role="tablist" aria-label="Events views" id="evTabs">
         <button type="button" role="tab" id="tab-browse" aria-controls="panel-browse" aria-selected="true" tabindex="0">All events</button>
-        <button type="button" role="tab" id="tab-saved" aria-controls="panel-saved" aria-selected="false" tabindex="-1">My list <span class="ev-count" id="savedCount">0</span></button>
+        <button type="button" role="tab" id="tab-saved" aria-controls="panel-saved" aria-selected="false" tabindex="-1">My Profile <span class="ev-count" id="savedCount">0</span></button>
         <button type="button" role="tab" id="tab-prefs" aria-controls="panel-prefs" aria-selected="false" tabindex="-1">My preferences</button>
       </div>
 
@@ -181,8 +182,8 @@
       <div class="ev-panel" role="tabpanel" id="panel-saved" aria-labelledby="tab-saved" tabindex="0" hidden>
         <div class="ev-share" id="evShare" hidden>
           <div class="ev-share-copy">
-            <h3 id="evShareTitle">Share my list</h3>
-            <p>Send your saved events to friends and family: a branded PDF with each event’s name, dates, place and Visit Orlando link, or a link that opens this list on their phone.</p>
+            <h3 id="evShareTitle">Share my profile</h3>
+            <p>Send your profile to friends and family: a branded PDF of your saved events (name, dates, place and Visit Orlando link), favourite hotels, brands and preferences, or a link that opens a read-only copy on their phone. <a href="../profile/">Open My Profile</a></p>
           </div>
           <div class="ev-share-actions" role="group" aria-labelledby="evShareTitle">
             <button type="button" class="btn btn-solid" id="shPdf">Download PDF</button>
@@ -231,103 +232,16 @@
     </div>
   </section>
 
-  <!-- 3 Plan your visit -->
+  <!-- 3 Plan your visit: teaser for the standalone page (visit/) -->
   <section class="section ev-plan" id="plan" aria-labelledby="planTitle">
     <div class="wrap">
-      <header class="section-head">
-        <p class="kicker">Plan your visit</p>
-        <h2 id="planTitle">Getting here, when to come, and visiting AMBAR</h2>
-      </header>
-
-      <div class="ev-tabs" role="tablist" aria-label="Plan your visit" id="planTabs">
-        <button type="button" role="tab" id="ptab-getting" aria-controls="ppanel-getting" aria-selected="true" tabindex="0">Getting here</button>
-        <button type="button" role="tab" id="ptab-when" aria-controls="ppanel-when" aria-selected="false" tabindex="-1">Best time to visit</button>
-        <button type="button" role="tab" id="ptab-visit" aria-controls="ppanel-visit" aria-selected="false" tabindex="-1">Visit AMBAR</button>
-      </div>
-
-      <!-- Getting here -->
-      <div class="ev-panel" role="tabpanel" id="ppanel-getting" aria-labelledby="ptab-getting" tabindex="0">
-        <div class="pl-airports">
-          <article class="pl-card">
-            <p class="pl-code">MCO</p>
-            <h3>Orlando International</h3>
-            <p class="pl-drive"><b>About 27 miles · about 42 min</b> by car from AMBAR with no traffic; allow longer at peak times.</p>
-            <h4>Nonstop from the UK</h4>
-            <ul class="pl-routes">
-              <li><b>London Gatwick</b> British Airways, Norse Atlantic</li>
-              <li><b>London Heathrow</b> Virgin Atlantic</li>
-              <li><b>Manchester</b> Virgin Atlantic</li>
-              <li><b>Edinburgh</b> Virgin Atlantic <span class="pl-seasonal">Seasonal</span></li>
-            </ul>
-            <h4>Other key markets, nonstop</h4>
-            <ul class="pl-routes pl-routes-sm">
-              <li><b>Dublin</b> Aer Lingus</li>
-              <li><b>Paris CDG</b> Air France</li>
-              <li><b>Frankfurt, Munich</b> Discover Airlines</li>
-              <li><b>Madrid</b> Iberia</li>
-              <li><b>Lisbon</b> TAP Air Portugal</li>
-              <li><b>Amsterdam</b> Delta</li>
-              <li><b>Reykjavik</b> Icelandair</li>
-              <li><b>Toronto</b> Air Canada, Flair, Porter, WestJet</li>
-              <li><b>Montreal</b> Air Canada</li>
-              <li><b>São Paulo</b> LATAM (GRU), Azul (VCP)</li>
-              <li><b>Mexico City</b> Aeroméxico, Volaris</li>
-              <li><b>Dubai</b> Emirates</li>
-            </ul>
-            <p class="pl-actions">
-              <a class="btn btn-solid" href="https://www.google.com/travel/flights?q=Flights%20to%20MCO" target="_blank" rel="noopener">Live fares to MCO on Google Flights<span class="sr-only"> (opens in a new tab)</span></a>
-              <a class="ev-link-btn" href="https://www.google.com/maps/dir/?api=1&amp;origin=8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Kissimmee%2C%20FL%2034747&amp;destination=Orlando%20International%20Airport%20(MCO)" target="_blank" rel="noopener">Directions from AMBAR<span class="sr-only"> (opens in a new tab)</span></a>
-            </p>
-          </article>
-          <article class="pl-card">
-            <p class="pl-code">SFB</p>
-            <h3>Orlando Sanford</h3>
-            <p class="pl-drive"><b>About 52 miles · about 70 min</b> by car from AMBAR with no traffic; allow longer at peak times.</p>
-            <h4>From the UK</h4>
-            <p class="pl-none">No nonstop UK flights are listed by the airport at present; UK travellers connect via a US or Caribbean hub.</p>
-            <h4>Nonstop, mainly US</h4>
-            <ul class="pl-routes pl-routes-sm">
-              <li><b>70+ US cities</b> mostly Allegiant</li>
-              <li><b>Bermuda</b> BermudAir, from Oct 31, 2026</li>
-              <li><b>Belize</b> BermudAir, from Dec 21, 2026</li>
-              <li><b>Punta Cana</b> Arajet</li>
-            </ul>
-            <p class="pl-actions">
-              <a class="btn btn-solid" href="https://www.google.com/travel/flights?q=Flights%20to%20SFB" target="_blank" rel="noopener">Live fares to SFB on Google Flights<span class="sr-only"> (opens in a new tab)</span></a>
-              <a class="ev-link-btn" href="https://www.google.com/maps/dir/?api=1&amp;origin=8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Kissimmee%2C%20FL%2034747&amp;destination=Orlando%20Sanford%20International%20Airport%20(SFB)" target="_blank" rel="noopener">Directions from AMBAR<span class="sr-only"> (opens in a new tab)</span></a>
-            </p>
-          </article>
+      <div class="pl-teaser">
+        <div class="pl-teaser-copy">
+          <p class="kicker">Plan your visit</p>
+          <h2 id="planTitle">Getting here, when to come, and <em>visiting AMBAR</em></h2>
+          <p>Orlando’s three airports (MCO, SFB and MLB), Brightline from South Florida, drive times from AMBAR and the best months to come, all on one page.</p>
         </div>
-        <p class="pl-sources"><b>Sources, as of Oct 31, 2026:</b> routes from the airports’ own pages, <a href="https://www.flymco.com/international-service/" target="_blank" rel="noopener">MCO nonstop international destinations</a> (the airport lists service planned for the next 12 months; dates are tentative) and <a href="https://flysfb.com/flights/destinations/" target="_blank" rel="noopener">FlySFB destinations</a> / <a href="https://flysfb.com/" target="_blank" rel="noopener">FlySFB news</a>; Edinburgh marked seasonal per the <a href="https://flymco.com/media/press-releases/item/virgin-atlantic-moving-to-terminal-c-at-orlando-international-airport/" target="_blank" rel="noopener">MCO / Virgin Atlantic release</a>. Some routes run seasonally, so confirm with the airline. Drive distances and no-traffic times are routing estimates from <a href="https://www.openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a> data (OSRM router), from 8701 W Irlo Bronson Memorial Hwy; open the directions links for live traffic. No fares are shown on this page.</p>
-      </div>
-
-      <!-- Best time to visit -->
-      <div class="ev-panel" role="tabpanel" id="ppanel-when" aria-labelledby="ptab-when" tabindex="0" hidden>
-        <p class="pl-intro">Average daily high and low at Orlando International Airport, and how busy the theme-park side of Orlando usually is. Quieter, milder months tend to be January–February, early May and early November.</p>
-        <div class="pl-months" id="plMonths" role="table" aria-label="Orlando by month: average high and low temperature, and crowd level">
-          <div class="pl-month-legend" role="row"><span role="columnheader">Month</span><span role="columnheader">High / low</span><span role="columnheader">Crowds</span></div>
-        </div>
-        <p class="pl-sources"><b>Sources:</b> temperatures are NOAA NCEI <a href="https://www.ncei.noaa.gov/products/land-based-station/us-climate-normals" target="_blank" rel="noopener">1991–2020 U.S. Climate Normals</a>, monthly normal max/min for Orlando International Airport (station USW00012815), rounded. Crowd levels are qualitative, from the 1–5 monthly ratings in the <a href="https://www.themeparkdirect.com/information/orlando-crowd-calendar" target="_blank" rel="noopener">Theme Park Direct Orlando crowd calendar</a> (1–2 low, 3 moderate, 4–5 high) and reflect theme-park crowds; holiday weeks within a month can be busier.</p>
-      </div>
-
-      <!-- Visit AMBAR -->
-      <div class="ev-panel" role="tabpanel" id="ppanel-visit" aria-labelledby="ptab-visit" tabindex="0" hidden>
-        <div class="pl-visit">
-          <div class="pl-visit-copy">
-            <h3>Visit the sales center</h3>
-            <p>Book an in-person visit to the sales center in Kissimmee: 45 minutes to see the residences and talk them through with Callum Brown. Pick a time that suits you on Calendly.</p>
-            <p class="pl-actions">
-              <a class="btn btn-visit" id="plBook" href="https://calendly.com/callum-ambarorlando/meet-us-at-ambar" target="_blank" rel="noopener">Visit AMBAR<span class="sr-only"> (book an in-person visit on Calendly, opens in a new tab)</span></a>
-              <a class="btn btn-outline" href="https://www.google.com/maps/dir/?api=1&amp;destination=8701%20W%20Irlo%20Bronson%20Memorial%20Hwy%2C%20Unit%20108%2C%20Kissimmee%2C%20FL%2034747" target="_blank" rel="noopener">Directions to the sales center<span class="sr-only"> (Google Maps, opens in a new tab)</span></a>
-            </p>
-            <p class="pl-fine">Visits are in person at the sales center. Booking opens Calendly; times are shown in your own time zone.</p>
-          </div>
-          <address class="pl-address">
-            <span class="pl-code">Sales center</span>
-            <b>AMBAR Residences Orlando</b>
-            8701 W Irlo Bronson Memorial Hwy, Unit 108<br>Kissimmee, FL 34747
-          </address>
-        </div>
+        <p class="pl-teaser-actions"><a class="btn btn-solid" href="../visit/">Plan your visit <span aria-hidden="true">→</span></a></p>
       </div>
     </div>
   </section>
@@ -348,16 +262,17 @@
         <p class="updated" id="evFooterNote"></p>
       </div>
     </div>
-    <p class="disclaimer">Event titles, dates, venues and descriptions are taken from public Visit Orlando event pages and attributed to Visit Orlando; each card links to its official listing. Check the listing for times, prices and changes before you go. This page does not invent events. Saved events and preferences stay in this browser (localStorage) and are not sent anywhere. Hotel rates, the brand matrix and market data are on the <a href="../index.html">AMBAR Orlando Market Landscape</a>.</p>
+    <p class="disclaimer">Event titles, dates, venues and descriptions are taken from public Visit Orlando event pages and attributed to Visit Orlando; each card links to its official listing. Check the listing for times, prices and changes before you go. This page does not invent events. My Profile (saved events, favourite hotels, brands and preferences) stays in this browser (localStorage) and is not sent anywhere. Hotel rates, the brand matrix and market data are on the <a href="../index.html">AMBAR Orlando Market Landscape</a>.</p>
     <p class="fineprint on-dark">Compiled by Callum Brown · Headings in Cormorant Garamond, body in DM Sans (SIL Open Font License)</p>
   </div>
 </footer>
 
 <script src="../data/visitorlando_events.js"></script>
 <script src="../assets/js/events-core.js"></script>
+<script src="../assets/js/profile.js"></script>
+<script src="../assets/js/profile-share.js"></script>
 <script src="../assets/js/events-pdf.js"></script>
 <script src="../assets/js/events.js"></script>
-<script src="../assets/js/plan.js"></script>
 <script src="../assets/js/visit-cta.js"></script>
 <script src="../assets/js/nav.js"></script>
 <script src="../assets/js/assistant-config.js"></script>

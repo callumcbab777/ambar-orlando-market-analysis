@@ -175,6 +175,7 @@
 .ev-searchRow{grid-template-columns:1fr}
 
 /* share my list */
+.ev-share[hidden]{display:none}
 .ev-share{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 24px;align-items:center;background:linear-gradient(135deg,#FBF3E6 0%,#F4E6D2 100%);border:1px solid rgba(179,125,80,.35);border-radius:calc(var(--r) + 4px);padding:20px 22px;margin:0 0 18px}
 .ev-share h3{font-size:1.7rem;margin:0 0 4px}
 .ev-share p{margin:0;font-size:.9rem;color:#4a4b42;max-width:62ch}
@@ -344,3 +345,13 @@
 }
 @media (max-width:360px){.ev-mbar-t{display:none}}
 @media print{.ev-visit-band,.ev-visit-slim,.ev-mbar{display:none!important}}
+/* Plan your visit teaser (the full plan lives on visit/) */
+.pl-teaser{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 32px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:calc(var(--r) + 4px);padding:28px 32px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.pl-teaser::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(var(--amber),var(--gold-2))}
+.pl-teaser h2{margin:0 0 8px;font-size:clamp(1.7rem,3vw,2.3rem)}
+.pl-teaser p{margin:0;color:#3d3f36;max-width:70ch}
+.pl-teaser ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px 8px;margin:14px 0 0;padding:0}
+.pl-teaser li{font-size:.78rem;font-weight:600;color:var(--forest);background:var(--cream);border-radius:999px;padding:5px 12px}
+@media (max-width:640px){.pl-teaser{grid-template-columns:1fr;padding:20px 18px}.pl-teaser .btn{width:100%;justify-content:center}}
+.pl-teaser h2 em{font-style:italic;color:var(--brown)}
+.pl-teaser-actions{margin:0}
