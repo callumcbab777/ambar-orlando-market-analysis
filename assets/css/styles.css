@@ -99,6 +99,8 @@ h3{font-size:1.45rem}
 .btn-more:hover{background:var(--forest);color:var(--cream)}
 .btn-more:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
 @media (max-width:560px){.heat-more{flex-direction:column}.btn-more{width:100%}}
+.is-condensed .more-extra{display:none}
+.more-bar{margin-top:18px}
 .heat-wrap{overflow-x:auto;border-radius:var(--r);background:#fff;box-shadow:var(--shadow);border:1px solid var(--line)}
 table.heat{border-collapse:separate;border-spacing:4px;width:100%;min-width:860px;font-variant-numeric:tabular-nums}
 .heat th,.heat td{text-align:center}

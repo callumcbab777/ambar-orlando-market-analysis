@@ -51,7 +51,7 @@
     DB = db; H = db.hotels; weeks = db.weeks; collected = weeks.filter((w) => w.status === "collected"); latest = collected[collected.length - 1];
     hotelById = Object.fromEntries(H.map((h) => [h.id, h]));
     tip = $("#tip");
-    renderHero(); renderWeekAhead(); renderMatrix(); renderHotels(); renderDemand(); renderNews(); renderFooter(); navSpy();
+    renderHero(); renderWeekAhead(); renderMatrix(); renderHotels(); renderDemand(); renderNews(); renderFooter(); navSpy(); bindReveal();
   }
 
   const ratesFor = (week) => DB.rates.filter((r) => r.week === week);
@@ -204,6 +204,55 @@
       (notes.length ? `<br><strong>Brief notes this week:</strong> ` + notes.map((n) => `${esc(hotelById[n.hotel].short)}: ${esc(n.rate_note)}`).join(" · ") : "");
   }
 
+  /* ---------- shared 'See all' toggle (same pattern as the Week ahead grid), used by 05 Demand and 06 News ----------
+     A native button with aria-expanded/aria-controls sits under the content. Items beyond the preview carry
+     .more-extra and are hidden only while JS has put .is-condensed on their region, so without JS (or before
+     render) everything shows. Counts come from the data each time a section repaints. */
+  const MORE = [];
+  function moreToggle({ id, regions, after, noun }) {
+    const bar = el("div", { class: "heat-more more-bar", hidden: true }, `<span class="heat-count" id="${id}Count"></span><button type="button" class="btn-more" id="${id}" aria-controls="${regions.join(" ")}" aria-expanded="false"></button>`);
+    after.after(bar);
+    const btn = bar.querySelector("button"), count = bar.querySelector(".heat-count");
+    const t = { expanded: false, preview: 0, total: 0, regions: regions.map((r) => document.getElementById(r)).filter(Boolean) };
+    t.sync = (preview, total) => {
+      if (preview != null) { t.preview = preview; t.total = total; }
+      const can = t.total > t.preview;
+      bar.hidden = !can;
+      t.regions.forEach((r) => r.classList.toggle("is-condensed", can && !t.expanded));
+      btn.setAttribute("aria-expanded", String(can && t.expanded));
+      btn.textContent = t.expanded ? "Show fewer" : `See all ${noun} (${t.total})`;
+      count.textContent = can ? (t.expanded ? `Showing all ${t.total} ${noun}` : `Showing ${t.preview} of ${t.total} ${noun}`) : "";
+    };
+    t.expand = () => { if (!t.expanded) { t.expanded = true; t.sync(); } };
+    btn.addEventListener("click", () => { t.expanded = !t.expanded; t.sync(); if (!t.expanded) btn.scrollIntoView({ block: "nearest" }); });
+    MORE.push(t);
+    return t;
+  }
+  /* A nav jump, site-guide link or shared URL whose #target sits in a condensed list opens that list first,
+     so the browser (or we) can scroll to it. t.resolve lets a section bring back an item hidden by its filter. */
+  function reveal(hash) {
+    if (!hash || hash.length < 2) return null;
+    let id; try { id = decodeURIComponent(hash.slice(1)); } catch (e) { return null; }
+    MORE.forEach((t) => t.resolve && !document.getElementById(id) && t.resolve(id));
+    const target = document.getElementById(id); if (!target) return null;
+    MORE.forEach((t) => { if (t.regions.some((r) => r.contains(target)) && target.closest(".more-extra")) t.expand(); });
+    return target;
+  }
+  const samePage = (a) => { try { const u = new URL(a.href, location.href), norm = (p) => p.replace(/index\.html$/, ""); return u.origin === location.origin && norm(u.pathname) === norm(location.pathname) && u.search === location.search; } catch (e) { return false; } };
+  function bindReveal() {
+    document.addEventListener("click", (e) => { const a = e.target.closest("a[href*='#']"); if (a && a.hash && samePage(a)) reveal(a.hash); }, true);
+    addEventListener("hashchange", () => { const t = reveal(location.hash); if (t) t.scrollIntoView(); });
+    /* Opening a #link: the browser jumps before the data-driven sections exist, so land on the target once
+       they have rendered, and again while the async Residences block above settles, unless the reader moves first. */
+    if (location.hash) {
+      const t = reveal(location.hash); if (!t) return;
+      let moved = false; const stop = () => { moved = true; };
+      ["wheel", "touchstart", "keydown", "mousedown"].forEach((ev) => addEventListener(ev, stop, { once: true, passive: true }));
+      const land = () => { if (!moved) t.scrollIntoView({ behavior: "instant", block: "start" }); };
+      requestAnimationFrame(land); [300, 900, 1800].forEach((ms) => setTimeout(land, ms));
+    }
+  }
+
   /* ---------- favourites: star on each hotel card saves it to My Profile ---------- */
   const P = window.AMBAR_PROFILE || null;
   const isFav = (id) => !!(P && P.isFavHotel(id));
@@ -326,11 +375,14 @@
   function renderDemand() {
     const strip = $("#marketStrip");
     if (strip) strip.innerHTML = (DB.market || []).map((m) => `<div class="mstat"><div class="p">${esc(m.period)}</div><div class="v">${esc(m.value)}</div><p class="c">${esc(m.metric)} · ${esc(m.change)}</p><p class="s">Metro-wide, not these hotels. ${esc(m.source)}</p></div>`).join("");
-    const evHTML = (e) => `<div class="ev"><div class="d"><span class="type type-${esc(e.type || "Other")}">${esc(e.type || "Note")}</span><span>${esc(e.dates)}</span></div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="x">${esc(e.detail)}</p>` : ""}${(e.hotels && e.hotels.length) ? `<p class="x">Linked hotels: ${e.hotels.map((id) => `<a href="#hotel-${id}">${esc((hotelById[id]||{}).short || id)}</a>`).join(", ")}</p>` : ""}<p class="s">${esc(e.source || "")}</p></div>`;
+    const DM_TOP = 3, DA_TOP = 3; // condensed preview: first 3 notes of the chosen week + first 3 'Looking ahead' items
+    const evHTML = (e, i, wk) => `<div class="ev${i >= DM_TOP ? " more-extra" : ""}" id="demand-${wk}-${i + 1}"><div class="d"><span class="type type-${esc(e.type || "Other")}">${esc(e.type || "Note")}</span><span>${esc(e.dates)}</span></div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="x">${esc(e.detail)}</p>` : ""}${(e.hotels && e.hotels.length) ? `<p class="x">Linked hotels: ${e.hotels.map((id) => `<a href="#hotel-${id}">${esc((hotelById[id]||{}).short || id)}</a>`).join(", ")}</p>` : ""}<p class="s">${esc(e.source || "")}</p></div>`;
     const weekList = [...weeks].reverse();
     let active = latest ? latest.week : (weekList[0] && weekList[0].week);
     const toolbar = $("#demandToolbar");
     const timeline = $("#timeline");
+    let shownEv = 0, more = null;
+    const LA = DB.looking_ahead || [];
     function paintDemand() {
       if (toolbar) {
         toolbar.innerHTML = weekList.map((w) => `<button type="button" class="chip" data-dw="${w.week}" aria-pressed="${w.week===active}">${fMD(w.week)}</button>`).join("");
@@ -341,18 +393,21 @@
       if (timeline) {
         timeline.innerHTML = show.map((w) => {
           const evs = DB.context[w.week] || [];
+          shownEv = evs.length;
           return `<article class="tweek${w.status === "missing" ? " missing" : ""}"><h3>${fMD(w.week)} – ${fMD(w.week_end)}</h3>
-            <p class="wk-status">${w.status === "missing" ? "No rate brief · context only" : `Brief of ${fMD(w.generated)}`}</p>${evs.map(evHTML).join("") || '<p class="x">No events recorded for this week.</p>'}</article>`;
+            <p class="wk-status">${w.status === "missing" ? "No rate brief · context only" : `Brief of ${fMD(w.generated)}`}</p>${evs.map((e, i) => evHTML(e, i, w.week)).join("") || '<p class="x">No events recorded for this week.</p>'}</article>`;
         }).join("");
       }
+      if (more) more.sync(Math.min(shownEv, DM_TOP) + Math.min(LA.length, DA_TOP), shownEv + LA.length);
     }
-    paintDemand();
     const ahead = $("#ahead");
     if (ahead) {
-      if (DB.looking_ahead?.length) {
-        ahead.innerHTML = `<h3>Looking ahead</h3><ul>${DB.looking_ahead.map((e) => `<li><div class="d">${esc(e.dates)}</div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="t" style="font-size:.82rem;opacity:.85">${esc(e.detail)}</p>` : ""}<span class="s">${esc(e.source)}</span></li>`).join("")}</ul>`;
+      if (LA.length) {
+        ahead.innerHTML = `<h3>Looking ahead</h3><ul>${LA.map((e, i) => `<li${i >= DA_TOP ? ' class="more-extra"' : ""} id="ahead-${i + 1}"><div class="d">${esc(e.dates)}</div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="t" style="font-size:.82rem;opacity:.85">${esc(e.detail)}</p>` : ""}<span class="s">${esc(e.source)}</span></li>`).join("")}</ul>`;
       } else ahead.remove();
     }
+    more = moreToggle({ id: "demandToggle", regions: ["timeline", ...(LA.length ? ["ahead"] : [])], after: LA.length ? ahead : timeline, noun: "demand notes" });
+    paintDemand();
   }
 
   /* ---------- 8 news ---------- */
@@ -360,8 +415,9 @@
     const list = $("#newsList");
     const toolbar = $("#newsToolbar");
     if (!list) return;
-    const items = [...(DB.news || [])].map((n) => ({
-      ...n,
+    const NEWS_TOP = 4; // condensed preview: the 4 newest headlines in the current filter (two rows on desktop)
+    const items = [...(DB.news || [])].map((n, i) => ({
+      ...n, _n: i + 1, // data order, matches the knowledge index id news:N and the #news-N anchor
       category: n.category || (n.orlando ? "orlando" : "marriott"),
     }));
     // Sort newest week first, then as listed
@@ -371,6 +427,8 @@
       return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
     });
     let filter = "all";
+    const more = moreToggle({ id: "newsToggle", regions: ["newsList"], after: list, noun: "headlines" });
+    more.resolve = (id) => { if (filter !== "all" && /^news-\d+$/.test(id) && items.some((n) => "news-" + n._n === id)) { filter = "all"; paint(); } };
     function paint() {
       if (toolbar) {
         const counts = { all: items.length, marriott: 0, orlando: 0, hospitality: 0 };
@@ -384,21 +442,23 @@
       const shown = items.filter((n) => filter === "all" || n.category === filter);
       let html = "";
       let lastWeek = null;
-      for (const n of shown) {
+      shown.forEach((n, i) => {
+        const extra = i >= NEWS_TOP ? " more-extra" : "";
         if (n.week !== lastWeek) {
           lastWeek = n.week;
           const w = weeks.find((x) => x.week === n.week);
-          html += `<div class="news-week-label">Week of ${fMD(n.week)}${w && w.generated ? ` · brief ${fMD(w.generated)}` : ""}</div>`;
+          html += `<div class="news-week-label${extra}">Week of ${fMD(n.week)}${w && w.generated ? ` · brief ${fMD(w.generated)}` : ""}</div>`;
         }
         const cat = n.category || "marriott";
-        html += `<article class="nitem">
+        html += `<article class="nitem${extra}" id="news-${n._n}">
           <div class="d"><span>${esc(n.date || "")}</span><span class="tag-cat tag-cat-${esc(cat)}">${esc(cat)}</span>${n.orlando ? '<span class="tag-orl">Orlando</span>' : ""}</div>
           <p>${esc(n.headline)}</p>
           <div class="s">${esc(n.source || "")}</div>
           ${n.url ? `<a class="nlink" href="${esc(n.url)}" target="_blank" rel="noopener">Read source</a>` : ""}
         </article>`;
-      }
+      });
       list.innerHTML = html || `<p class="vo-empty">No headlines in this filter.</p>`;
+      more.sync(Math.min(shown.length, NEWS_TOP), shown.length);
     }
     paint();
   }

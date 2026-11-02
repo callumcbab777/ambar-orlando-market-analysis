@@ -200,7 +200,7 @@ def comps_docs(db: dict) -> list[dict]:
         docs.append(doc("demand:market", "Metro Orlando market indicators", "index.html#demand",
                         " ".join(f"{m.get('period', '')}: {m.get('metric', '')} {m.get('value', '')} ({m.get('change', '')}). Source: {m.get('source', '')}." for m in mk), kind="demand"))
     for i, n in enumerate(db.get("news") or []):
-        docs.append(doc(f"news:{i + 1}", ws(n["headline"])[:110], n.get("url") or "index.html#news",
+        docs.append(doc(f"news:{i + 1}", ws(n["headline"])[:110], n.get("url") or f"index.html#news-{i + 1}",
                         f"{n.get('date', '')}: {n['headline']} Source: {n.get('source', '')}.", kind="news", source=n.get("source", ""), as_of=n.get("week", "")))
     return docs
 

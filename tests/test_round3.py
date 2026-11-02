@@ -280,6 +280,11 @@ class KnowledgeTest(unittest.TestCase):
             path, _, frag = u.partition("#")
             f = ROOT / (path + "index.html" if path.endswith("/") or not path else path)
             self.assertTrue(f.exists(), u)
+            if frag.startswith("news-"):   # headlines are rendered by app.js with id="news-<data index + 1>"
+                n = int(frag[5:])
+                self.assertTrue(1 <= n <= len(json.loads(read("data/comps.json"))["news"]), u)
+                self.assertIn('id="news-${n._n}"', read("assets/js/app.js"))
+                continue
             if frag and not frag.startswith("hotel-"):   # hotel cards are rendered by app.js with id="hotel-<id>"
                 self.assertIn(f'id="{frag}"', f.read_text(encoding="utf-8"), u)
 
