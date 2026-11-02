@@ -15,7 +15,7 @@ Marriott brands are the main focus (AMBAR is part of the Marriott family); key n
 - `assets/css/styles.css`, `assets/js/app.js`: design and rendering. All content comes from `data/comps.json`
 - `assets/ambar-logo.png`: AMBAR logo cropped from Callum's brand graphic
 - `assets/fonts/`: self-hosted Cormorant Garamond + DM Sans (SIL OFL)
-- `assets/vendor/`: Chart.js 4.4.4 and Leaflet 1.9.4, bundled so the page needs no CDN
+- `assets/vendor/`: Leaflet 1.9.4 (and Chart.js 4.4.4, no longer loaded by any page), bundled so the page needs no CDN
 - `data/comps.json`: the single source of truth. `data/comps.js` is an auto-generated mirror so that `file://` opening works
 
 ## Adding a new week
@@ -103,7 +103,11 @@ The headline lives in one constant, `HEADLINE` in `assets/js/visit.js` (default 
 
 ## Favourite hotels (main page)
 
-Each hotel card, and each mini chart in *By hotel: how rates have moved* (inside Hotels), has a star button (`aria-pressed`) that adds the hotel to My Profile. *Show favourites only* filters the mini charts.
+Each hotel card in Hotels has a star button (`aria-pressed`) that adds the hotel to My Profile (profile page, share link and PDF). A status line under the cards confirms each save or removal.
+
+## Week ahead (main page)
+
+The nightly grid shows the first 3 hotels (the `data/comps.json` order) plus the Median row; *See all hotels (N)* expands it and *Show fewer* collapses it (`aria-expanded`/`aria-controls`, 44px target on phones). The choice is kept when switching weeks. Without JavaScript every row shows.
 
 ## Site assistant (chat widget)
 

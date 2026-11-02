@@ -174,11 +174,17 @@ class MainPageTest(unittest.TestCase):
             self.assertNotIn(dead, self.app)
         self.assertNotIn(".chart-box", read("assets/css/styles.css"))
 
-    def test_by_hotel_lives_in_hotels(self):
+    def test_by_hotel_removed_stars_stay_on_cards(self):
         hotels = re.search(r'<section[^>]*id="hotels".*?</section>', self.html, flags=re.S).group(0)
-        for needle in ('id="byHotel"', 'id="multiples"', 'id="favOnly"', 'aria-pressed="false"'):
-            self.assertIn(needle, hotels, needle)
-        self.assertIn("renderByHotel", self.app)
+        for dead in ('id="byHotel"', 'id="multiples"', 'id="favOnly"', "By hotel", "favourites only"):
+            self.assertNotIn(dead, self.html, dead)
+        for dead in ("renderByHotel", "#multiples", "favOnly", "data-chart", "See history"):
+            self.assertNotIn(dead, self.app, dead)
+        self.assertIn('id="favStatus"', hotels)
+        render = self.app[self.app.index("function renderHotels()"):]
+        render = render[: render.index("\n  }\n")]
+        self.assertIn("starBtn(h", render)
+        self.assertIn("bindFavs();", render)
 
     def test_favourites(self):
         for needle in ("fav-star", "aria-pressed", "toggleHotel", "P.subscribe"):

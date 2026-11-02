@@ -34,7 +34,6 @@
     { t: "Your brands · hotel brands in Orlando", h: home("#familiar"), d: "Pick the hotel companies and brands you know; verified Orlando-area brands, saved to My Profile.", k: "brand brands familiar company companies parent hilton hyatt ihg wyndham disney universal loews marriott other not listed" },
     { t: "Marriott brand matrix", h: home("#brands"), d: "Where AMBAR and the Marriott hotels sit in the Marriott portfolio.", k: "marriott brand brands matrix tier portfolio autograph premium luxury bonvoy" },
     { t: "The hotels + map", h: home("#hotels"), d: "The comparable hotels, their locations and distances.", k: "hotels hotel map location locations distance jw ritz swan dolphin gaylord hyatt conrad wyndham ette comparable comps" },
-    { t: "By hotel · how rates moved, and favourites", h: home("#byHotel"), d: "A small chart per hotel; star hotels to keep them in My Profile.", k: "history chart trend trends moved change favourite favourites favorite favorites star starred by hotel" },
     { t: "Demand context", h: home("#demand"), d: "Conventions, Disney calendars and notes from the weekly briefs; metro occupancy.", k: "demand convention conventions disney occupancy market context brief briefs" },
     { t: "Orlando & hospitality news", h: home("#news"), d: "Marriott, wider Orlando and hospitality-media headlines.", k: "news headlines headline hospitality media article articles" },
     { t: "Sources & methodology", h: home("#sources"), d: "How the figures are gathered, caveats and sources.", k: "source sources methodology method caveat caveats data how gathered disclaimer" },
@@ -162,7 +161,7 @@
     scope = PROFILE_SCOPES.includes(scope) ? scope : "all";
     const P = myProfile() || { events: [], hotels: [], brands: [], prefs: null }, L = (window.AMBAR_KNOWLEDGE && window.AMBAR_KNOWLEDGE.lookups) || {};
     const link = `<a href="${esc(profilePage())}">Open My Profile →</a>`;
-    const starHow = `To save one, go to <a href="${esc(home("#hotels"))}">Hotels</a> and tap the star (☆) on a hotel card, or next to a hotel’s name in <a href="${esc(home("#byHotel"))}">By hotel</a>; starred hotels show up here and in My Profile.`;
+    const starHow = `To save one, go to <a href="${esc(home("#hotels"))}">Hotels</a> and tap the star (☆) on a hotel card; starred hotels show up here and in My Profile.`;
     const other = String(P.other_brand || "");
     if (scope === "all" && !P.events.length && !P.hotels.length && !P.brands.length && !other && !P.prefs) {
       return `<p>Your profile on this browser is empty so far. Star hotels in <a href="${esc(home("#hotels"))}">Hotels</a>, pick brands in <a href="${esc(home("#familiar"))}">Your brands</a> and save events on the <a href="${esc(evPage())}">events page</a>; they all show up in ${link.replace("Open My Profile →", "My Profile")}.</p>`;

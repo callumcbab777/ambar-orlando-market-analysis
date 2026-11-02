@@ -44,14 +44,14 @@
   }
 
 
-  let DB, H, byHotel, weeks, collected, latest, tip;
+  let DB, H, hotelById, weeks, collected, latest, tip;
 
     function init(payload) {
     const db = payload.comps || payload;
     DB = db; H = db.hotels; weeks = db.weeks; collected = weeks.filter((w) => w.status === "collected"); latest = collected[collected.length - 1];
-    byHotel = Object.fromEntries(H.map((h) => [h.id, h]));
+    hotelById = Object.fromEntries(H.map((h) => [h.id, h]));
     tip = $("#tip");
-    renderHero(); renderWeekAhead(); renderMatrix(); renderHotels(); renderByHotel(); renderDemand(); renderNews(); renderFooter(); navSpy();
+    renderHero(); renderWeekAhead(); renderMatrix(); renderHotels(); renderDemand(); renderNews(); renderFooter(); navSpy();
   }
 
   const ratesFor = (week) => DB.rates.filter((r) => r.week === week);
@@ -109,6 +109,21 @@
 
   /* ---------- 2 week ahead ---------- */
   let selWeek;
+  /* Condensed list: the grid shows the first WA_TOP hotels (data/comps.json order, the same order the
+     grid has always used) and a 'See all hotels (N)' button expands it. JS adds the condensed class, so
+     without it every row stays visible. N comes from the data, so a weekly regeneration just works.
+     The Median row is never hidden, and the expanded/collapsed choice is kept across week switches. */
+  const WA_TOP = 3;
+  let waExpanded = false;
+  function syncHeatToggle(show) {
+    const btn = $("#heatToggle"), wrap = $("#heatWrap"); if (!btn) return;
+    const can = show && H.length > WA_TOP;
+    btn.parentElement.hidden = !can;
+    wrap.classList.toggle("is-condensed", can && !waExpanded);
+    btn.setAttribute("aria-expanded", String(can && waExpanded));
+    btn.textContent = waExpanded ? "Show fewer" : `See all hotels (${H.length})`;
+    const note = $("#heatCount"); if (note) note.textContent = can ? (waExpanded ? `Showing all ${H.length} hotels` : `Showing ${WA_TOP} of ${H.length} hotels`) : "";
+  }
   function renderWeekAhead() {
     const tabs = $("#weekTabs");
     weeks.forEach((w) => {
@@ -121,6 +136,12 @@
     $("#heatLegend").innerHTML = `<span class="ramp">${money(s[0])}<span class="bar" style="background:linear-gradient(90deg,${STOPS.join(",")})"></span>${money(s[s.length - 1])}</span>
       <span class="sw"><i style="background:repeating-linear-gradient(135deg,#EEE7D9 0 3px,#E2D7C2 3px 6px);border:1px dashed #b8ab8d"></i>Unavailable (no public offer)</span>
       <span class="sw"><i style="background:#F1F1F1"></i>Not collected</span>`;
+    const more = el("div", { class: "heat-more" }, `<span class="heat-count" id="heatCount"></span><button type="button" class="btn-more" id="heatToggle" aria-controls="heatWrap" aria-expanded="false"></button>`);
+    $("#heatWrap").after(more);
+    $("#heatToggle").addEventListener("click", () => {
+      waExpanded = !waExpanded; syncHeatToggle(true);
+      if (!waExpanded) $("#heatToggle").scrollIntoView({ block: "nearest" });
+    });
     selectWeek(latest.week);
   }
 
@@ -132,15 +153,15 @@
     if (w.status === "missing") {
       $("#waSub").textContent = `${fLong(w.week)} – ${fLong(w.week_end)}`;
       wrap.innerHTML = `<div class="gap-panel"><h3>Week of ${fMD(w.week)}: not collected</h3><p>${esc(w.note)}</p><p>No figures are shown or estimated for this week.</p></div>`;
-      $("#heatFoot").textContent = ""; return;
+      $("#heatFoot").textContent = ""; syncHeatToggle(false); return;
     }
     const rs = ratesFor(wk), dates = weekDates(w), srcs = sourcesOf(rs);
     $("#waSub").innerHTML = `${wk === latest.week ? "Latest week" : "Week"} · ${fLong(w.week)} – ${fLong(w.week_end)}. Lowest public nightly rate observed, snapshot ${fLong(w.generated)} (${esc(srcs.join("; "))}).`;
     let html = `<table class="heat"><caption class="sr-only" style="position:absolute;left:-9999px">Lowest public nightly rates, week of ${fMD(wk)}</caption><thead><tr><th scope="col" class="row"><span>Hotel</span></th>`;
     dates.forEach((d) => { html += `<th scope="col" class="${d === todayISO ? "today" : ""}">${fDay(d)}<b>${fMD(d).split(" ")[1]}</b></th>`; });
     html += `<th scope="col" class="sumhead">Mean of<br>priced nights</th></tr></thead><tbody>`;
-    H.forEach((h) => {
-      html += `<tr><th scope="row" class="row"><strong>${esc(h.short)}</strong><span>${esc(h.brand)} · ${h.tier}</span></th>`;
+    H.forEach((h, i) => {
+      html += `<tr${i >= WA_TOP ? ' class="wa-extra"' : ""} data-rank="${i + 1}"><th scope="row" class="row"><strong>${esc(h.short)}</strong><span>${esc(h.brand)} · ${h.tier}</span></th>`;
       const row = dates.map((d) => rs.find((r) => r.hotel === h.id && r.date === d));
       row.forEach((r, i) => {
         if (!r) { html += `<td class="cell nc" tabindex="0" data-tip="">n/a</td>`; return; }
@@ -164,6 +185,7 @@
     const unav = rs.filter((r) => r.status === "UNAVAILABLE").length;
     html += `<td class="sum">${unav ? `<b>${unav}</b>unavailable nights` : ""}</td></tr></tbody></table>`;
     wrap.innerHTML = html;
+    syncHeatToggle(true);
     if (!$("#swipeHint")) wrap.before(el("p", { class: "swipe-hint", id: "swipeHint" }, "Swipe the grid sideways to see every night →"));
     wrap.querySelectorAll(".cell[data-tip]").forEach((c) => {
       const on = () => {
@@ -179,111 +201,33 @@
     });
     const notes = DB.hotel_notes.filter((n) => n.week === wk && n.rate_note);
     $("#heatFoot").innerHTML = `Unavailable = no offer returned for a one-night search: a scarcity signal, not a confirmed sell-out. * = note on that night (hover for detail). Taxes are generally excluded and resort fees may apply.` +
-      (notes.length ? `<br><strong>Brief notes this week:</strong> ` + notes.map((n) => `${esc(byHotel[n.hotel].short)}: ${esc(n.rate_note)}`).join(" · ") : "");
+      (notes.length ? `<br><strong>Brief notes this week:</strong> ` + notes.map((n) => `${esc(hotelById[n.hotel].short)}: ${esc(n.rate_note)}`).join(" · ") : "");
   }
 
-  /* ---------- by hotel (in the Hotels section): weekly-mean change + nightly sparkline per hotel, with favourites ---------- */
-  let CAP = null;
-  const CAP_SHAPE = "triangle";
-  // Cap rule: 1.5 x the 95th percentile of all priced nights, rounded up to the next $250 (min $500).
-  // Recomputed automatically as weeks are added; nights above it are pinned at the cap with a triangle.
-  function capValue() {
-    if (CAP) return CAP;
-    const v = priced(DB.rates).sort((a, b) => a - b); if (!v.length) return (CAP = Infinity);
-    const p95 = v[Math.max(0, Math.ceil(0.95 * v.length) - 1)];
-    CAP = Math.max(500, Math.ceil((p95 * 1.5) / 250) * 250); capValue.p95 = p95; return CAP;
-  }
-  const capArr = (arr) => arr.map((v) => (v != null && v > capValue() ? capValue() : v));
-  const isCapped = (raw, i) => raw[i] != null && raw[i] > capValue();
-  const capPlugin = {
-    id: "capLine",
-    afterDatasetsDraw(c) {
-      const o = c.options.plugins.capLine; if (!o || !o.on) return;
-      const { ctx, chartArea: a, scales: { y } } = c, py = y.getPixelForValue(o.value);
-      if (py < a.top - 1 || py > a.bottom) return;
-      ctx.save(); ctx.strokeStyle = "rgba(243,111,67,.75)"; ctx.setLineDash([2, 4]); ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke(); ctx.restore();
-    }
-  };
-  const gapPlugin = {
-    id: "gapShade",
-    beforeDatasetsDraw(c) {
-      const { ctx, chartArea: a, scales: { x } } = c, ranges = c.options.plugins.gapShade?.ranges || [];
-      ranges.forEach(([i0, i1]) => {
-        const step = x.getPixelForValue(1) - x.getPixelForValue(0) || 40;
-        const x0 = x.getPixelForValue(i0) - step / 2, x1 = x.getPixelForValue(i1) + step / 2;
-        ctx.save(); ctx.fillStyle = "rgba(117,117,117,.09)"; ctx.fillRect(x0, a.top, x1 - x0, a.bottom - a.top); ctx.restore();
-      });
-    }
-  };
-  const allDates = () => weeks.flatMap(weekDates);
+  /* ---------- favourites: star on each hotel card saves it to My Profile ---------- */
   const P = window.AMBAR_PROFILE || null;
   const isFav = (id) => !!(P && P.isFavHotel(id));
   const starBtn = (h, where) => P ? `<button type="button" class="fav-star" data-fav="${h.id}" aria-pressed="${isFav(h.id)}" aria-label="Favourite ${esc(h.short)}${where ? " (" + where + ")" : ""}" title="Save ${esc(h.short)} to My Profile"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z"/></svg></button>` : "";
-  let favOnly = false;
   function syncFavs() {
     if (!P) return;
     const favs = P.get().hotels;
     document.querySelectorAll("[data-fav]").forEach((b) => b.setAttribute("aria-pressed", String(favs.includes(b.dataset.fav))));
-    document.querySelectorAll(".hcard,.mini").forEach((c) => c.classList.toggle("is-fav", favs.includes(c.dataset.hid)));
-    const n = H.filter((h) => favs.includes(h.id)).length;
-    $("#favN").textContent = n ? `(${n})` : "";
-    $("#favOnly").disabled = !n && !favOnly;
-    if (favOnly && !n) { favOnly = false; $("#favOnly").setAttribute("aria-pressed", "false"); }
-    document.querySelectorAll("#multiples .mini").forEach((c) => { c.hidden = favOnly && !favs.includes(c.dataset.hid); });
+    document.querySelectorAll(".hcard").forEach((c) => c.classList.toggle("is-fav", favs.includes(c.dataset.hid)));
   }
   function bindFavs() {
-    if (!P) { $("#favOnly").hidden = true; return; }
+    if (!P) return;
     document.addEventListener("click", (e) => {
       const b = e.target.closest("[data-fav]"); if (!b) return;
       e.preventDefault();
-      const id = b.dataset.fav, h = byHotel[id];
+      const id = b.dataset.fav, h = hotelById[id];
       const before = isFav(id);
       if (!before && P.get().hotels.length >= P.LIMITS.hotels) { $("#favStatus").textContent = `You can favourite up to ${P.LIMITS.hotels} hotels.`; return; }
       P.toggleHotel(id);
       $("#favStatus").textContent = before ? `${h.short} removed from your favourites.` : `${h.short} saved to your favourites in My Profile.`;
     });
-    $("#favOnly").addEventListener("click", (e) => { favOnly = !favOnly; e.currentTarget.setAttribute("aria-pressed", String(favOnly)); syncFavs(); });
     P.subscribe(syncFavs);
     syncFavs();
   }
-  function renderByHotel() {
-    const box = $("#multiples");
-    const dates = allDates();
-    const gaps = weeks.map((w, i) => w.status === "missing" ? [i * 7, i * 7 + 6] : null).filter(Boolean);
-    const allPriced = priced(DB.rates);
-    const anyCapped = allPriced.some((v) => v > capValue());
-    const yMax = anyCapped ? capValue() * 1.22 : Math.max(...allPriced) * 1.02;
-    if (window.Chart) { Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif"; Chart.defaults.color = "#5f5f55"; }
-    H.forEach((h) => {
-      const wm = weeks.map((w) => ({ w, m: mean(priced(DB.rates.filter((r) => r.week === w.week && r.hotel === h.id))) }));
-      const have = wm.filter((x) => x.m != null), last = have[have.length - 1], prev = have[have.length - 2];
-      const ch = last && prev ? (last.m / prev.m - 1) * 100 : null;
-      const card = el("article", { class: "mini", id: "mini-" + h.id, "data-hid": h.id, "aria-labelledby": "mn-" + h.id, tabindex: "-1" },
-        `<div class="mini-top"><h4 id="mn-${h.id}"><i style="background:${COLORS[h.id]}"></i>${esc(h.short)}</h4>${starBtn(h, "rate history")}</div><span class="m-brand">${esc(h.brand)} · ${h.tier}</span>
-         <div class="m-stats"><span><b>${money(last?.m)}</b> w/c ${last ? fMD(last.w.week) : "—"}</span>
-         ${ch == null ? "" : Math.abs(ch) < 0.5 ? `<span class="delta flat" title="Change in weekly mean vs w/c ${fMD(prev.w.week)}">Flat vs ${fMD(prev.w.week)}</span>` : `<span class="delta ${ch > 0 ? "up" : "down"}" title="Change in weekly mean vs w/c ${fMD(prev.w.week)}">${ch > 0 ? "▲" : "▼"} ${Math.abs(ch).toFixed(0)}% vs ${fMD(prev.w.week)}</span>`}</div>
-         <div class="m-chart"><canvas role="img" aria-label="Nightly lowest public rates for ${esc(h.short)}, ${fMD(weeks[0].week)} to ${fMD(weeks[weeks.length - 1].week_end)}"></canvas></div>`);
-      box.appendChild(card);
-      const data = dates.map((d) => { const r = DB.rates.find((x) => x.hotel === h.id && x.date === d); return r && r.status === "OK" && Number(r.rate) > 0 ? r.rate : null; });
-      if (window.Chart) new Chart($("canvas", card), {
-        type: "line", data: { labels: dates, datasets: [{ data: capArr(data), borderColor: COLORS[h.id], borderWidth: 1.8, tension: 0.3, spanGaps: false, fill: false,
-          pointStyle: CAP_SHAPE, pointBackgroundColor: "#F36F43", pointBorderColor: "#fff", pointBorderWidth: 1,
-          pointRadius: (c) => (isCapped(data, c.dataIndex) ? 8 : 0), clip: 12 }] },
-        plugins: [gapPlugin, capPlugin],
-        options: { responsive: true, maintainAspectRatio: false, animation: false, events: [], layout: { padding: { top: 10 } },
-          plugins: { legend: { display: false }, tooltip: { enabled: false }, gapShade: { ranges: gaps }, capLine: { on: anyCapped, value: capValue() } },
-          scales: { x: { display: false }, y: { display: false, max: yMax } } }
-      });
-      const capped = data.filter((v) => v != null && v > capValue());
-      if (capped.length) card.querySelector(".m-stats").insertAdjacentHTML("afterend", `<span class="m-cap">▲ ${capped.length} night${capped.length > 1 ? "s" : ""} above ${money(capValue())} cap (max ${money(Math.max(...capped))})</span>`);
-    });
-    $("#byHotelNote").textContent = `Each line is one hotel’s lowest public nightly rate, ${fMD(weeks[0].week)} to ${fMD(weeks[weeks.length - 1].week_end)}; the figure is the simple mean of the nights that showed a price in the latest collected week (illustrative, not ADR), compared with the week before. Shaded weeks were not collected and gaps are unavailable nights. ` +
-      (anyCapped ? `Nights above ${money(capValue())} (1.5 × the 95th percentile of all priced nights, ${money(capValue.p95)}, rounded up to the next $250) are pinned at that cap with a triangle so they don’t flatten the rest. ` : "") +
-      `Sources: ` + collected.map((w) => `w/c ${fMD(w.week)}: ${sourcesOf(ratesFor(w.week)).join(" & ")} (${fMD(w.generated)})`).join("; ") + `. Tap the star to save a hotel to My Profile.`;
-    bindFavs();
-  }
-
   /* ---------- 4 brand matrix ---------- */
   const WM = {
     "The Ritz-Carlton": "wm-caps", "St. Regis": "wm-wide", "JW Marriott": "wm-jw", "The Luxury Collection": "wm-ital", "W Hotels": "wm-w", "EDITION": "wm-light", "Bvlgari": "wm-wide",
@@ -322,7 +266,7 @@
   }
   function panel(b, btn) {
     document.querySelectorAll(".bchip").forEach((x) => x.classList.toggle("is-active", x._b === b));
-    const comps = b.comps.map((id) => byHotel[id]);
+    const comps = b.comps.map((id) => hotelById[id]);
     $("#brandPanel").innerHTML = `<span class="bp-tier">${b.tier} tier${b.featured ? " · featured" : ""}</span><h3>${esc(b.name)}</h3><p>${esc(b.description)}</p>
       <h4>Hotels tracked here</h4>${comps.length ? `<ul>${comps.map((h) => `<li><a href="#hotel-${h.id}" data-hid="${h.id}"><span>${esc(h.short)}</span><small>${esc(h.area.split(",")[0])}</small></a></li>`).join("")}</ul>`
         : `<p class="none">${b.featured ? "AMBAR is the subject of this landscape, so it is not one of the hotels tracked." : "No hotels from this brand are tracked here."}</p>`}
@@ -344,18 +288,13 @@
         ${h.keys ? `<p class="dist">${h.keys.toLocaleString("en-US")} keys</p>` : ""}<p class="dist">${h.on_disney_property ? "On Walt Disney World® property · " : ""}≈ ${h.distance_to_epcot_mi} mi straight-line to EPCOT</p>
         ${(() => { const n = DB.hotel_notes.find((x) => x.hotel === h.id && x.week === latest.week); return n && n.demand_note ? `<p class="hnote"><span>Brief note, w/c ${fMD(latest.week)}:</span> ${esc(n.demand_note)}</p>` : ""; })()}
         <div class="latest"><span><b>${p.length ? money(Math.min(...p)) + "–" + money(Math.max(...p)).slice(1) : "Not collected"}</b><br>${p.length ? `range, w/c ${fMD(latest.week)}` : `no public rates, w/c ${fMD(latest.week)}`}</span><span><b>${p.length ? p.length + "/7" : "—"}</b><br>${p.length ? "nights priced" : "not collected"}</span></div>
-        <div class="actions"><button type="button" class="linkbtn" data-map="${h.id}">Show on map</button><button type="button" class="linkbtn" data-chart="${h.id}">See history</button></div>`;
+        <div class="actions"><button type="button" class="linkbtn" data-map="${h.id}">Show on map</button></div>`;
       grid.appendChild(card);
     });
+    bindFavs();
     grid.addEventListener("click", (e) => {
-      const m = e.target.closest("[data-map]"), c = e.target.closest("[data-chart]");
+      const m = e.target.closest("[data-map]");
       if (m && markers[m.dataset.map]) { map.flyTo(markers[m.dataset.map].getLatLng(), 14, { duration: 0.8 }); markers[m.dataset.map].openPopup(); $("#map").scrollIntoView({ behavior: "smooth", block: "center" }); }
-      if (c) {
-        const mini = $("#mini-" + c.dataset.chart); if (!mini) return;
-        if (mini.hidden) { favOnly = false; $("#favOnly").setAttribute("aria-pressed", "false"); syncFavs(); }
-        mini.scrollIntoView({ behavior: "smooth", block: "center" }); mini.focus({ preventScroll: true });
-        mini.classList.add("flash"); setTimeout(() => mini.classList.remove("flash"), 2200);
-      }
     });
     if (!window.L) { $("#map").innerHTML = '<p style="padding:20px">Map library could not load.</p>'; return; }
     map = L.map("map", { scrollWheelZoom: false, zoomControl: true });
@@ -387,7 +326,7 @@
   function renderDemand() {
     const strip = $("#marketStrip");
     if (strip) strip.innerHTML = (DB.market || []).map((m) => `<div class="mstat"><div class="p">${esc(m.period)}</div><div class="v">${esc(m.value)}</div><p class="c">${esc(m.metric)} · ${esc(m.change)}</p><p class="s">Metro-wide, not these hotels. ${esc(m.source)}</p></div>`).join("");
-    const evHTML = (e) => `<div class="ev"><div class="d"><span class="type type-${esc(e.type || "Other")}">${esc(e.type || "Note")}</span><span>${esc(e.dates)}</span></div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="x">${esc(e.detail)}</p>` : ""}${(e.hotels && e.hotels.length) ? `<p class="x">Linked hotels: ${e.hotels.map((id) => `<a href="#hotel-${id}">${esc((byHotel[id]||{}).short || id)}</a>`).join(", ")}</p>` : ""}<p class="s">${esc(e.source || "")}</p></div>`;
+    const evHTML = (e) => `<div class="ev"><div class="d"><span class="type type-${esc(e.type || "Other")}">${esc(e.type || "Note")}</span><span>${esc(e.dates)}</span></div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="x">${esc(e.detail)}</p>` : ""}${(e.hotels && e.hotels.length) ? `<p class="x">Linked hotels: ${e.hotels.map((id) => `<a href="#hotel-${id}">${esc((hotelById[id]||{}).short || id)}</a>`).join(", ")}</p>` : ""}<p class="s">${esc(e.source || "")}</p></div>`;
     const weekList = [...weeks].reverse();
     let active = latest ? latest.week : (weekList[0] && weekList[0].week);
     const toolbar = $("#demandToolbar");

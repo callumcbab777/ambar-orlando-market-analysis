@@ -137,7 +137,7 @@ t("retrieval: bare 'my hotel' questions get normal results, no profile docs", ()
     const ctx = A._profileContext(A.guideAnswer("How far is my hotel from the airport?").profileScope);
     assert.strictEqual(ctx.scope, "all", "not a profile-section question: no section filter sent to the proxy");
   });
-  t("offline guide with the index: 'hotels I starred' / 'show my starred hotels' still list favourites only", () => {
+  t("offline guide with the index: 'hotels I starred' / 'show my starred hotels' still list only the favourite hotels", () => {
     for (const q of ["hotels I starred", "show my starred hotels", "list my favorites hotels", "which hotels did I save"]) {
       const h = A.guideAnswer(q).html;
       assert.ok(h.includes("Your favourite hotels (2)") && !/Thriller|Brands you know/.test(h), q + " → " + h);
