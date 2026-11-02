@@ -31,7 +31,7 @@
   const SECTIONS = [
     { t: "Week ahead · nightly rates", h: home("#week-ahead"), d: "Lowest public nightly rates for each tracked hotel, by night.", k: "rate rates nightly night price prices cheapest tonight week ahead grid hotel heatmap" },
     { t: "Residences · the week ahead", h: home("#residences-week"), d: "Labelled estimates of ADR and RevPAU for each AMBAR floor plan.", k: "residence residences ambar adr revpar revpau estimate estimates floor plan studio bedroom owner economics cap occupancy" },
-    { t: "Your brands · hotel brands in Orlando", h: home("#familiar"), d: "Pick the hotel companies and brands you know; verified Orlando-area brands, saved to My Profile.", k: "brand brands familiar company companies parent hilton hyatt ihg wyndham disney universal loews choice accor best western four seasons marriott" },
+    { t: "Your brands · hotel brands in Orlando", h: home("#familiar"), d: "Pick the hotel companies and brands you know; verified Orlando-area brands, saved to My Profile.", k: "brand brands familiar company companies parent hilton hyatt ihg wyndham disney universal loews marriott other not listed" },
     { t: "Marriott brand matrix", h: home("#brands"), d: "Where AMBAR and the Marriott hotels sit in the Marriott portfolio.", k: "marriott brand brands matrix tier portfolio autograph premium luxury bonvoy" },
     { t: "The hotels + map", h: home("#hotels"), d: "The comparable hotels, their locations and distances.", k: "hotels hotel map location locations distance jw ritz swan dolphin gaylord hyatt conrad wyndham ette comparable comps" },
     { t: "By hotel · how rates moved, and favourites", h: home("#byHotel"), d: "A small chart per hotel; star hotels to keep them in My Profile.", k: "history chart trend trends moved change favourite favourites favorite favorites star starred by hotel" },
@@ -163,7 +163,8 @@
     const P = myProfile() || { events: [], hotels: [], brands: [], prefs: null }, L = (window.AMBAR_KNOWLEDGE && window.AMBAR_KNOWLEDGE.lookups) || {};
     const link = `<a href="${esc(profilePage())}">Open My Profile →</a>`;
     const starHow = `To save one, go to <a href="${esc(home("#hotels"))}">Hotels</a> and tap the star (☆) on a hotel card, or next to a hotel’s name in <a href="${esc(home("#byHotel"))}">By hotel</a>; starred hotels show up here and in My Profile.`;
-    if (scope === "all" && !P.events.length && !P.hotels.length && !P.brands.length && !P.prefs) {
+    const other = String(P.other_brand || "");
+    if (scope === "all" && !P.events.length && !P.hotels.length && !P.brands.length && !other && !P.prefs) {
       return `<p>Your profile on this browser is empty so far. Star hotels in <a href="${esc(home("#hotels"))}">Hotels</a>, pick brands in <a href="${esc(home("#familiar"))}">Your brands</a> and save events on the <a href="${esc(evPage())}">events page</a>; they all show up in ${link.replace("Open My Profile →", "My Profile")}.</p>`;
     }
     const want = (k) => scope === "all" || scope === k;
@@ -173,10 +174,12 @@
       else if (scope === "hotels") h += `<p>You haven’t starred any favourite hotels yet. ${starHow}</p>`;
     }
     if (want("brands")) {
-      if (P.brands.length) {
-        const by = {};
-        for (const id of P.brands) { const b = L.brands && L.brands[id]; if (b) (by[b.parent] = by[b.parent] || []).push(b.name); }
-        h += `<p>Brands you know: ${Object.keys(by).map((k) => `<b>${esc(k)}</b>: ${esc(by[k].join(", "))}`).join("; ")}.</p>`;
+      const by = {};
+      for (const id of P.brands) { const b = L.brands && L.brands[id]; if (b) (by[b.parent] = by[b.parent] || []).push(b.name); }
+      const parts = Object.keys(by).map((k) => `<b>${esc(k)}</b>: ${esc(by[k].join(", "))}`);
+      if (other) parts.push(`<b>Other</b> (you typed it in; not on the site’s list): ${esc(other)}`);
+      if (parts.length) {
+        h += `<p>Brands you know: ${parts.join("; ")}.</p>`;
       } else if (scope === "brands") h += `<p>You haven’t picked any hotel brands yet. Tick the ones you know in <a href="${esc(home("#familiar"))}">Your brands</a>.</p>`;
     }
     if (want("events")) {
@@ -274,6 +277,29 @@
     <p class="as-foot">${AI ? "AI answers use this site’s data and can be wrong. Check each Visit Orlando source link." : `Answers are links from this site and <a href="${esc(calUrl())}" target="_blank" rel="noopener">Visit Orlando</a>.`}</p>`;
   document.body.appendChild(launcher);
   document.body.appendChild(panel);
+  /* Phones: the floating launcher steps aside while it would sit on top of a box marked data-as-avoid (the main
+     page's hero median box) and comes back as soon as you scroll past it. Nothing else moves. */
+  (function tuck() {
+    const avoid = [...document.querySelectorAll("[data-as-avoid]")];
+    if (!avoid.length || !window.matchMedia) return;
+    const mq = window.matchMedia("(max-width: 640px)");
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      let hit = false;
+      if (mq.matches && !launcher.hidden) {
+        const l = launcher.getBoundingClientRect();
+        hit = avoid.some((el) => { const r = el.getBoundingClientRect(); return r.bottom > l.top - 8 && r.top < l.bottom + 8 && r.right > l.left && r.left < l.right; });
+      }
+      if (hit && document.activeElement === launcher) hit = false;
+      launcher.classList.toggle("as-tucked", hit);
+    };
+    const later = () => { if (!raf) raf = requestAnimationFrame(check); };
+    addEventListener("scroll", later, { passive: true });
+    addEventListener("resize", later);
+    if (mq.addEventListener) mq.addEventListener("change", later);
+    check(); setTimeout(check, 600);
+  })();
   const log = panel.querySelector("#asLog"), input = panel.querySelector("#asInput"), form = panel.querySelector("#asForm");
   const history = [];
   function add(role, html, cls = "") {
@@ -316,6 +342,7 @@
     return {
       scope: only || "all",
       hotels: want("hotels") ? P.hotels.slice(0, 20) : [], brands: want("brands") ? P.brands.slice(0, 120) : [],
+      other_brand: want("brands") && P.other_brand ? String(P.other_brand).slice(0, 60) : "",
       events: want("events") ? P.events.filter((e) => e.url).slice(0, 25).map((e) => ({ title: e.title, start_date: e.start_date, end_date: e.end_date, url: e.url })) : [],
       prefs: want("prefs") && P.prefs ? { cats: P.prefs.cats, areas: P.prefs.areas, from: P.prefs.from, to: P.prefs.to, budget: P.prefs.budget, party: P.prefs.party, keywords: P.prefs.keywords, access: P.prefs.access } : null,
     };

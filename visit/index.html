@@ -49,42 +49,104 @@
           <a href="#getting-here">Airports</a><a href="#brightline">Brightline</a><a href="#drive-times">Drive times</a><a href="#best-time">Best time to visit</a><a href="#visit-ambar">Visit AMBAR</a>
         </nav>
       </div>
-      <figure class="evh-art vh-art" aria-hidden="true">
-        <svg viewBox="0 0 480 560" preserveAspectRatio="xMidYMid slice" role="presentation" focusable="false">
-          <defs>
-            <clipPath id="vhArch"><path d="M24 560V240C24 120.7 120.7 24 240 24s216 96.7 216 216v320z"/></clipPath>
-            <linearGradient id="vhSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E3A2C"/><stop offset=".55" stop-color="#27492F"/><stop offset="1" stop-color="#143023"/></linearGradient>
-            <radialGradient id="vhGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE2B0"/><stop offset=".6" stop-color="#FFA94A"/><stop offset="1" stop-color="#FFA94A" stop-opacity="0"/></radialGradient>
+      <figure class="evh-art vh-art">
+        <!-- Stylised route map (no real building or logo artwork). Large arch for desktop/tablet, simplified wide card on phones. -->
+          <svg class="vh-map vh-map-lg" viewBox="0 0 480 560" role="img" aria-labelledby="vhMapT vhMapD" focusable="false">
+          <title id="vhMapT">All roads lead to AMBAR</title><desc id="vhMapD">A stylised globe with travel routes from the UK and Europe, Canada, US cities and Latin America converging on a pin labelled AMBAR, near Orlando, Florida.</desc>
+          <defs><linearGradient id="vhSkylg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E3A2C"/><stop offset=".6" stop-color="#27492F"/><stop offset="1" stop-color="#143023"/></linearGradient><radialGradient id="vhGlowlg" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE2B0" stop-opacity=".95"/><stop offset=".55" stop-color="#FFA94A" stop-opacity=".55"/><stop offset="1" stop-color="#FFA94A" stop-opacity="0"/></radialGradient><marker id="vhArrlg" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L10 5 0 10 2.5 5z" fill="#FFA94A"/></marker>
+          <clipPath id="vhArch"><path d="M24 560V240C24 120.7 120.7 24 240 24s216 96.7 216 216v320z"/></clipPath>
           </defs>
           <g clip-path="url(#vhArch)">
-            <rect width="480" height="560" fill="url(#vhSky)"/>
-            <g stroke="#E3C68A" stroke-width=".6" opacity=".18" fill="none">
-              <path d="M0 120h480M0 200h480M0 280h480M0 360h480M0 440h480M0 520h480M80 0v560M160 0v560M240 0v560M320 0v560M400 0v560"/>
-            </g>
-            <g fill="none" stroke-linecap="round">
-              <path d="M40 90C150 150 200 250 240 360" stroke="#E3C68A" stroke-width="2" stroke-dasharray="2 9" opacity=".9"/>
-              <path d="M440 70C360 170 290 250 240 360" stroke="#E3C68A" stroke-width="2" stroke-dasharray="2 9" opacity=".9"/>
-              <path d="M470 300C380 320 300 330 240 360" stroke="#FFA94A" stroke-width="3" opacity=".9"/>
-              <path d="M470 300C380 320 300 330 240 360" stroke="#1E3A2C" stroke-width="1" stroke-dasharray="6 6" opacity=".8"/>
-              <path d="M10 470C110 430 180 390 240 360" stroke="#F4EFE7" stroke-width="5" opacity=".55"/>
-              <path d="M10 470C110 430 180 390 240 360" stroke="#1E3A2C" stroke-width="1" stroke-dasharray="10 8" opacity=".9"/>
-              <path d="M120 560C170 470 210 410 240 360" stroke="#F4EFE7" stroke-width="5" opacity=".4"/>
-            </g>
-            <g fill="#E3C68A">
-              <path d="M40 90l-14-4 4 7-4 7 14-4 10 9 2-2-6-10 6-10-2-2z" transform="rotate(30 40 90)"/>
-              <path d="M440 70l-14-4 4 7-4 7 14-4 10 9 2-2-6-10 6-10-2-2z" transform="rotate(130 440 70)"/>
-            </g>
-            <circle cx="240" cy="360" r="78" fill="url(#vhGlow)" opacity=".85"/>
-            <circle cx="240" cy="360" r="22" fill="#FFA94A" stroke="#F4EFE7" stroke-width="3"/>
-            <path d="M240 346l4 9.5 10 .8-7.6 6.6 2.4 9.8-8.8-5.4-8.8 5.4 2.4-9.8-7.6-6.6 10-.8z" fill="#1E3A2C"/>
-            <g font-family="'DM Sans',sans-serif" font-size="12" letter-spacing="2" fill="#E3C68A" font-weight="700">
-              <text x="62" y="128">MCO</text><text x="408" y="176" text-anchor="end">SFB · MLB</text><text x="425" y="292" text-anchor="end">BRIGHTLINE</text><text x="40" y="446">I-4 · US-192</text>
-            </g>
-            <text x="240" y="420" text-anchor="middle" font-family="'Cormorant Garamond',serif" font-style="italic" font-size="28" fill="#F4EFE7">AMBAR</text>
+          <rect width="480" height="560" fill="url(#vhSkylg)"/>
+          <g aria-hidden="true" fill="none" stroke="#E3C68A" stroke-width=".7" opacity=".2">
+          <circle cx="240" cy="330" r="250"/>
+          <ellipse cx="240" cy="330" rx="62" ry="250"/>
+          <ellipse cx="240" cy="330" rx="125" ry="250"/>
+          <ellipse cx="240" cy="330" rx="188" ry="250"/>
+          <ellipse cx="240" cy="165" rx="188" ry="23"/>
+          <ellipse cx="240" cy="248" rx="236" ry="28"/>
+          <ellipse cx="240" cy="330" rx="250" ry="30"/>
+          <ellipse cx="240" cy="412" rx="236" ry="28"/>
+          <ellipse cx="240" cy="495" rx="188" ry="23"/>
+          </g>
+          <g aria-hidden="true" fill="none" stroke-linecap="round">
+          <path d="M408.1 233.0Q298.0 251.4 250.3 324.8" stroke="#FFA94A" stroke-width="6" opacity=".12"/>
+          <path class="vh-flow" d="M408.1 233.0Q298.0 251.4 250.3 324.8" stroke="#FFA94A" stroke-width="2" stroke-dasharray="3 7" marker-end="url(#vhArrlg)"/>
+          <path d="M249.8 109.6Q203.6 224.1 227.0 320.8" stroke="#F4EFE7" stroke-width="6" opacity=".12"/>
+          <path class="vh-flow" d="M249.8 109.6Q203.6 224.1 227.0 320.8" stroke="#F4EFE7" stroke-width="2" stroke-dasharray="3 7" marker-end="url(#vhArrlg)"/>
+          <path d="M89.5 198.4Q189.8 243.0 222.5 322.3" stroke="#E3C68A" stroke-width="6" opacity=".12"/>
+          <path class="vh-flow" d="M89.5 198.4Q189.8 243.0 222.5 322.3" stroke="#E3C68A" stroke-width="2" stroke-dasharray="3 7" marker-end="url(#vhArrlg)"/>
+          <path d="M103.5 481.7Q192.8 444.2 222.0 377.5" stroke="#E3C68A" stroke-width="6" opacity=".12"/>
+          <path class="vh-flow" d="M103.5 481.7Q192.8 444.2 222.0 377.5" stroke="#E3C68A" stroke-width="2" stroke-dasharray="3 7" marker-end="url(#vhArrlg)"/>
+          </g>
+          <g aria-hidden="true">
+          <circle cx="414" cy="232" r="5.5" fill="#143023" stroke="#FFA94A" stroke-width="2"/><circle cx="414" cy="232" r="2" fill="#FFA94A"/>
+          <circle cx="252" cy="104" r="5.5" fill="#143023" stroke="#F4EFE7" stroke-width="2"/><circle cx="252" cy="104" r="2" fill="#F4EFE7"/>
+          <circle cx="84" cy="196" r="5.5" fill="#143023" stroke="#E3C68A" stroke-width="2"/><circle cx="84" cy="196" r="2" fill="#E3C68A"/>
+          <circle cx="98" cy="484" r="5.5" fill="#143023" stroke="#E3C68A" stroke-width="2"/><circle cx="98" cy="484" r="2" fill="#E3C68A"/>
+          </g>
+          <g font-family="'DM Sans',system-ui,sans-serif">
+          <text x="252" y="70" text-anchor="middle" class="vh-map-l">CANADA</text><text x="252" y="85" text-anchor="middle" class="vh-map-s">Toronto · Montreal</text>
+          <text x="52" y="160" text-anchor="start" class="vh-map-l">US CITIES</text><text x="52" y="175" text-anchor="start" class="vh-map-s">New York · Minneapolis</text>
+          <text x="434" y="190" text-anchor="end" class="vh-map-l">UK &amp; EUROPE</text><text x="434" y="205" text-anchor="end" class="vh-map-s">London · Dublin · Paris</text>
+          <text x="70" y="514" text-anchor="start" class="vh-map-l">LATIN AMERICA</text><text x="70" y="529" text-anchor="start" class="vh-map-s">São Paulo · Mexico City</text>
+          </g>
+          <circle cx="234" cy="350" r="70" fill="url(#vhGlowlg)"/>
+          <circle class="vh-pulse" cx="234" cy="350" r="26" fill="none" stroke="#FFA94A" stroke-width="1.5" opacity=".7"/>
+          <g transform="translate(234 350) scale(1)"><path d="M0 14C-9 2-17-6-17-17a17 17 0 0 1 34 0C17-6 9 2 0 14z" fill="#FFA94A" stroke="#F4EFE7" stroke-width="2.5"/><circle cx="0" cy="-17" r="6.5" fill="#1E3A2C"/></g>
+          <text x="234" y="406" text-anchor="middle" class="vh-map-dest" font-family="'Cormorant Garamond',Georgia,serif" font-size="40" font-style="italic" font-weight="600">AMBAR</text>
+          <path d="M200 420h68" stroke="#C9A35A" stroke-width="1.2"/>
           </g>
           <path d="M24 560V240C24 120.7 120.7 24 240 24s216 96.7 216 216v320" fill="none" stroke="#C9A35A" stroke-width="1.5"/>
           <path d="M6 560V240C6 110.8 110.8 6 240 6s234 104.8 234 234v320" fill="none" stroke="#C9A35A" stroke-width=".75" opacity=".55"/>
-        </svg>
+          </svg>
+          <svg class="vh-map vh-map-sm" viewBox="0 0 360 210" role="img" aria-labelledby="vhMapTs vhMapDs" focusable="false">
+          <title id="vhMapTs">All roads lead to AMBAR</title><desc id="vhMapDs">Travel routes from the UK and Europe, Canada, US cities and Latin America converging on a pin labelled AMBAR, near Orlando, Florida.</desc>
+          <defs><linearGradient id="vhSkysm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E3A2C"/><stop offset=".6" stop-color="#27492F"/><stop offset="1" stop-color="#143023"/></linearGradient><radialGradient id="vhGlowsm" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE2B0" stop-opacity=".95"/><stop offset=".55" stop-color="#FFA94A" stop-opacity=".55"/><stop offset="1" stop-color="#FFA94A" stop-opacity="0"/></radialGradient><marker id="vhArrsm" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto" markerUnits="userSpaceOnUse"><path d="M0 0L10 5 0 10 2.5 5z" fill="#FFA94A"/></marker>
+          <clipPath id="vhBox"><rect x="1" y="1" width="358" height="208" rx="18"/></clipPath>
+          </defs>
+          <g clip-path="url(#vhBox)">
+          <rect width="360" height="210" fill="url(#vhSkysm)"/>
+          <g aria-hidden="true" fill="none" stroke="#E3C68A" stroke-width=".7" opacity=".2">
+          <circle cx="200" cy="150" r="190"/>
+          <ellipse cx="200" cy="150" rx="48" ry="190"/>
+          <ellipse cx="200" cy="150" rx="95" ry="190"/>
+          <ellipse cx="200" cy="150" rx="142" ry="190"/>
+          <ellipse cx="200" cy="25" rx="143" ry="17"/>
+          <ellipse cx="200" cy="87" rx="179" ry="22"/>
+          <ellipse cx="200" cy="150" rx="190" ry="23"/>
+          <ellipse cx="200" cy="213" rx="179" ry="22"/>
+          <ellipse cx="200" cy="275" rx="143" ry="17"/>
+          </g>
+          <g aria-hidden="true" fill="none" stroke-linecap="round">
+          <path d="M324.0 70.1Q264.5 71.0 238.9 106.2" stroke="#FFA94A" stroke-width="5" opacity=".12"/>
+          <path class="vh-flow" d="M324.0 70.1Q264.5 71.0 238.9 106.2" stroke="#FFA94A" stroke-width="1.7" stroke-dasharray="3 7" marker-end="url(#vhArrsm)"/>
+          <path d="M169.0 33.9Q177.8 87.6 208.4 110.7" stroke="#F4EFE7" stroke-width="5" opacity=".12"/>
+          <path class="vh-flow" d="M169.0 33.9Q177.8 87.6 208.4 110.7" stroke="#F4EFE7" stroke-width="1.7" stroke-dasharray="3 7" marker-end="url(#vhArrsm)"/>
+          <path d="M45.9 73.1Q144.0 58.1 208.9 110.2" stroke="#E3C68A" stroke-width="5" opacity=".12"/>
+          <path class="vh-flow" d="M45.9 73.1Q144.0 58.1 208.9 110.2" stroke="#E3C68A" stroke-width="1.7" stroke-dasharray="3 7" marker-end="url(#vhArrsm)"/>
+          <path d="M46.0 168.7Q140.9 179.5 207.6 136.0" stroke="#E3C68A" stroke-width="5" opacity=".12"/>
+          <path class="vh-flow" d="M46.0 168.7Q140.9 179.5 207.6 136.0" stroke="#E3C68A" stroke-width="1.7" stroke-dasharray="3 7" marker-end="url(#vhArrsm)"/>
+          </g>
+          <g aria-hidden="true">
+          <circle cx="330" cy="70" r="4.5" fill="#143023" stroke="#FFA94A" stroke-width="2"/><circle cx="330" cy="70" r="2" fill="#FFA94A"/>
+          <circle cx="168" cy="28" r="4.5" fill="#143023" stroke="#F4EFE7" stroke-width="2"/><circle cx="168" cy="28" r="2" fill="#F4EFE7"/>
+          <circle cx="40" cy="74" r="4.5" fill="#143023" stroke="#E3C68A" stroke-width="2"/><circle cx="40" cy="74" r="2" fill="#E3C68A"/>
+          <circle cx="40" cy="168" r="4.5" fill="#143023" stroke="#E3C68A" stroke-width="2"/><circle cx="40" cy="168" r="2" fill="#E3C68A"/>
+          </g>
+          <g font-family="'DM Sans',system-ui,sans-serif">
+          <text x="180" y="32" text-anchor="start" class="vh-map-l">CANADA</text>
+          <text x="18" y="58" text-anchor="start" class="vh-map-l">US CITIES</text>
+          <text x="344" y="52" text-anchor="end" class="vh-map-l">UK &amp; EUROPE</text>
+          <text x="28" y="194" text-anchor="start" class="vh-map-l">LATIN AMERICA</text>
+          </g>
+          <circle cx="226" cy="124" r="55" fill="url(#vhGlowsm)"/>
+          <circle class="vh-pulse" cx="226" cy="124" r="20" fill="none" stroke="#FFA94A" stroke-width="1.5" opacity=".7"/>
+          <g transform="translate(226 124) scale(0.78)"><path d="M0 14C-9 2-17-6-17-17a17 17 0 0 1 34 0C17-6 9 2 0 14z" fill="#FFA94A" stroke="#F4EFE7" stroke-width="2.5"/><circle cx="0" cy="-17" r="6.5" fill="#1E3A2C"/></g>
+          <text x="226" y="170" text-anchor="middle" class="vh-map-dest" font-family="'Cormorant Garamond',Georgia,serif" font-size="28" font-style="italic" font-weight="600">AMBAR</text>
+          </g>
+          <rect x="1" y="1" width="358" height="208" rx="18" fill="none" stroke="#C9A35A" stroke-width="1.5"/>
+          </svg>
       </figure>
     </div>
   </section>

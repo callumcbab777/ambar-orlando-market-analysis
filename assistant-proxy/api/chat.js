@@ -1,7 +1,7 @@
 /* AMBAR Orlando site assistant · serverless proxy (Vercel Node.js function).
    Holds the LLM API key in an environment variable, so the static GitHub Pages site never sees it.
    POST /api/chat  { messages:[{role:"user"|"assistant", content}],
-                     context:{ page, today, calendar_url, events:[], knowledge_ids:[], profile:{hotels,brands,events,prefs}, sections:[] } }
+                     context:{ page, today, calendar_url, events:[], knowledge_ids:[], profile:{hotels,brands,other_brand,events,prefs}, sections:[] } }
    → 200 { reply }   | 4xx/5xx { error }
    Grounding: the prompt is built here from ../knowledge.json (the site's own index, copied in by tools/build_knowledge.py),
    never from text the browser sends. The browser only names doc ids; ids that aren't in the index are dropped, and the
@@ -76,6 +76,7 @@ function sanitize(body) {
     scope: ["hotels", "events", "brands", "prefs"].includes(pr.scope) ? pr.scope : "all",
     hotels: [...new Set(words(pr.hotels, 20, 60))].filter((id) => L.hotels && Object.prototype.hasOwnProperty.call(L.hotels, id)),
     brands: [...new Set(words(pr.brands, 120, 60))].filter((id) => L.brands && Object.prototype.hasOwnProperty.call(L.brands, id)),
+    other_brand: typeof pr.other_brand === "string" ? clip(pr.other_brand, 60).replace(/[\n\r]/g, " ") : "",
     events: (Array.isArray(pr.events) ? pr.events : []).slice(0, 25).filter((e) => e && isVO(e.url)).map((e) => ({ title: clip(e.title, 160).replace(/[\n\r]/g, " "), start_date: iso(e.start_date), end_date: iso(e.end_date), url: clip(e.url, 300) })),
     prefs: pr.prefs && typeof pr.prefs === "object" ? {
       cats: words(pr.prefs.cats, 20, 40), areas: words(pr.prefs.areas, 20, 40), from: iso(pr.prefs.from), to: iso(pr.prefs.to),

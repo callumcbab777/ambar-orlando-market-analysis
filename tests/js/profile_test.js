@@ -68,4 +68,42 @@ t("isEmpty / counts", () => {
   assert.ok(P.isEmpty(P.empty()));
   assert.strictEqual(P.counts(P.normalise({ hotels: ["swan"], brands: ["westin"] })).total, 2);
 });
+t("Other brand: cleaned, capped at 60, saved, counted, merged", () => {
+  assert.strictEqual(P.cleanOther("  <b>Kimpton</b>\n  Hotels  "), "b Kimpton /b Hotels");
+  assert.strictEqual(P.cleanOther("Hôtel Café & Co. (Paris)"), "Hôtel Café & Co. (Paris)");
+  assert.strictEqual(P.cleanOther("javascript:alert(1)"), "javascript alert(1)");
+  assert.strictEqual(P.cleanOther("x".repeat(80)).length, 60);
+  assert.strictEqual(P.cleanOther(42), "");
+  const p = P.normalise({ other_brand: "  Omni   Hotels " });
+  assert.strictEqual(p.other_brand, "Omni Hotels");
+  assert.ok(!P.isEmpty(p));
+  assert.deepStrictEqual([P.counts(p).brands, P.counts(p).total], [1, 1]);
+  assert.strictEqual(P.merge({ other_brand: "Mine" }, { other_brand: "Theirs" }).other_brand, "Mine");
+  assert.strictEqual(P.merge({}, { other_brand: "Theirs" }).other_brand, "Theirs");
+});
+t("Other brand round-trips through the ?p= share link; junk is dropped", () => {
+  const enc = P.encode({ brands: ["westin"], other_brand: "Omni Hotels & Resorts" }, bIdx);
+  assert.ok(/~o[A-Za-z0-9_-]+/.test(enc), enc);
+  const d = P.decode(enc, { hotels, brands: bIdx });
+  assert.deepStrictEqual(d.profile.brands, ["westin"]);
+  assert.strictEqual(d.profile.other_brand, "Omni Hotels & Resorts");
+  assert.strictEqual(d.unknown, 0);
+  const bad = P.decode("o" + P.b64e("<<<>>>"), { brands: bIdx });
+  assert.strictEqual(bad.profile.other_brand, ""); assert.strictEqual(bad.unknown, 1);
+  const long = P.decode("o" + P.b64e("y".repeat(200)), { brands: bIdx });
+  assert.strictEqual(long.profile.other_brand.length, 60);
+});
+t("old profiles with removed brands (Accor, Four Seasons, Choice, Best Western) load without them", () => {
+  const removed = ["four-seasons-resort", "park-royal", "cambria", "ascend", "clarion", "comfort", "quality", "sleep-inn", "bw", "bw-plus"];
+  for (const id of removed) assert.ok(!bIdx.idToCode.has(id), id + " should no longer be in data/brands.json");
+  for (const pid of ["accor", "four-seasons", "choice", "best-western"]) assert.ok(!brands.parents.some((p) => p.id === pid), pid);
+  const store = { "ambar.profile.v1": JSON.stringify({ brands: ["westin", ...removed, "hampton"], hotels: ["swan"] }) };
+  const m = P.migrate((k) => store[k] ?? null);
+  assert.deepStrictEqual(m.profile.brands, ["westin", "hampton"]);
+  assert.strictEqual(P.counts(m.profile).total, 3);
+  /* old share links with their codes: dropped and counted, never shown */
+  const d = P.decode("bm5.f1.a1.c1.b2~hswan", { hotels, brands: bIdx });
+  assert.deepStrictEqual(d.profile.brands, ["westin"]);
+  assert.strictEqual(d.unknown, 4);
+});
 console.log(`profile: ${n} checks passed`);

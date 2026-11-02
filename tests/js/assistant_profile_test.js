@@ -143,5 +143,23 @@ t("retrieval: bare 'my hotel' questions get normal results, no profile docs", ()
       assert.ok(h.includes("Your favourite hotels (2)") && !/Thriller|Brands you know/.test(h), q + " → " + h);
     }
   });
+  t("Other brand: in the offline guide's brands answer, the proxy context and the profile docs", () => {
+    const B = loadAssistant({ hotels: [], brands: ["jw-marriott"], other_brand: "Omni Hotels", events: [], prefs: null });
+    const h = B.guideAnswer("what's in my profile").html;
+    assert.ok(/Brands you know:.*JW Marriott.*<b>Other<\/b>.*Omni Hotels/.test(h), h);
+    assert.strictEqual(B._profileContext("brands").other_brand, "Omni Hotels");
+    assert.strictEqual(B._profileContext("hotels").other_brand, "");
+    const only = loadAssistant({ hotels: [], brands: [], other_brand: "Omni Hotels", events: [], prefs: null });
+    assert.ok(/Omni Hotels/.test(only.guideAnswer("what's in my profile").html), "an Other-only profile is not empty");
+    const ix = K.createIndex(KNOW);
+    const docs = K.profileDocs(ix, { brands: ["jw-marriott"], other_brand: "<script>Omni</script>" }, "brands");
+    const d = docs.find((x) => x.id === "profile:brands");
+    assert.ok(d && /JW Marriott/.test(d.text) && /Other \(typed by the visitor.*\): script Omni \/script/.test(d.text), d && d.text);
+    assert.ok(!K.profileDocs(ix, { brands: [], other_brand: "Omni" }, "hotels").some((x) => x.id === "profile:brands"));
+  });
+  t("the index no longer lists the removed picker brands", () => {
+    const txt = JSON.stringify(KNOW);
+    for (const w of ["Accor", "Four Seasons", "Choice Hotels", "Best Western", "Park Royal", "Cambria", "Sleep Inn"]) assert.ok(!txt.includes(w), w);
+  });
   console.log(`assistant profile: ${n} checks passed`);
 })().catch((e) => { console.error(e); process.exit(1); });

@@ -2,7 +2,7 @@
   "as_of": "2026-10-31",
   "title": "Which hotel brands are you most familiar with?",
   "area": "Orlando area: hotels within about 30 miles of downtown Orlando, which covers Walt Disney World, Lake Buena Vista, Kissimmee, Celebration, International Drive, the airport, Winter Park, Altamonte Springs, Lake Mary and Sanford.",
-  "method": "Each brand is listed only if an official brand directory or official property page shows an open Orlando-area hotel, as of Oct 31, 2026. The example and source link are one such hotel, not the full list. Hilton and Loews pages were fetched directly; Marriott, Hyatt, IHG, Wyndham, Choice, Best Western, Accor, Four Seasons and Disney block automated fetches, so their official URLs were confirmed through search results. Brand names follow each company’s own naming; Marriott names match the brand matrix on this site.",
+  "method": "Each brand is listed only if an official brand directory or official property page shows an open Orlando-area hotel, as of Oct 31, 2026. The example and source link are one such hotel, not the full list. Hilton and Loews pages were fetched directly; Marriott, Hyatt, IHG, Wyndham and Disney block automated fetches, so their official URLs were confirmed through search results. Brand names follow each company’s own naming; Marriott names match the brand matrix on this site.",
   "parents": [
     {
       "id": "marriott",
@@ -585,116 +585,6 @@
         }
       ],
       "link": "https://www.universalorlando.com/web/en/us/places-to-stay"
-    },
-    {
-      "id": "four-seasons",
-      "name": "Four Seasons",
-      "blurb": "Four Seasons’ Orlando resort sits on Walt Disney World property.",
-      "brands": [
-        {
-          "id": "four-seasons-resort",
-          "code": "f1",
-          "name": "Four Seasons Hotels and Resorts",
-          "example": "Four Seasons Resort Orlando at Walt Disney World Resort",
-          "source_url": "https://www.fourseasons.com/orlando/",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        }
-      ]
-    },
-    {
-      "id": "accor",
-      "name": "Accor",
-      "blurb": "Accor manages one Orlando-area hotel under a partner brand.",
-      "brands": [
-        {
-          "id": "park-royal",
-          "code": "a1",
-          "name": "Park Royal Hotels (managed by Accor)",
-          "example": "Park Royal Orlando managed by Accor, Kissimmee",
-          "source_url": "https://all.accor.com/hotel/C4P2/index.en.shtml",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        }
-      ],
-      "note": "Fairmont Orlando has been announced but is not open, so it is not listed."
-    },
-    {
-      "id": "choice",
-      "name": "Choice Hotels",
-      "blurb": "Choice brands listed for Orlando on choicehotels.com.",
-      "brands": [
-        {
-          "id": "cambria",
-          "code": "c1",
-          "name": "Cambria Hotels",
-          "example": "Cambria Hotel Orlando Airport · Cambria Hotel Orlando Universal Blvd",
-          "source_url": "https://www.choicehotels.com/florida/orlando/cambria-hotels",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        },
-        {
-          "id": "ascend",
-          "code": "c2",
-          "name": "Ascend Hotel Collection",
-          "example": "Ascend Hotel Collection hotels listed for Orlando",
-          "source_url": "https://www.choicehotels.com/florida/orlando/ascend-hotels",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        },
-        {
-          "id": "clarion",
-          "code": "c3",
-          "name": "Clarion",
-          "example": "Clarion hotels listed for Orlando",
-          "source_url": "https://www.choicehotels.com/florida/orlando/clarion-hotels",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        },
-        {
-          "id": "comfort",
-          "code": "c4",
-          "name": "Comfort",
-          "example": "Comfort hotels listed for Orlando",
-          "source_url": "https://www.choicehotels.com/florida/orlando/hotels",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        },
-        {
-          "id": "quality",
-          "code": "c5",
-          "name": "Quality Inn",
-          "example": "Quality Inn hotels listed for Orlando",
-          "source_url": "https://www.choicehotels.com/florida/orlando/hotels",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        },
-        {
-          "id": "sleep-inn",
-          "code": "c6",
-          "name": "Sleep Inn",
-          "example": "Sleep Inn hotels listed for Orlando",
-          "source_url": "https://www.choicehotels.com/florida/orlando/sleep-inn-hotels",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        }
-      ],
-      "link": "https://www.choicehotels.com/florida/orlando/hotels"
-    },
-    {
-      "id": "best-western",
-      "name": "Best Western Hotels & Resorts",
-      "blurb": "Best Western brands with an Orlando-area hotel page on bestwestern.com.",
-      "brands": [
-        {
-          "id": "bw",
-          "code": "b1",
-          "name": "Best Western",
-          "example": "Best Western Orlando Gateway Hotel",
-          "source_url": "https://www.bestwestern.com/en_US/book/hotels-in-orlando/best-western-orlando-gateway-hotel/propertyCode.10380.html",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        },
-        {
-          "id": "bw-plus",
-          "code": "b2",
-          "name": "Best Western Plus",
-          "example": "Best Western Plus Universal Inn",
-          "source_url": "https://www.bestwestern.com/en_US/book/hotels-in-orlando/best-western-plus-universal-inn/propertyCode.10285.html",
-          "verified": "indexed official page (the site blocks automated fetches; URL confirmed in search results Oct 31, 2026)"
-        }
-      ]
     }
   ],
   "not_included": [
@@ -739,19 +629,15 @@
       "reason": "No hotel within about 30 miles of downtown Orlando on hilton.com’s Orlando brand pages."
     },
     {
-      "name": "Fairmont",
-      "parent": "Accor",
-      "reason": "Fairmont Orlando announced, not open."
-    },
-    {
-      "name": "SureStay",
-      "parent": "Best Western Hotels & Resorts",
-      "reason": "The Orlando SureStay Plus listed on bestwestern.com is being converted to another brand, so it is left out."
-    },
-    {
       "name": "Loews (as a separate parent)",
       "parent": "Loews Hotels",
       "reason": "Loews’ Orlando hotels are all at Universal Orlando Resort, so they are shown once, under Universal."
     }
-  ]
+  ],
+  "other": {
+    "label": "Other",
+    "prompt": "Brand not listed? Tell us.",
+    "placeholder": "Your favourite brand",
+    "max": 60
+  }
 }

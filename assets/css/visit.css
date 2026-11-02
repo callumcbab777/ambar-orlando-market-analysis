@@ -42,3 +42,18 @@
   .vh-drive-row [role=cell]:last-child{grid-column:1/-1}
   .vh-drive-row [role=cell]:nth-child(2)::after{content:" ";}
 }
+/* Hero route map (visit/index.html): an arch on desktop and tablet, a simpler wide card on phones */
+.vh-art .vh-map-sm{display:none}
+.vh-map-l{font-size:13px;font-weight:700;letter-spacing:.16em;fill:#E3C68A}
+.vh-map-s{font-size:11.5px;font-weight:500;letter-spacing:.02em;fill:#CFC7B3}
+.vh-map-sm .vh-map-l{font-size:10.5px;letter-spacing:.12em}
+.vh-map-dest{fill:#F4EFE7;letter-spacing:.02em}
+.vh-flow{animation:vhFlow 1.8s linear infinite}
+.vh-pulse{transform-box:fill-box;transform-origin:center;animation:vhPulse 2.8s ease-out infinite}
+@keyframes vhFlow{to{stroke-dashoffset:-20}}
+@keyframes vhPulse{0%{transform:scale(.7);opacity:.8}100%{transform:scale(1.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.vh-flow,.vh-pulse{animation:none}.vh-pulse{opacity:0}}
+@media (max-width:640px){
+  .vh-art .vh-map-lg{display:none}
+  .vh-art svg.vh-map-sm{display:block;height:auto;width:100%;filter:drop-shadow(0 18px 24px rgba(30,58,44,.22))}
+}

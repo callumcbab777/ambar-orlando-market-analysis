@@ -113,8 +113,9 @@
     if (!profile || typeof profile !== "object") return [];
     const out = [], L = ix.lookups || {};
     if (scope && scope !== "all") {
-      const only = { hotels: [], brands: [], events: [], prefs: null };
+      const only = { hotels: [], brands: [], other_brand: "", events: [], prefs: null };
       only[scope] = profile[scope];
+      if (scope === "brands") only.other_brand = profile.other_brand;
       profile = only;
     }
     const hotels = (Array.isArray(profile.hotels) ? profile.hotels : []).filter((id) => ix.byId.has("hotel:" + id));
@@ -124,11 +125,16 @@
       for (const id of hotels) out.push(ix.byId.get("hotel:" + id));
     }
     const brands = (Array.isArray(profile.brands) ? profile.brands : []).filter((id) => L.brands && L.brands[id]);
-    if (brands.length) {
+    /* the visitor's own "Other" brand: plain text only (letters, digits, simple punctuation), max 60 characters */
+    const other = typeof profile.other_brand === "string"
+      ? Array.from(profile.other_brand.normalize("NFKC").replace(/[^\p{L}\p{M}\p{N} &'’.,+()\/-]+/gu, " ").replace(/\s+/g, " ").trim()).slice(0, 60).join("").trim() : "";
+    if (brands.length || other) {
       const by = {};
       for (const id of brands) { const b = L.brands[id]; (by[b.parent] = by[b.parent] || []).push(b.name); }
+      const parts = Object.keys(by).map((p) => `${p}: ${by[p].join(", ")}`);
+      if (other) parts.push(`Other (typed by the visitor, not on this site's verified list): ${other}`);
       out.push({ id: "profile:brands", kind: "profile", title: "Hotel brands you know, from your profile", url: "profile/",
-        text: "Brands you marked as familiar: " + Object.keys(by).map((p) => `${p}: ${by[p].join(", ")}`).join("; ") + "." });
+        text: "Brands you marked as familiar: " + parts.join("; ") + "." });
     }
     const evs = profile.events && typeof profile.events === "object" ? (Array.isArray(profile.events) ? profile.events : Object.values(profile.events)) : [];
     const ev = evs.filter((e) => e && e.title).slice(0, 25);

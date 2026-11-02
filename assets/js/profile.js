@@ -22,6 +22,16 @@
   const TEXT_RE = /^[\p{L}\p{N} &'’,.\/()+:-]{1,60}$/u;
   const KW_RE = /^[\p{L}\p{N} '&-]{2,30}$/u;
   const VO_URL = /^https:\/\/www\.visitorlando\.com\//;
+  /* brands that were in the picker once and have since been removed (Accor, Four Seasons, Choice, Best Western):
+     dropped quietly from older saved profiles so counts and the share link stay right */
+  const RETIRED_BRANDS = new Set(["four-seasons-resort", "park-royal", "cambria", "ascend", "clarion", "comfort", "quality", "sleep-inn", "bw", "bw-plus"]);
+  /* "Other" brand typed by the visitor: plain text only, max 60 characters (letters, digits, spaces and & ' ’ . , - + ( ) /) */
+  const OTHER_MAX = 60;
+  function cleanOther(v) {
+    if (typeof v !== "string") return "";
+    const t = v.normalize("NFKC").replace(/[^\p{L}\p{M}\p{N} &'’.,+()\/-]+/gu, " ").replace(/\s+/g, " ").trim();
+    return Array.from(t).slice(0, OTHER_MAX).join("").trim();
+  }
   const str = (v, n) => (typeof v === "string" ? v.slice(0, n) : "");
   const uniq = (arr, re, max) => {
     const out = [];
@@ -72,14 +82,15 @@
       v: 1,
       events,
       hotels: uniq(p.hotels, HOTEL_ID, LIMITS.hotels),
-      brands: uniq(p.brands, BRAND_ID, LIMITS.brands),
+      brands: uniq((Array.isArray(p.brands) ? p.brands : []).filter((id) => !RETIRED_BRANDS.has(String(id ?? "").trim())), BRAND_ID, LIMITS.brands),
+      other_brand: cleanOther(p.other_brand),
       prefs: cleanPrefs(p.prefs),
       updated_at: str(p.updated_at, 40),
       ...(p.migrated_from ? { migrated_from: uniq(p.migrated_from, /^ambar\.[a-z.0-9]+$/, 4) } : {}),
     };
   }
   const empty = () => normalise({});
-  const isEmpty = (p) => !p.events.length && !p.hotels.length && !p.brands.length && !p.prefs;
+  const isEmpty = (p) => !p.events.length && !p.hotels.length && !p.brands.length && !p.other_brand && !p.prefs;
 
   /* ---------- migration from the events page's old keys ---------- */
   function parseJSON(s) { try { return s ? JSON.parse(s) : null; } catch (e) { return null; } }
@@ -96,9 +107,10 @@
     return { profile, migrated: from.length > 0 };
   }
 
-  /* ---------- compact share link: ?p=e<ids>~h<ids>~b<codes>~p<base64url prefs> ----------
+  /* ---------- compact share link: ?p=e<ids>~h<ids>~b<codes>~o<base64url other brand>~p<base64url prefs> ----------
      e: Visit Orlando event ids (digits) joined with "."   h: hotel ids from data/comps.json
-     b: short brand codes from data/brands.json            p: preferences as compact JSON, base64url
+     b: short brand codes from data/brands.json            o: the typed "Other" brand, base64url text
+     p: preferences as compact JSON, base64url
      Empty sections are left out. Everything is re-validated when the link is opened. */
   const b64e = (s) => {
     const bytes = typeof TextEncoder !== "undefined" ? new TextEncoder().encode(s) : Buffer.from(s, "utf8");
@@ -129,6 +141,7 @@
     if (p.hotels.length) parts.push("h" + p.hotels.join("."));
     const codes = bIdx ? p.brands.map((id) => bIdx.idToCode.get(id)).filter(Boolean) : [];
     if (codes.length) parts.push("b" + codes.join("."));
+    if (p.other_brand) parts.push("o" + b64e(p.other_brand));
     if (p.prefs) {
       const q = p.prefs, c = {};
       if (q.cats.length) c.c = q.cats;
@@ -147,7 +160,7 @@
      and counted. Returns { profile, unknown }. */
   function decode(s, known) {
     known = known || {};
-    const out = { events: [], hotels: [], brands: [], prefs: null };
+    const out = { events: [], hotels: [], brands: [], other_brand: "", prefs: null };
     let unknown = 0;
     const text = String(s || "").slice(0, LIMITS.link);
     for (const part of text.split("~")) {
@@ -168,6 +181,9 @@
             if (!out.brands.includes(id) && out.brands.length < LIMITS.brands) out.brands.push(id);
           }
         }
+      } else if (tag === "o") {
+        const t = cleanOther(b64d(body) || "");
+        if (t) out.other_brand = t; else unknown++;
       } else if (tag === "p") {
         const json = b64d(body);
         let c = null; try { c = json ? JSON.parse(json) : null; } catch (e) { c = null; }
@@ -175,7 +191,7 @@
         out.prefs = cleanPrefs({ cats: c.c, areas: c.a, from: c.f, to: c.t, budget: c.b === 1 ? "free" : "any", party: c.y, keywords: c.k, access: c.x === 1 });
       } else unknown++;
     }
-    return { profile: normalise({ events: out.events.map((id) => ({ id })), hotels: out.hotels, brands: out.brands, prefs: out.prefs }), unknown };
+    return { profile: normalise({ events: out.events.map((id) => ({ id })), hotels: out.hotels, brands: out.brands, other_brand: out.other_brand, prefs: out.prefs }), unknown };
   }
   function shareUrl(base, profile, bIdx) {
     const enc = encode(profile, bIdx);
@@ -192,12 +208,13 @@
       events,
       hotels: [...A.hotels, ...B.hotels.filter((h) => !A.hotels.includes(h))],
       brands: [...A.brands, ...B.brands.filter((x) => !A.brands.includes(x))],
+      other_brand: A.other_brand || B.other_brand,
       prefs: A.prefs || B.prefs,
     });
   }
-  const counts = (p) => ({ events: p.events.length, hotels: p.hotels.length, brands: p.brands.length, prefs: p.prefs ? 1 : 0, total: p.events.length + p.hotels.length + p.brands.length + (p.prefs ? 1 : 0) });
+  const counts = (p) => { const nb = p.brands.length + (p.other_brand ? 1 : 0); return { events: p.events.length, hotels: p.hotels.length, brands: nb, prefs: p.prefs ? 1 : 0, total: p.events.length + p.hotels.length + nb + (p.prefs ? 1 : 0) }; };
 
-  const core = { KEY, LEGACY, LIMITS, normalise, cleanPrefs, hasPrefs, migrate, encode, decode, shareUrl, merge, brandIndex, counts, empty, isEmpty, b64e, b64d };
+  const core = { KEY, LEGACY, LIMITS, OTHER_MAX, RETIRED_BRANDS, cleanOther, normalise, cleanPrefs, hasPrefs, migrate, encode, decode, shareUrl, merge, brandIndex, counts, empty, isEmpty, b64e, b64d };
 
   /* ---------- browser store ---------- */
   const ls = (() => { try { return root && root.localStorage ? root.localStorage : null; } catch (e) { return null; } })();
@@ -255,6 +272,7 @@
     toggleHotel: (id) => update((p) => { id = String(id); p.hotels = p.hotels.includes(id) ? p.hotels.filter((h) => h !== id) : [...p.hotels, id]; return p; }),
     hasBrand: (id) => read().brands.includes(String(id)),
     setBrands: (ids) => update((p) => { p.brands = ids; return p; }),
+    setOtherBrand: (text) => update((p) => { p.other_brand = cleanOther(text); return p; }),
     setPrefs: (prefs) => update((p) => { p.prefs = prefs; return p; }),
     clearPrefs: () => update((p) => { p.prefs = null; return p; }),
     clearAll: () => write(empty()),

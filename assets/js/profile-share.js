@@ -61,7 +61,10 @@
     if (hs.length) out.push({ key: "hotels", kicker: "Market landscape", heading: "Favourite hotels", entries: hs });
     const byParent = new Map();
     for (const id of profile.brands) { const b = d.brandById.get(id); if (!b) continue; if (!byParent.has(b.parent)) byParent.set(b.parent, []); byParent.get(b.parent).push(b); }
-    const bs = [...byParent.entries()].map(([parent, list]) => ({ title: parent, dates: `${list.length} brand${list.length === 1 ? "" : "s"}`, location: list.map((b) => b.name).join(", "), ambar: list.some((b) => b.ambar) }));
+    const bs = [...byParent.entries()].map(([parent, list]) => ({ title: parent, dates: `${list.length} brand${list.length === 1 ? "" : "s"}`, location: list.map((b) => b.name).join(", "), ambar: list.some((b) => b.ambar), n: list.length }));
+    /* the brand typed into "Other" (already cleaned by AMBAR_PROFILE); shown as the visitor wrote it, not verified */
+    const other = P.cleanOther ? P.cleanOther(profile.other_brand || "") : "";
+    if (other) bs.push({ title: "Other", dates: "1 brand · not on the list", location: other, other: true, n: 1 });
     if (bs.length) out.push({ key: "brands", kicker: "Hotel brands", heading: "Brands I know", note: `Brands with Orlando-area hotels, verified as of ${d.brands.as_of ? fMDY(d.brands.as_of) : "the date shown on the site"}.`, entries: bs });
     const pl = prefsLines(profile.prefs);
     if (pl.length) out.push({ key: "prefs", kicker: "Events", heading: "My preferences", entries: pl.map(([k, v]) => ({ title: v, dates: k })) });
@@ -76,7 +79,7 @@
     if (n("events")) bits.push(`${n("events")} event${n("events") === 1 ? "" : "s"}`);
     if (n("hotels")) bits.push(`${n("hotels")} hotel${n("hotels") === 1 ? "" : "s"}`);
     const nb = secs.find((s) => s.key === "brands");
-    if (nb) { const c = nb.entries.reduce((t, e) => t + Number(e.dates.split(" ")[0]), 0); bits.push(`${c} brand${c === 1 ? "" : "s"}`); }
+    if (nb) { const c = nb.entries.reduce((t, e) => t + (Number(e.n) || Number(e.dates.split(" ")[0]) || 0), 0); bits.push(`${c} brand${c === 1 ? "" : "s"}`); }
     if (n("prefs")) bits.push("preferences");
     return bits.join(" · ");
   }
