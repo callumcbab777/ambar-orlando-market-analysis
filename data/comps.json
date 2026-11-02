@@ -24,7 +24,7 @@
       "Key counts for Hyatt Regency Grand Cypress (779) and Wyndham Grand Bonnet Creek (400) are as provided by Callum Brown; Conrad Orlando (433) and ette (126) match their official fact sheets. Key counts for the Marriott hotels are not shown."
     ],
     "last_updated": "2026-11-02",
-    "built": "2026-11-02T08:19"
+    "built": "2026-11-02T08:40"
   },
   "tiers": [
     {
@@ -5686,6 +5686,51 @@
       "orlando": true,
       "category": "orlando",
       "url": "https://www.visitorlando.org/media/press-releases/post/from-pumpkin-patches-to-punk-rock-orlandos-fall-lineup-offers-something-for-every-traveler/"
+    },
+    {
+      "week": "2026-11-02",
+      "date": "2 Nov",
+      "headline": "Marriott International Q3 2026 beat-and-raise: worldwide RevPAR +6.5%, U.S. & Canada +7.4% (occ 73.9%, ADR $197.93). Adj. EPS $3.02 vs company guide $2.74–2.82 (consensus ~$2.84–2.86 [verify]); revenue $7.0bn (+8%); adj. EBITDA $1,512m (+12%). FY26 RevPAR raised to +4.5–5.0% (from +3.0–3.5%), adj. EPS $12.07–12.14; record pipeline 634k rooms. Shares ~+3% premarket.",
+      "source": "Marriott IR / PR Newswire",
+      "orlando": false,
+      "category": "marriott",
+      "url": "https://marriott.gcs-web.com/news-releases/news-release-details/marriott-international-reports-third-quarter-2026-results"
+    },
+    {
+      "week": "2026-11-02",
+      "date": "27 Oct",
+      "headline": "Accesso (Ovation developer) bought the 718-key Delta Hotels by Marriott Orlando Celebration (Kissimmee, near AMBAR) at “a significant discount to replacement cost”; Aimbridge to manage, Delta flag through 2042.",
+      "source": "GrowthSpotter / Orlando Business Journal",
+      "orlando": true,
+      "category": "orlando",
+      "url": "https://www.growthspotter.com/2026/10/27/ovation-developer-buys-neighboring-marriott-delta-hotel/"
+    },
+    {
+      "week": "2026-11-02",
+      "date": "As of 1 Nov",
+      "headline": "Chicago UNITE HERE Local 1 strike still unresolved at 8 hotels (3 Marriott brands: Sheraton Grand Riverwalk, Westin River North, Westin Michigan Ave).",
+      "source": "The Hoteliere / WTTW",
+      "orlando": false,
+      "category": "marriott",
+      "url": "https://www.thehoteliere.com/the-brands-report-the-owners-pay-for-the-picket-line/"
+    },
+    {
+      "week": "2026-11-02",
+      "date": "27–29 Oct",
+      "headline": "Peers: Hilton U.S. RevPAR +7.0% but Q4 guide only +3.0–3.5% (midterms, Middle East), leisure transient +1.6%; Hyatt U.S. RevPAR +8.2%.",
+      "source": "Hilton IR; Hyatt IR",
+      "orlando": false,
+      "category": "marriott",
+      "url": "https://ir.hilton.com/news-events/investor-news/detail/419/hilton-reports-third-quarter-results"
+    },
+    {
+      "week": "2026-11-02",
+      "date": "29 Oct",
+      "headline": "Gaylord Hotels x Coca-Cola holiday experiences: Coca-Cola Holiday Caravan at Gaylord Palms 23–26 Nov; ice! runs 13 Nov – 3 Jan.",
+      "source": "news.marriott.com",
+      "orlando": true,
+      "category": "orlando",
+      "url": "https://news.marriott.com/news/2026/10/29/gaylord-hotels-select-jw-marriott-resorts-and-the-coca-cola-company-bring-new-holiday-experiences-to-eight-resorts-nationwide"
     }
   ],
   "context": {
@@ -6004,39 +6049,137 @@
         "source": "disneyworld.disney.go.com; Mon 19 brief",
         "hotels": []
       }
+    ],
+    "2026-11-02": [
+      {
+        "dates": "Fri 6 – Wed 11 Nov",
+        "title": "ACR Convergence (American College of Rheumatology), OCCC West",
+        "type": "Convention",
+        "detail": "Citywide headline event of the week: 15,000+ attendees per ACR. Pre-meetings Fri 6–Sat 7; exhibit hall opens Sun 8 [hours verify]. Carries compression into Mon 9–Tue 10.",
+        "source": "rheumatology.org/meetings; Mon 2 Nov Marriott Orlando brief",
+        "hotels": []
+      },
+      {
+        "dates": "Fri 6 – Tue 10 Nov (sections Thu 5 – Fri 6)",
+        "title": "AMA House of Delegates Interim Meeting, HQ at Walt Disney World Swan & Dolphin",
+        "type": "Convention",
+        "detail": "Group rate $342 run of house per AMA travel page (cut-off 12 Oct); overflow Delta Marriott Orlando. Swan and Swan Reserve UNAV Fri–Sat; Dolphin Thu–Fri only tax-inclusive offers (excluded).",
+        "source": "ama-assn.org interim meeting travel page; Mon 2 Nov Marriott Orlando brief",
+        "hotels": [
+          "swan",
+          "dolphin",
+          "swan-reserve"
+        ]
+      },
+      {
+        "dates": "Sun 1 – Wed 4 Nov, then Thu 5 – Sat 7 Nov",
+        "title": "IWCS Cable & Connectivity Forum, then Airlift/Tanker Association Symposium, Gaylord Palms",
+        "type": "Group",
+        "detail": "Back-to-back groups at Gaylord; Wed–Thu UNAV in the rate table. A/TA registration listed 5–8 Nov [verify].",
+        "source": "wireworld.com; atalink.org; Mon 2 Nov Marriott Orlando brief",
+        "hotels": [
+          "gaylord-palms"
+        ]
+      },
+      {
+        "dates": "Fri 6 – Sun 8 Nov",
+        "title": "FSOMS Annual Meeting, Ritz-Carlton Orlando Grande Lakes",
+        "type": "Group",
+        "detail": "Small specialty meeting at the neighbouring Ritz [verify: third-party listing]; JW Grande Lakes spikes Mon–Tue and Sun.",
+        "source": "radissonfl.com event listing [verify]; Mon 2 Nov Marriott Orlando brief",
+        "hotels": [
+          "jw-grande-lakes"
+        ]
+      },
+      {
+        "dates": "Mon 2 – Thu 5 Nov",
+        "title": "Advanced Textiles Expo (OCCC West), DFI51 (Hyatt Regency Orlando), SMA (Hilton Buena Vista Palace, Wed 4 – Sat 7)",
+        "type": "Convention",
+        "detail": "Mid-size and small midweek groups on I-Drive and near Disney Springs; SMA HQ hotel sold out Wed.",
+        "source": "advancedtextilesexpo.com; dfi-events.org; sma2026orlando.dryfta.com",
+        "hotels": []
+      },
+      {
+        "dates": "Tue 3 Nov",
+        "title": "U.S. Election Day (midterms)",
+        "type": "Holiday",
+        "detail": "Leisure trough (cheapest Disney tickets of the week) yet the highest average OTA rate of the week across the set, driven by Conrad and Grande Lakes. Hilton cited midterms as a Q4 headwind.",
+        "source": "Mon 2 Nov Marriott Orlando brief",
+        "hotels": []
+      },
+      {
+        "dates": "Mon 2 – Sun 8 Nov",
+        "title": "Disney crowds: light Mon–Thu, building into the weekend",
+        "type": "Disney",
+        "detail": "SupaPark 4-park avg 3.3/10 (Thu 5 lightest at 2.5; Fri–Sun 3.8). Lightning Brain: Sat 7 busiest (6/10). EPCOT Food & Wine continues (ends 21 Nov).",
+        "source": "supapark.com; Lightning Brain week-ahead; disneyworld.disney.go.com",
+        "hotels": []
+      },
+      {
+        "dates": "Sat 7 Nov",
+        "title": "Disney Jollywood Nights opens (opening sold out)",
+        "type": "Disney",
+        "detail": "Hollywood Studios closes to day guests at 7pm.",
+        "source": "disneyworld.disney.go.com; wdwnt.com",
+        "hotels": []
+      },
+      {
+        "dates": "Sun 8 Nov",
+        "title": "Mickey's Very Merry Christmas Party opens (opening sold out [verify current])",
+        "type": "Disney",
+        "detail": "Magic Kingdom 7pm–midnight, $189–229.",
+        "source": "disneyworld.disney.go.com; wdwnt.com",
+        "hotels": []
+      },
+      {
+        "dates": "Fri 6 Nov",
+        "title": "Universal Nights at Epic Universe (tickets still available)",
+        "type": "Universal",
+        "detail": "From $179; unsold as of 29 Oct — soft Universal demand signal. HHN ended Sun 1; Holidays at Universal start 14 Nov.",
+        "source": "insidethemagic.net",
+        "hotels": []
+      },
+      {
+        "dates": "Fri 6 – Sun 8 Nov",
+        "title": "EDC Orlando, Tinker Field",
+        "type": "Other",
+        "detail": "Multi-day EDM festival drawing out-of-town visitors; attendance not confirmed [verify]. Magic vs Wizards home game Mon 2 (7:30pm); no UCF home game.",
+        "source": "orlando.edc.com; nba.com/magic",
+        "hotels": []
+      },
+      {
+        "dates": "As of Mon 2 Nov",
+        "title": "Wet start, dry weekend; no Florida tropical threat",
+        "type": "Weather",
+        "detail": "NWS Orange County: Mon 70% rain, Tue–Wed 50%, then dry Thu–Sat, highs mid 80s. NHC: subtropical low NE of the Bahamas, 20% at 7 days, no indicated Florida threat.",
+        "source": "forecast.weather.gov FLZ045; nhc.noaa.gov",
+        "hotels": []
+      }
     ]
   },
   "looking_ahead": [
     {
-      "dates": "Mon 2 Nov",
-      "title": "Marriott International Q3 2026 results",
-      "type": "Other",
-      "detail": "Before the open; earnings call 8:00am ET (Marriott IR). Consensus EPS ~$2.84 on ~$6.92bn revenue vs company Q3 guide $2.74–$2.82 [verify: MarketBeat].",
-      "source": "marriott.gcs-web.com IR release; MarketBeat preview [verify]",
+      "dates": "Mon 9 – Tue 10 Nov",
+      "title": "ACR Convergence and AMA HOD continue",
+      "type": "Convention",
+      "detail": "Compression carries past the weekend; ACR exhibit hall Mon 9–Tue 10 [hours verify].",
+      "source": "rheumatology.org; ama-assn.org",
       "hotels": []
     },
     {
-      "dates": "Sat 7 Nov",
-      "title": "Disney Jollywood Nights opens (opening sold out)",
-      "type": "Disney",
-      "detail": "Holiday hard-ticket season begins after Halloween week.",
-      "source": "wdwnt.com",
-      "hotels": []
-    },
-    {
-      "dates": "Sun 8 Nov",
-      "title": "Mickey's Very Merry Christmas Party opens (opening sold out)",
-      "type": "Disney",
-      "detail": "Magic Kingdom holiday parties start.",
-      "source": "wdwnt.com",
+      "dates": "Wed 11 Nov",
+      "title": "Veterans Day (midweek)",
+      "type": "Holiday",
+      "detail": "No long weekend; OCPS in session [verify].",
+      "source": "OCPS calendar [verify]",
       "hotels": []
     },
     {
       "dates": "13 Nov 2026 – 3 Jan 2027",
       "title": "ice! featuring The Polar Express at Gaylord Palms",
       "type": "Group",
-      "detail": "Holiday demand driver for Gaylord Palms from mid-November (carving under way as of mid-Oct).",
-      "source": "news.marriott.com (19 Oct 2026 ice! release)",
+      "detail": "Holiday demand driver for Gaylord Palms; Coca-Cola Holiday Caravan 23–26 Nov.",
+      "source": "news.marriott.com (19 and 29 Oct 2026 releases)",
       "hotels": [
         "gaylord-palms"
       ]
@@ -6045,8 +6188,16 @@
       "dates": "14 Nov 2026 – 3 Jan 2027",
       "title": "Holidays at Universal Orlando",
       "type": "Universal",
-      "detail": "Holiday season starts after HHN ends Sun 1 Nov.",
+      "detail": "Holiday season starts after the HHN-to-holidays gap week.",
       "source": "universalfamilyvacations.com / Universal Orlando news",
+      "hotels": []
+    },
+    {
+      "dates": "Tue 17 Nov",
+      "title": "Walt Disney Co. fiscal Q4 results",
+      "type": "Other",
+      "detail": "Before the open.",
+      "source": "investors.thewaltdisneycompany.com",
       "hotels": []
     }
   ],
@@ -6064,6 +6215,20 @@
       "value": "66.0%",
       "change": "+17.3% YoY; largest occupancy gain among the top 25 U.S. markets",
       "source": "CoStar via Asian Hospitality (Oct 12, 2026)"
+    },
+    {
+      "period": "Week ending Oct 10, 2026",
+      "metric": "Metro Orlando hotel occupancy",
+      "value": "67.3%",
+      "change": "−3.6% YoY; ADR $196.20",
+      "source": "Visit Orlando research (LinkedIn post) [verify primary release]"
+    },
+    {
+      "period": "Week ending Oct 17, 2026",
+      "metric": "Metro Orlando hotel occupancy",
+      "value": "76.5%",
+      "change": "+5.2% YoY; ADR $225.62; highest since April",
+      "source": "Visit Orlando research (cited in Mon 2 Nov brief) [verify primary release]"
     },
     {
       "period": "August 2026",
