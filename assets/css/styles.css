@@ -69,7 +69,6 @@ h3{font-size:1.45rem}
 .section-sub{color:var(--muted);margin:12px 0 0;font-size:1.02rem}
 .section-head.on-dark h2{color:var(--cream)}
 .section-head.on-dark .section-sub{color:#d7d0bf}
-.sub-title{margin:44px 0 16px;font-size:1.7rem}
 .fineprint{font-size:.82rem;color:var(--muted);margin:14px 0 0}
 .fineprint.on-dark{color:#bdb6a4}
 
@@ -93,6 +92,13 @@ h3{font-size:1.45rem}
 .legend .sw i{width:16px;height:12px;border-radius:3px;display:inline-block}
 
 /* Heatmap */
+.heat-wrap.is-condensed tr.wa-extra{display:none}
+.heat-more{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;margin:14px 0 0}
+.heat-more[hidden]{display:none}
+.heat-count{font-size:.84rem;color:var(--muted)}
+.btn-more{font:inherit;font-size:.92rem;font-weight:600;min-height:44px;padding:10px 22px;border-radius:999px;border:1px solid var(--forest);background:#fff;color:var(--forest);cursor:pointer;transition:background .2s,color .2s}
+.btn-more:hover{background:var(--forest);color:var(--cream)}
+@media (max-width:560px){.heat-more{flex-direction:column}.btn-more{width:100%}}
 .heat-wrap{overflow-x:auto;border-radius:var(--r);background:#fff;box-shadow:var(--shadow);border:1px solid var(--line)}
 table.heat{border-collapse:separate;border-spacing:4px;width:100%;min-width:860px;font-variant-numeric:tabular-nums}
 .heat th,.heat td{text-align:center}
@@ -128,18 +134,6 @@ table.heat{border-collapse:separate;border-spacing:4px;width:100%;min-width:860p
 .chip[aria-pressed="false"]{opacity:.45;background:transparent}
 .chart-card{margin:0;background:#fff;border-radius:var(--r);padding:20px 20px 16px;box-shadow:var(--shadow);border:1px solid var(--line)}
 .chart-box{position:relative;height:440px}
-.multiples{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-.mini{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 10px;box-shadow:var(--shadow);cursor:pointer;text-align:left;font:inherit;color:inherit;transition:transform .2s}
-.mini:hover{transform:translateY(-2px)}
-.mini h4{margin:0;font-family:var(--serif);font-size:1.15rem;font-weight:600;color:var(--forest);display:flex;align-items:center;gap:8px}
-.mini h4 i{width:10px;height:10px;border-radius:50%}
-.mini .m-brand{font-size:.72rem;color:var(--muted);letter-spacing:.04em}
-.mini .m-stats{display:flex;justify-content:space-between;align-items:baseline;margin:8px 0 2px;font-size:.78rem;color:var(--muted)}
-.mini .m-stats b{font-family:var(--serif);font-size:1.4rem;color:var(--ink);font-weight:600}
-.delta{font-weight:600;font-size:.78rem;padding:2px 8px;border-radius:999px;background:var(--lgrey)}
-.delta.up{color:#8a3a1c;background:#fbe2d6}
-.delta.down{color:var(--blue);background:#e1ecef}
-.mini canvas{width:100%!important;height:70px!important}
 
 /* Brand matrix */
 .matrix-toolbar{margin:-8px 0 20px}
@@ -275,7 +269,6 @@ table.heat{border-collapse:separate;border-spacing:4px;width:100%;min-width:860p
   .hotels-layout{grid-template-columns:1fr}
   .map-card{position:static}
   #map{height:440px}
-  .multiples{grid-template-columns:repeat(2,minmax(0,1fr))}
   .timeline{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:820px){
@@ -293,7 +286,7 @@ table.heat{border-collapse:separate;border-spacing:4px;width:100%;min-width:860p
 }
 @media (max-width:560px){
   .wrap{padding:0 16px}
-  .hotel-grid,.multiples,.timeline{grid-template-columns:1fr}
+  .hotel-grid,.timeline{grid-template-columns:1fr}
   .site-nav a{padding:8px 8px;font-size:.8rem}
   .hero-stats dd{font-size:1.7rem}
   .heat th.row{min-width:140px}
@@ -305,7 +298,7 @@ table.heat{border-collapse:separate;border-spacing:4px;width:100%;min-width:860p
 
 /* ---- refinements ---- */
 body,h1,h2,h3,h4,.hero-stats dd,.tier-label h3{font-variant-numeric:lining-nums}
-.heat,.hcard .latest b,.mini .m-stats b,.heat td.sum b,.mstat .v{font-variant-numeric:lining-nums tabular-nums}
+.heat,.hcard .latest b,.heat td.sum b,.mstat .v{font-variant-numeric:lining-nums tabular-nums}
 .leaflet-tile-pane{filter:saturate(.35) sepia(.18) brightness(1.03) contrast(.95)}
 .map-tools{display:flex;gap:6px;padding:8px 8px 0}
 .map-tools .seg-btn{border:1px solid var(--line);background:#fff;font-size:.8rem;padding:6px 12px}
@@ -326,12 +319,11 @@ body,h1,h2,h3,h4,.hero-stats dd,.tier-label h3{font-variant-numeric:lining-nums}
   .heat td.sum{min-width:90px}
 }
 /* numerals: Cormorant ships old-style figures, so data figures use DM Sans */
-.hero-stats dd,.heat thead th b,.heat td.sum b,.hcard .latest b,.mini .m-stats b,.mstat .v,.tip .t-rate,.heat tr.setrow .cell{font-family:var(--sans);font-weight:500;letter-spacing:-.01em}
+.hero-stats dd,.heat thead th b,.heat td.sum b,.hcard .latest b,.mstat .v,.tip .t-rate,.heat tr.setrow .cell{font-family:var(--sans);font-weight:500;letter-spacing:-.01em}
 .hero-stats dd{font-size:1.85rem;font-weight:400}
 .heat thead th b{font-size:1.1rem}
 .mstat .v{font-size:2.1rem;font-weight:400}
 .legend .sw i{border:1px solid #d5ccba}
-.delta.flat{color:var(--muted)}
 .hcard .hnote{font-size:.8rem;color:#4a4b42;margin:4px 0 6px;line-height:1.45}
 .hcard .hnote span{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--brown);font-weight:600;display:block}
 @media (max-width:820px){
@@ -342,7 +334,6 @@ body,h1,h2,h3,h4,.hero-stats dd,.tier-label h3{font-variant-numeric:lining-nums}
 .cap-note{margin:12px 0 0;padding:10px 14px;border-radius:10px;background:#FBF1E6;border:1px solid rgba(243,111,67,.25);font-size:.84rem;color:#4a3a2e;line-height:1.5}
 .cap-note strong{color:#8a3a1c}
 .cap-mark{color:var(--orange);font-size:.9em}
-.mini .m-cap{display:block;font-size:.7rem;color:#B4492A;font-weight:600;margin:2px 0 0}
 .pill-nm{background:#F4EFE7;border:1px dashed #B37D50;color:#6E2E1C}
 
 

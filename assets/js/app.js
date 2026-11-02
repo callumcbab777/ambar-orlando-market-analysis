@@ -114,6 +114,20 @@
 
   /* ---------- 2 week ahead ---------- */
   let selWeek;
+  /* Condensed list: the grid shows the first WA_TOP hotels (data/comps.json order, the same order the
+     grid has always used) and a 'See all hotels (N)' button expands it. JS adds the condensed class, so
+     without it every row stays visible. N comes from the data, so a weekly regeneration just works. */
+  const WA_TOP = 3;
+  let waExpanded = false;
+  function syncHeatToggle(show) {
+    const btn = $("#heatToggle"), wrap = $("#heatWrap"); if (!btn) return;
+    const can = show && H.length > WA_TOP;
+    btn.parentElement.hidden = !can;
+    wrap.classList.toggle("is-condensed", can && !waExpanded);
+    btn.setAttribute("aria-expanded", String(can && waExpanded));
+    btn.textContent = waExpanded ? "Show fewer" : `See all hotels (${H.length})`;
+    const note = $("#heatCount"); if (note) note.textContent = can ? (waExpanded ? `Showing all ${H.length} hotels` : `Showing ${WA_TOP} of ${H.length} hotels`) : "";
+  }
   function renderWeekAhead() {
     const tabs = $("#weekTabs");
     weeks.forEach((w) => {
@@ -126,6 +140,12 @@
     $("#heatLegend").innerHTML = `<span class="ramp">${money(s[0])}<span class="bar" style="background:linear-gradient(90deg,${STOPS.join(",")})"></span>${money(s[s.length - 1])}</span>
       <span class="sw"><i style="background:repeating-linear-gradient(135deg,#EEE7D9 0 3px,#E2D7C2 3px 6px);border:1px dashed #b8ab8d"></i>Unavailable (no public offer)</span>
       <span class="sw"><i style="background:#F1F1F1"></i>Not collected</span>`;
+    const more = el("div", { class: "heat-more" }, `<span class="heat-count" id="heatCount"></span><button type="button" class="btn-more" id="heatToggle" aria-controls="heatWrap" aria-expanded="false"></button>`);
+    $("#heatWrap").after(more);
+    $("#heatToggle").addEventListener("click", () => {
+      waExpanded = !waExpanded; syncHeatToggle(true);
+      if (!waExpanded) $("#heatToggle").scrollIntoView({ block: "nearest" });
+    });
     selectWeek(latest.week);
   }
 
@@ -137,15 +157,15 @@
     if (w.status === "missing") {
       $("#waSub").textContent = `${fLong(w.week)} – ${fLong(w.week_end)}`;
       wrap.innerHTML = `<div class="gap-panel"><h3>Week of ${fMD(w.week)}: not collected</h3><p>${esc(w.note)}</p><p>No figures are shown or estimated for this week.</p></div>`;
-      $("#heatFoot").textContent = ""; return;
+      $("#heatFoot").textContent = ""; syncHeatToggle(false); return;
     }
     const rs = ratesFor(wk), dates = weekDates(w), srcs = sourcesOf(rs);
     $("#waSub").innerHTML = `${wk === latest.week ? "Latest week" : "Week"} · ${fLong(w.week)} – ${fLong(w.week_end)}. Lowest public nightly rate observed, snapshot ${fLong(w.generated)} (${esc(srcs.join("; "))}).`;
     let html = `<table class="heat"><caption class="sr-only" style="position:absolute;left:-9999px">Lowest public nightly rates, week of ${fMD(wk)}</caption><thead><tr><th scope="col" class="row"><span>Hotel</span></th>`;
     dates.forEach((d) => { html += `<th scope="col" class="${d === todayISO ? "today" : ""}">${fDay(d)}<b>${fMD(d).split(" ")[1]}</b></th>`; });
     html += `<th scope="col" class="sumhead">Mean of<br>priced nights</th></tr></thead><tbody>`;
-    H.forEach((h) => {
-      html += `<tr><th scope="row" class="row"><strong>${esc(h.short)}</strong><span>${esc(h.brand)} · ${h.tier}</span></th>`;
+    H.forEach((h, i) => {
+      html += `<tr${i >= WA_TOP ? ' class="wa-extra"' : ""} data-rank="${i + 1}"><th scope="row" class="row"><strong>${esc(h.short)}</strong><span>${esc(h.brand)} · ${h.tier}</span></th>`;
       const row = dates.map((d) => rs.find((r) => r.hotel === h.id && r.date === d));
       row.forEach((r, i) => {
         if (!r) { html += `<td class="cell nc" tabindex="0" data-tip="">n/a</td>`; return; }
@@ -169,6 +189,7 @@
     const unav = rs.filter((r) => r.status === "UNAVAILABLE").length;
     html += `<td class="sum">${unav ? `<b>${unav}</b>unavailable nights` : ""}</td></tr></tbody></table>`;
     wrap.innerHTML = html;
+    syncHeatToggle(true);
     if (!$("#swipeHint")) wrap.before(el("p", { class: "swipe-hint", id: "swipeHint" }, "Swipe the grid sideways to see every night →"));
     wrap.querySelectorAll(".cell[data-tip]").forEach((c) => {
       const on = () => {
@@ -188,7 +209,7 @@
   }
 
   /* ---------- 3 history ---------- */
-  let chart, view = "nightly", showBand = true, capOn = true, CAP = null, minis = [];
+  let chart, view = "nightly", showBand = true, capOn = true, CAP = null;
   const CAP_SHAPE = "triangle";
   // Cap rule: 1.5 x the 95th percentile of all priced nights, rounded up to the next $250 (min $500).
   // With the current data: p95 = $658 -> cap = $1,000. Recomputed automatically as weeks are added.
@@ -285,7 +306,7 @@
     $("#toggleBand").addEventListener("click", (e) => { showBand = !showBand; e.currentTarget.setAttribute("aria-pressed", String(showBand)); updateChart(); });
     $("#allHotels").addEventListener("click", () => { H.forEach((h) => visible.add(h.id)); syncChips(); updateChart(); });
     $("#noHotels").addEventListener("click", () => { visible.clear(); syncChips(); updateChart(); });
-    $("#toggleCap").addEventListener("click", (e) => { capOn = !capOn; e.currentTarget.setAttribute("aria-pressed", String(capOn)); updateChart(); updateMinis(); });
+    $("#toggleCap").addEventListener("click", (e) => { capOn = !capOn; e.currentTarget.setAttribute("aria-pressed", String(capOn)); updateChart(); });
 
     Chart.defaults.font.family = "'DM Sans', system-ui, sans-serif"; Chart.defaults.color = "#5f5f55";
     const s = series();
@@ -317,39 +338,6 @@
     applyCapAxis(s);
     chart.update("none");
     updateCaption(s);
-
-    // small multiples
-    const box = $("#multiples");
-    const dates = allDates();
-    H.forEach((h) => {
-      const wm = weeks.map((w) => ({ w, m: mean(priced(DB.rates.filter((r) => r.week === w.week && r.hotel === h.id))) }));
-      const have = wm.filter((x) => x.m != null), last = have[have.length - 1], prev = have[have.length - 2];
-      const ch = last && prev ? (last.m / prev.m - 1) * 100 : null;
-      const card = el("button", { type: "button", class: "mini", "aria-label": `Show only ${h.short} in the main chart` },
-        `<h4><i style="background:${COLORS[h.id]}"></i>${esc(h.short)}</h4><span class="m-brand">${esc(h.brand)} · ${h.tier}</span>
-         <div class="m-stats"><span><b>${money(last?.m)}</b> w/c ${last ? fMD(last.w.week) : "—"}</span>
-         ${ch == null ? "" : Math.abs(ch) < 0.5 ? `<span class="delta flat" title="Change in weekly mean vs w/c ${fMD(prev.w.week)}">Flat vs ${fMD(prev.w.week)}</span>` : `<span class="delta ${ch > 0 ? "up" : "down"}" title="Change in weekly mean vs w/c ${fMD(prev.w.week)}">${ch > 0 ? "▲" : "▼"} ${Math.abs(ch).toFixed(0)}% vs ${fMD(prev.w.week)}</span>`}</div>
-         <canvas aria-hidden="true"></canvas>`);
-      card.addEventListener("click", () => { visible.clear(); visible.add(h.id); syncChips(); updateChart(); $("#history").scrollIntoView({ behavior: "smooth" }); });
-      box.appendChild(card);
-      const data = dates.map((d) => { const r = DB.rates.find((x) => x.hotel === h.id && x.date === d); return r && r.status === "OK" && Number(r.rate) > 0 ? r.rate : null; });
-      const mc = new Chart($("canvas", card), {
-        type: "line", data: { labels: dates, datasets: [{ data: capArr(data), borderColor: COLORS[h.id], borderWidth: 1.8, tension: 0.3, spanGaps: false, fill: false,
-          pointStyle: CAP_SHAPE, pointBackgroundColor: "#F36F43", pointBorderColor: "#fff", pointBorderWidth: 1,
-          pointRadius: (c) => (isCapped(data, c.dataIndex) ? 8 : 0), clip: 12 }] },
-        plugins: [gapPlugin, capPlugin],
-        options: { responsive: true, maintainAspectRatio: false, animation: false, events: [], layout: { padding: { top: 10 } }, plugins: { legend: { display: false }, tooltip: { enabled: false }, gapShade: { ranges: weeks.map((w, i) => w.status === "missing" ? [i * 7, i * 7 + 6, ""] : null).filter(Boolean) } },
-          scales: { x: { display: false }, y: { display: false, min: undefined, suggestedMin: undefined, max: miniMax() } } }
-      });
-      mc._raw = data; minis.push(mc);
-      const capped = data.filter((v) => v != null && v > capValue());
-      if (capped.length) card.querySelector(".m-stats").insertAdjacentHTML("afterend", `<span class="m-cap" data-capnote>▲ ${capped.length} night${capped.length > 1 ? "s" : ""} above ${money(capValue())} cap (max ${money(Math.max(...capped))})</span>`);
-    });
-  }
-  const miniMax = () => (capOn && anyAbove([priced(DB.rates)]) ? capValue() * 1.22 : Math.max(...priced(DB.rates)) * 1.02);
-  function updateMinis() {
-    minis.forEach((m) => { m.data.datasets[0].data = capArr(m._raw); m.options.scales.y.max = miniMax(); m.update("none"); });
-    document.querySelectorAll("[data-capnote]").forEach((n) => (n.hidden = !capOn));
   }
   function applyCapAxis(s) {
     const above = capOn && anyAbove([...s.per.filter((p) => visible.has(p.h.id)).map((p) => p.data), showBand ? s.max : []]);
