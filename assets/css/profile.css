@@ -138,3 +138,33 @@
 }
 .tc-share .btn{min-height:44px}
 .pf-prefs [hidden],.tc [hidden]{display:none!important}
+
+/* ---- Travel Concierge: chat-first entry ("Tell Isla about your trip") ---- */
+.tc-chat{flex:1 1 100%;display:grid;gap:8px}
+.tc-chat-form label{display:block;font-weight:600;color:#fff;margin:0 0 6px}
+.tc-chat-row{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+.tc-chat-row textarea{flex:1 1 320px;min-height:56px;font:inherit;font-size:1rem;line-height:1.45;color:var(--ink);background:var(--cream);border:2px solid transparent;border-radius:12px;padding:10px 14px;resize:vertical}
+.tc-chat-row textarea:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.tc-chat-row .btn{min-height:48px;min-width:44px;align-self:flex-end}
+.tc-cta .tc-hint{font-size:.88rem;color:rgba(244,239,231,.82);margin:6px 0 0}
+.tc-log{display:grid;gap:8px;max-height:240px;overflow:auto;padding:2px}
+.tc-msg{margin:0;padding:9px 13px;border-radius:14px;max-width:min(560px,92%);line-height:1.45}
+.tc-cta .tc-msg-me{justify-self:end;background:rgba(244,239,231,.16);color:#fff}
+.tc-cta .tc-msg-isla{justify-self:start;background:var(--cream);color:var(--ink)}
+.tc-cta .tc-filled{margin:0;font-weight:600;color:var(--gold-2)}
+.tc-cta .tc-filled:empty{display:none}
+.tp-set.tp-filled{box-shadow:0 0 0 3px var(--gold-2);background:rgba(201,163,90,.12);transition:box-shadow .3s,background .3s}
+@media (prefers-reduced-motion:reduce){.tp-set.tp-filled{transition:none}}
+
+/* ---- Generate (new version) + Keep my edits / Regenerate all ---- */
+.tc-genbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 18px}
+.tc-genbar #tcGen{min-height:48px;padding:12px 28px;font-weight:600}
+.tc-genbar .tc-hint{margin:0;color:var(--muted,#5b5b5b);font-size:.92rem}
+.tc-choice{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--cream);border:1px solid rgba(201,163,90,.6);border-radius:12px;padding:12px 16px}
+.tc-choice p{margin:0;flex:1 1 100%;font-weight:600}
+.tc-choice .btn,.tc-choice .ev-link-btn{min-height:44px}
+.tc-pin{display:inline-block;font-size:.74rem;font-weight:700;letter-spacing:.02em;color:var(--forest-3);background:rgba(201,163,90,.25);border-radius:999px;padding:1px 9px;margin:2px 0 4px}
+
+/* phones: room under the last itinerary item so nothing fixed sits on its buttons */
+@media (max-width:760px){.tc-days{padding-bottom:12px}#concierge{scroll-margin-top:70px}.tc-chat-row .btn{flex:1 1 100%}}
+.tc-cta .btn-solid{background:var(--amber);border-color:var(--amber);color:var(--dark);font-weight:600}

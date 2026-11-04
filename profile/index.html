@@ -101,6 +101,18 @@
           <p>Let Isla propose an itinerary for your upcoming trip. Share it with your family and plan it together.</p>
         </div>
         <button type="button" class="btn btn-gold tc-go" id="tcGo" aria-controls="concierge">Travel Concierge</button>
+        <div class="tc-chat" id="tcChat">
+          <div class="tc-log" id="tcLog" role="log" aria-live="polite" aria-label="Your chat with Isla" hidden></div>
+          <form class="tc-chat-form" id="tcChatForm" novalidate>
+            <label for="tcAsk">Tell Isla about your trip in your own words</label>
+            <div class="tc-chat-row">
+              <textarea id="tcAsk" rows="2" maxlength="600" autocomplete="off" aria-describedby="tcAskHint tcFilled" placeholder="We’re a family of 4 from Manchester, kids 3 and 6, a week in April, love theme parks and good food"></textarea>
+              <button type="submit" class="btn btn-solid" id="tcChatGo">Fill in my trip</button>
+            </div>
+            <p class="tc-hint" id="tcAskHint">Isla fills in the form below for you. Check it and change anything.</p>
+          </form>
+          <p class="tc-filled" id="tcFilled" aria-live="polite"></p>
+        </div>
       </aside>
       <form class="tp-form" id="tpForm" novalidate>
         <fieldset class="tp-set">
@@ -181,6 +193,16 @@
         <p><b>Shared with you.</b> Edit it here and share it back; it only joins your own profile if you save it.</p>
         <button type="button" class="btn btn-outline" id="tcKeep">Save to my profile</button>
       </div>
+      <div class="tc-genbar" id="tcGenBar" hidden>
+        <button type="button" class="btn btn-gold" id="tcGen" aria-describedby="tcGenHint">Generate</button>
+        <p class="tc-hint" id="tcGenHint">Each press gives a new version with different picks.</p>
+        <div class="tc-choice" id="tcChoice" role="group" aria-labelledby="tcChoiceQ" hidden>
+          <p id="tcChoiceQ">You’ve changed this plan. What should the new version do?</p>
+          <button type="button" class="btn btn-solid" id="tcKeepEdits">Keep my edits</button>
+          <button type="button" class="btn btn-outline" id="tcAll">Regenerate all</button>
+          <button type="button" class="ev-link-btn" id="tcChoiceX">Cancel</button>
+        </div>
+      </div>
       <p class="tc-ai" id="tcAi" hidden></p>
       <div class="tc-days" id="tcDays"></div>
       <p class="tc-tools">
@@ -240,6 +262,7 @@
 <script src="../assets/js/fav-hotels.js"></script>
 <script src="../assets/js/flights.js"></script>
 <script src="../assets/js/itinerary.js"></script>
+<script src="../assets/js/trip-parse.js"></script>
 <script src="../assets/js/profile-page.js" data-root="../"></script>
 <script src="../assets/js/concierge.js" data-root="../"></script>
 <script src="../assets/js/visit-cta.js"></script>

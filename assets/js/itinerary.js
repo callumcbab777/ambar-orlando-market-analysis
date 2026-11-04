@@ -1,7 +1,9 @@
 /* AMBAR Orlando · Travel Concierge itinerary: data model, rule-based generator and the share-link codec.
    Pure (no DOM); used by assets/js/concierge.js in the browser (window.AMBAR_ITIN) and by
    tests/js/itinerary_test.js in Node.
-   Model: { v:1, start:"YYYY-MM-DD", note:"", days:[ { items:[ { k, time, title, ref, note } ] } ] }
+   Model: { v:1, start:"YYYY-MM-DD", note:"", seed, days:[ { items:[ { k, time, title, ref, note, p } ] } ] }
+     seed: the variation number the plan was generated with (each Generate click uses a new one; kept in the share link)
+     p: true when the visitor edited, added or moved the item ("Keep my edits" carries these into a new version)
      k: f flight · h hotel stay · e Visit Orlando event · a AMBAR visit · v site page (visit / events / market)
         · d departure · c the visitor's own item
      time: "" | "am" | "pm" | "eve"
@@ -65,6 +67,7 @@
     if (REF_RE[k] && !REF_RE[k].test(ref)) ref = "";
     const it = { k: (REF_RE[k] && !ref) || (k === "v" && !ref) ? "c" : k, time: TIMES.includes(x.time) ? x.time : "", title: text(x.title, MAX.title), ref: "", note: text(x.note, MAX.note) };
     if (it.k !== "c" && it.k !== "a") it.ref = ref;
+    if (x.p === true || x.p === 1) it.p = true;
     if (it.k === "a" && !it.title) it.title = "Visit AMBAR · in-person tour";
     return it.title ? it : null;
   }
@@ -86,6 +89,7 @@
     if (!days.length) days.push({ items: [] });
     const it = { v: 1, start: ISO_RE.test(r.start || "") ? r.start : "", note: text(r.note, 600), days };
     if (r.ai === true && it.note) it.ai = true;
+    if (Number.isInteger(r.seed) && r.seed > 0 && r.seed < 2147483648) it.seed = r.seed;
     return ensureAmbar(it);
   }
   const ambarItem = () => ({ k: "a", time: "am", title: "Visit AMBAR · in-person tour", ref: "", note: "45 minutes at the sales center, 8701 W Irlo Bronson Memorial Hwy, Unit 108, Kissimmee. Pick a time on Calendly." });
@@ -113,6 +117,10 @@
   /* ---------- rule-based generator ---------- */
   const overlaps = (e, d) => e.start_date <= d && e.end_date >= d;
   const runDays = (e) => Math.round((parse(e.end_date) - parse(e.start_date)) / 864e5) + 1;
+  /* small seeded PRNG (mulberry32) so the same seed always gives the same plan */
+  function rng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  /* what a plan picked: event and hotel refs, used to steer the next version away from them */
+  function picksOf(it) { return it ? it.days.flatMap((d) => d.items).filter((x) => (x.k === "e" || x.k === "h") && x.ref).map((x) => x.k + ":" + x.ref) : []; }
   function eventScore(e, trip) {
     let s = 0;
     const cats = e.categories || [];
@@ -146,7 +154,7 @@
     const why = off && off.label ? `The nonstop from ${home} is ${off.label.replace(/^Seasonal/, "seasonal")}; ` : home && !keys.length ? `No nonstop from ${home} is listed on the visit page; ` : "";
     return { k: "f", time: "", title: home ? `Fly ${home} → MCO` : "Fly into Orlando (MCO)", ref, note: `${why}Google Flights shows the options for your dates.${home ? "" : " Add your home airport in My Preferences for a direct link."}` };
   }
-  function pickHotel(trip, favs, db) {
+  function pickHotel(trip, favs, db, rand, avoid) {
     const H = (db && db.hotels) || [];
     const fav = (favs || []).map((id) => H.find((h) => h.id === id)).filter(Boolean)[0];
     if (fav) return { h: fav, why: "Your favourite on the market page" };
@@ -154,9 +162,18 @@
     let pool = H.filter((h) => h.tier === tier);
     if (trip.interests && trip.interests.includes("parks") && pool.some((h) => h.on_disney_property)) pool = pool.filter((h) => h.on_disney_property);
     pool.sort((a, b) => (a.distance_to_epcot_mi ?? 99) - (b.distance_to_epcot_mi ?? 99) || a.name.localeCompare(b.name));
+    if (rand && pool.length > 1) {
+      /* a new version: one of the closest three, not the one the last version used when there is another */
+      const top = pool.slice(0, 3), fresh = top.filter((h) => !avoid.has("h:" + h.id));
+      const from = fresh.length ? fresh : top;
+      pool = [from[Math.floor(rand() * from.length)]];
+    }
     return pool[0] ? { h: pool[0], why: `A ${tier} hotel from the market page’s comp set${pool[0].on_disney_property ? ", on Walt Disney World property" : ""}` } : null;
   }
-  /* input: { trip, today, events:[], db (comps), favs:[hotel ids], flights (AMBAR_FLIGHTS) } */
+  /* input: { trip, today, events:[], db (comps), favs:[hotel ids], flights (AMBAR_FLIGHTS),
+              seed (optional: a new number per Generate click), avoid ([picksOf(previous plan)]), prefer ([event ids an AI chose]) }
+     Without a seed the plan is the plain best match (deterministic). With a seed, event choices get a small seeded shuffle and
+     anything the previous plan used ranks below fresh alternatives, so consecutive versions differ wherever the data allows. */
   function generate(input) {
     const trip = input.trip || {};
     const today = ISO_RE.test(input.today || "") ? input.today : iso(new Date());
@@ -167,9 +184,13 @@
     const slots = PACE_SLOTS[trip.pace] || PACE_SLOTS.balanced;
     const days = Array.from({ length: nDays }, () => ({ items: [] }));
     const F = input.flights;
+    const seed = Number.isInteger(input.seed) && input.seed > 0 ? input.seed : 0;
+    const rand = seed ? rng(seed) : null;
+    const avoid = new Set(input.avoid || []);
+    const prefer = (input.prefer || []).map(String);
     const fl = flightItem(trip, start, end, today, F);
     days[0].items.push({ ...fl, time: "am" });
-    const hp = pickHotel(trip, input.favs, input.db);
+    const hp = pickHotel(trip, input.favs, input.db, rand, avoid);
     if (hp) days[0].items.push({ k: "h", time: "pm", title: `Check in · ${hp.h.name}`, ref: hp.h.id, note: `${hp.why}. ${hp.h.area}. Rates and notes are on the hotel card.` });
     else days[0].items.push({ k: "v", time: "pm", title: "Choose where to stay", ref: "hotels", note: "Compare the hotels on the market page." });
     /* AMBAR visit: the morning of day 2 (day 1 on a one-day trip) */
@@ -188,7 +209,9 @@
       const room = Math.min(free().length, slots - (i === 0 ? Math.max(0, day.items.length - 1) : day.items.length));
       if (room <= 0) continue;
       const pool = evs.filter((e) => overlaps(e, date) && !used.has(String(e.id)))
-        .map((e) => ({ e, s: eventScore(e, trip) })).filter((x) => x.s > (i === nDays - 1 && nDays > 1 ? 1 : -5))
+        .map((e) => { const base = eventScore(e, trip); const pi = prefer.indexOf(String(e.id));
+          return { e, base, s: base + (pi >= 0 ? 8 - pi * 0.1 : 0) + (rand ? rand() * 2.5 : 0) - (avoid.has("e:" + e.id) ? 6 : 0) }; })
+        .filter((x) => x.base > (i === nDays - 1 && nDays > 1 ? 1 : -5))
         .sort((a, b) => b.s - a.s || runDays(a.e) - runDays(b.e) || String(a.e.title).localeCompare(String(b.e.title)));
       for (const { e } of pool.slice(0, room)) {
         const t = free()[0]; if (!t) break;
@@ -198,7 +221,7 @@
       /* no listings for this day in the site's events data: suggest by interest, pointing at site pages only */
       if (i > 0 && i <= lastFull && day.items.length < slots && free().length) {
         const ints = (trip.interests && trip.interests.length ? trip.interests : ["parks", "culture", "dining"]);
-        const pick = ints[(i + day.items.length) % ints.length];
+        const pick = ints[(i + day.items.length + (seed % ints.length)) % ints.length];
         const m = INTEREST_MAP[pick];
         if (pick === "parks" || pick === "culture" || pick === "sports" || pick === "nightlife" || pick === "nature" || pick === "shopping") {
           day.items.push({ k: "v", time: free()[0], title: `${m.label}: see what’s on`, ref: "events", note: `Browse the Visit Orlando listings on the events page for ${dayLabel(date)}. Listings cover the dates the site has collected.` });
@@ -213,19 +236,41 @@
     }
     const rank = { "": 0, am: 1, pm: 2, eve: 3 };
     for (const d of days) d.items.sort((a, b) => rank[a.time] - rank[b.time]);
-    const it = normalise({ v: 1, start, days, note: "" });
+    const it = normalise({ v: 1, start, days, note: "", seed: seed || undefined });
     return it;
   }
   const endDate = (it) => addDays(it.start, it.days.length - 1);
+  /* "Keep my edits": carry the visitor's pinned items (edited, added or moved) into a freshly generated version.
+     Each stays on the same day number (the last day if the new plan is shorter) and replaces a generated suggestion in the
+     same time slot; a generated item pointing at the same event or hotel is dropped so nothing appears twice. */
+  function keepEdits(fresh, old) {
+    const n = clone(fresh);
+    const pins = [];
+    (old && old.days ? old.days : []).forEach((d, di) => d.items.forEach((x) => { if (x.p) pins.push({ di, x }); }));
+    if (!pins.length) return normalise(n);
+    const refs = new Set(pins.filter((p) => p.x.ref).map((p) => p.x.k + ":" + p.x.ref));
+    for (const d of n.days) d.items = d.items.filter((x) => !(x.ref && refs.has(x.k + ":" + x.ref)));
+    if (pins.some((p) => p.x.k === "a")) for (const d of n.days) d.items = d.items.filter((x) => x.k !== "a");
+    for (const { di, x } of pins) {
+      const day = n.days[Math.min(di, n.days.length - 1)];
+      if (x.time) { const j = day.items.findIndex((y) => !y.p && y.time === x.time && (y.k === "e" || y.k === "v" || y.k === "c")); if (j >= 0) day.items.splice(j, 1); }
+      if (day.items.length >= MAX.items) { const j = day.items.findIndex((y) => !y.p && y.k !== "a"); if (j >= 0) day.items.splice(j, 1); }
+      day.items.push({ ...x });
+    }
+    const rank = { "": 0, am: 1, pm: 2, eve: 3 };
+    for (const d of n.days) d.items = d.items.map((x, i) => [x, i]).sort((a, b) => rank[a[0].time] - rank[b[0].time] || a[1] - b[1]).map((a) => a[0]);
+    return normalise(n);
+  }
+  const hasEdits = (it) => !!it && it.days.some((d) => d.items.some((x) => x.p));
 
   /* ---------- editing (pure; return a new itinerary) ---------- */
   const clone = (it) => JSON.parse(JSON.stringify(it));
-  function addItem(it, dayIdx, item) { const n = clone(it); const d = n.days[dayIdx]; const c = cleanItem({ ...item, k: item.k || "c" }); if (d && c && d.items.length < MAX.items) d.items.push(c); return normalise(n); }
+  function addItem(it, dayIdx, item) { const n = clone(it); const d = n.days[dayIdx]; const c = cleanItem({ ...item, k: item.k || "c", p: true }); if (d && c && d.items.length < MAX.items) d.items.push(c); return normalise(n); }
   function removeItem(it, dayIdx, i) { const n = clone(it); const d = n.days[dayIdx]; if (d && d.items[i] && d.items[i].k !== "a") d.items.splice(i, 1); return normalise(n); }
   function editItem(it, dayIdx, i, patch) {
     const n = clone(it); const d = n.days[dayIdx]; if (!d || !d.items[i]) return n;
     const cur = d.items[i];
-    const next = cleanItem({ ...cur, title: patch.title ?? cur.title, note: patch.note ?? cur.note, time: patch.time ?? cur.time });
+    const next = cleanItem({ ...cur, title: patch.title ?? cur.title, note: patch.note ?? cur.note, time: patch.time ?? cur.time, p: true });
     if (next) d.items[i] = next;
     return normalise(n);
   }
@@ -233,6 +278,7 @@
   function moveItem(it, dayIdx, i, dir) {
     const n = clone(it); const d = n.days[dayIdx]; if (!d || !d.items[i]) return { it: n, day: dayIdx, i };
     const [x] = d.items.splice(i, 1);
+    x.p = true;
     let nd = dayIdx, ni = i + dir;
     if (ni < 0) { if (dayIdx === 0) { d.items.splice(0, 0, x); return { it: n, day: 0, i: 0 }; } nd = dayIdx - 1; ni = n.days[nd].items.length; }
     else if (ni > d.items.length) { if (dayIdx === n.days.length - 1) { d.items.push(x); return { it: n, day: dayIdx, i: d.items.length - 1 }; } nd = dayIdx + 1; ni = 0; }
@@ -252,13 +298,14 @@
   /* ---------- share codec ---------- */
   function compact(it) {
     const n = normalise(it);
-    const o = { v: 1, s: n.start, d: n.days.map((d) => d.items.map((x) => { const a = [x.k, x.time, x.title, x.ref, x.note]; while (a.length > 3 && !a[a.length - 1]) a.pop(); return a; })) };
+    const o = { v: 1, s: n.start, d: n.days.map((d) => d.items.map((x) => { const a = [x.k, x.time, x.title, x.ref, x.note, x.p ? 1 : 0]; while (a.length > 3 && !a[a.length - 1]) a.pop(); return a; })) };
     if (n.note) { o.n = n.note; if (n.ai) o.ai = 1; }
+    if (n.seed) o.sd = n.seed;
     return o;
   }
   function expand(o) {
     if (!o || typeof o !== "object" || o.v !== 1 || !Array.isArray(o.d)) return null;
-    return normalise({ start: o.s, note: o.n, ai: o.ai === 1, days: o.d.map((d) => ({ items: (Array.isArray(d) ? d : []).map((a) => Array.isArray(a) ? { k: a[0], time: a[1], title: a[2], ref: a[3], note: a[4] } : null) })) });
+    return normalise({ start: o.s, note: o.n, ai: o.ai === 1, seed: o.sd, days: o.d.map((d) => ({ items: (Array.isArray(d) ? d : []).map((a) => Array.isArray(a) ? { k: a[0], time: a[1], title: a[2], ref: a[3], note: a[4], p: a[5] === 1 } : null) })) });
   }
   const isNode = typeof module === "object" && module.exports && typeof require === "function";
   const toB64u = (bytes) => {
@@ -315,5 +362,6 @@
   }
 
   return { CALENDLY, KINDS, TIMES, TIME_LABEL, MAX, PAGES, DRIVE, INTEREST_MAP, normalise, cleanItem, ensureAmbar, linkFor, generate, endDate,
-    addItem, removeItem, editItem, moveItem, addDay, removeDay, compact, expand, encode, decode, pdfSections, dayLabel, addDays, eventScore };
+    addItem, removeItem, editItem, moveItem, addDay, removeDay, compact, expand, encode, decode, pdfSections, dayLabel, addDays, eventScore,
+    picksOf, keepEdits, hasEdits, rng };
 });

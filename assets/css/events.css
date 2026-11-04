@@ -355,3 +355,47 @@
 @media (max-width:640px){.pl-teaser{grid-template-columns:1fr;padding:20px 18px}.pl-teaser .btn{width:100%;justify-content:center}}
 .pl-teaser h2 em{font-style:italic;color:var(--brown)}
 .pl-teaser-actions{margin:0}
+
+/* ---- "Ask Isla what's on" (Powered by Isla AI - ABI Group) ---- */
+.isla-btn{display:inline-flex;align-items:center;gap:12px;margin:16px 0 0;min-height:52px;padding:8px 20px 8px 10px;border-radius:999px;cursor:pointer;
+  font-family:var(--sans);text-align:left;color:var(--cream);background:linear-gradient(120deg,var(--forest-3),var(--blue));border:2px solid var(--gold);
+  box-shadow:0 8px 22px -10px rgba(20,48,35,.6)}
+.isla-btn:hover{border-color:var(--gold-2)}
+.isla-btn:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+.isla-spark{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--forest-3);font-size:1.15rem}
+.isla-btn-text{display:grid;line-height:1.2}
+.isla-btn-text b{font-size:1rem}
+.isla-btn-text small{font-size:.76rem;letter-spacing:.03em;color:var(--gold-2)}
+.isla-dlg{width:min(640px,calc(100vw - 32px));max-height:min(760px,calc(100vh - 48px));padding:0;border:0;border-radius:18px;background:var(--card);color:var(--ink);box-shadow:0 30px 80px -20px rgba(0,0,0,.45)}
+.isla-dlg::backdrop{background:rgba(20,48,35,.55)}
+.isla-inner{display:flex;flex-direction:column;gap:12px;padding:20px 22px;max-height:inherit;box-sizing:border-box}
+.isla-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.isla-head h2{margin:2px 0 0;font-family:var(--serif);font-size:1.8rem;color:var(--forest)}
+.isla-kicker{margin:0;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brown)}
+.isla-x{min-width:44px;min-height:44px;border:0;border-radius:50%;background:var(--lgrey);font-size:1.6rem;line-height:1;cursor:pointer;color:var(--ink)}
+.isla-x:focus-visible,.isla-chip:focus-visible,.isla-form input:focus-visible,.isla-evs a:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.isla-note{margin:0;font-size:.86rem;color:var(--muted)}
+.isla-log{flex:1 1 auto;overflow:auto;display:grid;gap:10px;min-height:0}
+.isla-log:empty{display:none}
+.isla-msg{border-radius:14px;padding:10px 14px}
+.isla-msg p{margin:0 0 6px}
+.isla-q{justify-self:end;background:var(--forest);color:var(--cream);max-width:85%}
+.isla-a{background:#fff;border:1px solid var(--line)}
+.isla-wait{color:var(--muted);font-style:italic}
+.isla-evs{list-style:none;margin:4px 0 6px;padding:0;display:grid;gap:8px}
+.isla-ev{display:grid;gap:2px}
+.isla-evs a{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--forest)}
+.isla-ev-meta{font-size:.85rem;color:var(--muted)}
+.isla-src{font-size:.75rem;color:var(--grey);margin:4px 0 0!important}
+.isla-sugg{display:flex;flex-wrap:wrap;gap:8px}
+.isla-chip{min-height:44px;padding:8px 14px;border-radius:999px;border:1px solid var(--gold);background:var(--cream);color:var(--forest-3);font:inherit;font-size:.9rem;cursor:pointer;text-align:left}
+.isla-chip:hover{background:var(--gold-2)}
+.isla-form{display:flex;gap:8px}
+.isla-form input{flex:1;min-height:48px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);font:inherit;font-size:1rem}
+.isla-form .btn{min-height:48px;min-width:72px}
+html.isla-open{overflow:hidden}
+@media (max-width:640px){
+  .isla-dlg{width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;margin:0;border-radius:0}
+  .isla-inner{height:100%;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+  .isla-btn{width:100%}
+}

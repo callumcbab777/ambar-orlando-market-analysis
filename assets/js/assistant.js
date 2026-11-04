@@ -277,10 +277,9 @@
   document.body.appendChild(launcher);
   document.body.appendChild(panel);
   /* Phones: the floating launcher steps aside while it would sit on top of a box marked data-as-avoid (the main
-     page's hero median box) and comes back as soon as you scroll past it. Nothing else moves. */
+     page's hero median box, the Travel Concierge edit buttons) and comes back as soon as you scroll past it. Nothing else moves. */
   (function tuck() {
-    const avoid = [...document.querySelectorAll("[data-as-avoid]")];
-    if (!avoid.length || !window.matchMedia) return;
+    if (!window.matchMedia) return; /* the boxes are looked up on every check: the itinerary's edit buttons are re-rendered */
     const mq = window.matchMedia("(max-width: 640px)");
     let raf = 0;
     const check = () => {
@@ -288,7 +287,7 @@
       let hit = false;
       if (mq.matches && !launcher.hidden) {
         const l = launcher.getBoundingClientRect();
-        hit = avoid.some((el) => { const r = el.getBoundingClientRect(); return r.bottom > l.top - 8 && r.top < l.bottom + 8 && r.right > l.left && r.left < l.right; });
+        hit = [...document.querySelectorAll("[data-as-avoid]")].some((el) => { const r = el.getBoundingClientRect(); return r.bottom > l.top - 8 && r.top < l.bottom + 8 && r.right > l.left && r.left < l.right; });
       }
       if (hit && document.activeElement === launcher) hit = false;
       launcher.classList.toggle("as-tucked", hit);
@@ -296,6 +295,7 @@
     const later = () => { if (!raf) raf = requestAnimationFrame(check); };
     addEventListener("scroll", later, { passive: true });
     addEventListener("resize", later);
+    document.addEventListener("ambar:layout", later);
     if (mq.addEventListener) mq.addEventListener("change", later);
     check(); setTimeout(check, 600);
   })();

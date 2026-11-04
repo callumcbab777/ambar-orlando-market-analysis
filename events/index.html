@@ -48,6 +48,10 @@
           <a class="btn evh-btn" href="#events">See all events</a>
           <a class="btn evh-btn-line" href="../visit/">Plan your visit</a>
         </div>
+        <button type="button" class="isla-btn" id="evIslaBtn" aria-haspopup="dialog" aria-controls="evIsla">
+          <span class="isla-spark" aria-hidden="true">✦</span>
+          <span class="isla-btn-text"><b>Ask Isla what’s on</b><small>Powered by Isla AI - ABI Group</small></span>
+        </button>
       </div>
       <figure class="evh-art" aria-hidden="true">
         <svg viewBox="0 0 480 560" preserveAspectRatio="xMidYMid slice" role="presentation" focusable="false">
@@ -267,12 +271,39 @@
   </div>
 </footer>
 
+<dialog class="isla-dlg" id="evIsla" aria-labelledby="evIslaTitle" aria-describedby="evIslaNote">
+  <div class="isla-inner">
+    <header class="isla-head">
+      <div>
+        <p class="isla-kicker">Powered by Isla AI - ABI Group</p>
+        <h2 id="evIslaTitle">Ask Isla what’s on</h2>
+      </div>
+      <button type="button" class="isla-x" id="evIslaX" aria-label="Close Ask Isla">×</button>
+    </header>
+    <p class="isla-note" id="evIslaNote"></p>
+    <div class="isla-log" id="evIslaLog" role="log" aria-live="polite" aria-label="Isla’s answers"></div>
+    <div class="isla-sugg" id="evIslaSugg" role="group" aria-label="Suggested questions">
+      <button type="button" class="isla-chip">What’s best for families with little children?</button>
+      <button type="button" class="isla-chip">Any concerts this weekend?</button>
+      <button type="button" class="isla-chip">Something for a couple next week</button>
+      <button type="button" class="isla-chip">Free things to do this month</button>
+    </div>
+    <form class="isla-form" id="evIslaForm" novalidate>
+      <label for="evIslaQ" class="sr-only">Your question about Orlando events</label>
+      <input id="evIslaQ" type="text" maxlength="300" autocomplete="off" placeholder="Ask about dates, who’s coming or what you like">
+      <button type="submit" class="btn btn-gold">Ask</button>
+    </form>
+  </div>
+</dialog>
+
 <script src="../data/visitorlando_events.js"></script>
 <script src="../assets/js/events-core.js"></script>
 <script src="../assets/js/profile.js"></script>
 <script src="../assets/js/profile-share.js"></script>
 <script src="../assets/js/events-pdf.js"></script>
 <script src="../assets/js/events.js"></script>
+<script src="../assets/js/events-ask.js"></script>
+<script src="../assets/js/events-isla.js"></script>
 <script src="../assets/js/visit-cta.js"></script>
 <script src="../assets/js/nav.js"></script>
 <script src="../assets/js/assistant-config.js"></script>
