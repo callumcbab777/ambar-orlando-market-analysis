@@ -17,7 +17,8 @@
   const HOTEL_ID = /^[a-z0-9][a-z0-9-]{0,47}$/;
   const BRAND_ID = /^[a-z0-9][a-z0-9-]{0,47}$/;
   const BRAND_CODE = /^[a-z][0-9a-f]{1,2}$/;
-  const LIMITS = { events: 60, hotels: 20, brands: 120, link: 3000 };
+  /* link: the whole ?p= value. A Travel Concierge itinerary (tag i, compressed by assets/js/itinerary.js) can add a few KB. */
+  const LIMITS = { events: 60, hotels: 20, brands: 120, link: 9000 };
   const PARTY = ["any", "solo", "couple", "group", "family"];
   const TEXT_RE = /^[\p{L}\p{N} &'’,.\/()+:-]{1,60}$/u;
   const KW_RE = /^[\p{L}\p{N} '&-]{2,30}$/u;
@@ -25,6 +26,34 @@
   /* brands that were in the picker once and have since been removed (Accor, Four Seasons, Choice, Best Western):
      dropped quietly from older saved profiles so counts and the share link stay right */
   const RETIRED_BRANDS = new Set(["four-seasons-resort", "park-royal", "cambria", "ascend", "clarion", "comfort", "quality", "sleep-inn", "bw", "bw-plus"]);
+  /* trip preferences (My Profile > My Preferences), used by the Travel Concierge */
+  const PACE = ["relaxed", "balanced", "packed"];
+  const BUDGET_FEEL = ["value", "comfort", "luxury"];
+  const INTERESTS = ["parks", "golf", "dining", "nightlife", "shopping", "nature", "wellness", "sports", "culture"];
+  const ACCESS = ["step-free", "limited-walking", "sensory", "stroller", "hearing", "sight"];
+  const IATA_RE = /^[A-Z]{3}$/;
+  const int = (v, lo, hi) => { const n = Number(v); return Number.isInteger(n) && n >= lo && n <= hi ? n : null; };
+  function cleanTrip(t) {
+    if (!t || typeof t !== "object") return null;
+    const adults = int(t.adults, 1, 12) ?? 2;
+    const kids = int(t.kids, 0, 10) ?? 0;
+    const ages = (Array.isArray(t.kid_ages) ? t.kid_ages : []).map((a) => int(a, 0, 17)).filter((a) => a !== null).slice(0, kids);
+    const out = {
+      adults, kids, kid_ages: ages,
+      pace: PACE.includes(t.pace) ? t.pace : "",
+      interests: INTERESTS.filter((i) => Array.isArray(t.interests) && t.interests.includes(i)),
+      budget: BUDGET_FEEL.includes(t.budget) ? t.budget : "",
+      from: ISO_RE.test(t.from || "") ? t.from : "",
+      nights: int(t.nights, 1, 21) ?? 0,
+      home: IATA_RE.test(String(t.home || "").toUpperCase()) ? String(t.home).toUpperCase() : "",
+      access: ACCESS.filter((a) => Array.isArray(t.access) && t.access.includes(a)),
+      access_note: cleanOther(t.access_note),
+    };
+    return hasTrip(out) ? out : null;
+  }
+  function hasTrip(t) {
+    return !!t && !!(t.adults !== 2 || t.kids || t.pace || t.interests.length || t.budget || t.from || t.nights || t.home || t.access.length || t.access_note);
+  }
   /* "Other" brand typed by the visitor: plain text only, max 60 characters (letters, digits, spaces and & ' ’ . , - + ( ) /) */
   const OTHER_MAX = 60;
   function cleanOther(v) {
@@ -85,12 +114,13 @@
       brands: uniq((Array.isArray(p.brands) ? p.brands : []).filter((id) => !RETIRED_BRANDS.has(String(id ?? "").trim())), BRAND_ID, LIMITS.brands),
       other_brand: cleanOther(p.other_brand),
       prefs: cleanPrefs(p.prefs),
+      trip: cleanTrip(p.trip),
       updated_at: str(p.updated_at, 40),
       ...(p.migrated_from ? { migrated_from: uniq(p.migrated_from, /^ambar\.[a-z.0-9]+$/, 4) } : {}),
     };
   }
   const empty = () => normalise({});
-  const isEmpty = (p) => !p.events.length && !p.hotels.length && !p.brands.length && !p.other_brand && !p.prefs;
+  const isEmpty = (p) => !p.events.length && !p.hotels.length && !p.brands.length && !p.other_brand && !p.prefs && !p.trip;
 
   /* ---------- migration from the events page's old keys ---------- */
   function parseJSON(s) { try { return s ? JSON.parse(s) : null; } catch (e) { return null; } }
@@ -110,7 +140,9 @@
   /* ---------- compact share link: ?p=e<ids>~h<ids>~b<codes>~o<base64url other brand>~p<base64url prefs> ----------
      e: Visit Orlando event ids (digits) joined with "."   h: hotel ids from data/comps.json
      b: short brand codes from data/brands.json            o: the typed "Other" brand, base64url text
-     p: preferences as compact JSON, base64url
+     p: preferences as compact JSON, base64url       t: trip preferences as compact JSON, base64url
+     i: a Travel Concierge itinerary, compressed by assets/js/itinerary.js; carried through untouched here
+        (decode returns it as .itinerary for AMBAR_ITIN.decode to validate)
      Empty sections are left out. Everything is re-validated when the link is opened. */
   const b64e = (s) => {
     const bytes = typeof TextEncoder !== "undefined" ? new TextEncoder().encode(s) : Buffer.from(s, "utf8");
@@ -154,13 +186,30 @@
       if (q.access) c.x = 1;
       parts.push("p" + b64e(JSON.stringify(c)));
     }
+    if (p.trip) parts.push("t" + b64e(JSON.stringify(tripCompact(p.trip))));
     return parts.join("~");
   }
+  function tripCompact(q) {
+    const c = {};
+    if (q.adults !== 2) c.a = q.adults;
+    if (q.kids) { c.k = q.kids; if (q.kid_ages.length) c.g = q.kid_ages; }
+    if (q.pace) c.p = q.pace;
+    if (q.interests.length) c.i = q.interests;
+    if (q.budget) c.b = q.budget;
+    if (q.from) c.f = q.from;
+    if (q.nights) c.n = q.nights;
+    if (q.home) c.h = q.home;
+    if (q.access.length) c.x = q.access;
+    if (q.access_note) c.xn = q.access_note;
+    return c;
+  }
+  const tripFromCompact = (c) => cleanTrip({ adults: c.a ?? 2, kids: c.k, kid_ages: c.g, pace: c.p, interests: c.i, budget: c.b, from: c.f, nights: c.n, home: c.h, access: c.x, access_note: c.xn });
   /* known: { events?: Set|Map of ids, hotels?: Set, brands?: brandIndex } — unknown or malformed items are dropped
      and counted. Returns { profile, unknown }. */
   function decode(s, known) {
     known = known || {};
-    const out = { events: [], hotels: [], brands: [], other_brand: "", prefs: null };
+    const out = { events: [], hotels: [], brands: [], other_brand: "", prefs: null, trip: null };
+    let itinerary = "";
     let unknown = 0;
     const text = String(s || "").slice(0, LIMITS.link);
     for (const part of text.split("~")) {
@@ -189,12 +238,21 @@
         let c = null; try { c = json ? JSON.parse(json) : null; } catch (e) { c = null; }
         if (!c || typeof c !== "object" || Array.isArray(c)) { unknown++; continue; }
         out.prefs = cleanPrefs({ cats: c.c, areas: c.a, from: c.f, to: c.t, budget: c.b === 1 ? "free" : "any", party: c.y, keywords: c.k, access: c.x === 1 });
+      } else if (tag === "t") {
+        const json = b64d(body);
+        let c = null; try { c = json ? JSON.parse(json) : null; } catch (e) { c = null; }
+        if (!c || typeof c !== "object" || Array.isArray(c)) { unknown++; continue; }
+        out.trip = tripFromCompact(c);
+      } else if (tag === "i") {
+        if (/^[jz][A-Za-z0-9_-]{1,8000}$/.test(body)) itinerary = body; else unknown++;
       } else unknown++;
     }
-    return { profile: normalise({ events: out.events.map((id) => ({ id })), hotels: out.hotels, brands: out.brands, other_brand: out.other_brand, prefs: out.prefs }), unknown };
+    return { profile: normalise({ events: out.events.map((id) => ({ id })), hotels: out.hotels, brands: out.brands, other_brand: out.other_brand, prefs: out.prefs, trip: out.trip }), unknown, itinerary };
   }
-  function shareUrl(base, profile, bIdx) {
-    const enc = encode(profile, bIdx);
+  /* extra: an already-encoded itinerary token ("j…" or "z…") appended as ~i… */
+  function shareUrl(base, profile, bIdx, extra) {
+    let enc = encode(profile, bIdx);
+    if (extra && /^[jz][A-Za-z0-9_-]+$/.test(extra)) enc = (enc ? enc + "~" : "") + "i" + extra;
     const u = String(base).split("#")[0].split("?")[0];
     return enc ? `${u}?p=${enc}` : u;
   }
@@ -210,11 +268,12 @@
       brands: [...A.brands, ...B.brands.filter((x) => !A.brands.includes(x))],
       other_brand: A.other_brand || B.other_brand,
       prefs: A.prefs || B.prefs,
+      trip: A.trip || B.trip,
     });
   }
-  const counts = (p) => { const nb = p.brands.length + (p.other_brand ? 1 : 0); return { events: p.events.length, hotels: p.hotels.length, brands: nb, prefs: p.prefs ? 1 : 0, total: p.events.length + p.hotels.length + nb + (p.prefs ? 1 : 0) }; };
+  const counts = (p) => { const nb = p.brands.length + (p.other_brand ? 1 : 0); const np = (p.prefs ? 1 : 0) + (p.trip ? 1 : 0); return { events: p.events.length, hotels: p.hotels.length, brands: nb, prefs: np, total: p.events.length + p.hotels.length + nb + np }; };
 
-  const core = { KEY, LEGACY, LIMITS, OTHER_MAX, RETIRED_BRANDS, cleanOther, normalise, cleanPrefs, hasPrefs, migrate, encode, decode, shareUrl, merge, brandIndex, counts, empty, isEmpty, b64e, b64d };
+  const core = { KEY, LEGACY, LIMITS, OTHER_MAX, RETIRED_BRANDS, cleanOther, normalise, cleanPrefs, hasPrefs, cleanTrip, hasTrip, PACE, BUDGET_FEEL, INTERESTS, ACCESS, migrate, encode, decode, shareUrl, merge, brandIndex, counts, empty, isEmpty, b64e, b64d };
 
   /* ---------- browser store ---------- */
   const ls = (() => { try { return root && root.localStorage ? root.localStorage : null; } catch (e) { return null; } })();
@@ -275,6 +334,8 @@
     setOtherBrand: (text) => update((p) => { p.other_brand = cleanOther(text); return p; }),
     setPrefs: (prefs) => update((p) => { p.prefs = prefs; return p; }),
     clearPrefs: () => update((p) => { p.prefs = null; return p; }),
+    setTrip: (trip) => update((p) => { p.trip = trip; return p; }),
+    clearTrip: () => update((p) => { p.trip = null; return p; }),
     clearAll: () => write(empty()),
     counts: (p) => counts(p || read()),
     paintCounts,

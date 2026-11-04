@@ -26,7 +26,7 @@
     const brands = window.AMBAR_BRANDS || { parents: [] };
     const brandById = new Map();
     for (const p of brands.parents) for (const b of p.brands) brandById.set(b.id, { ...b, parent: p.name, parentId: p.id });
-    return { ev, hotels, brands, brandById, bIdx: P.brandIndex(brands) };
+    return { ev, hotels, brands, brandById, bIdx: P.brandIndex(brands), db: window.COMPS_DATA || null };
   }
   const D = (iso) => new Date(iso + "T12:00:00");
   const fMD = (iso) => D(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -47,6 +47,23 @@
     if (p.access) out.push(["Accessibility", "Prefer accessibility-focused listings"]);
     return out;
   }
+  /* trip preferences (My Preferences), shown with the event preferences */
+  const PACE_L = { relaxed: "Relaxed", balanced: "Balanced", packed: "Packed" };
+  const BUDGET_L = { value: "Good value", comfort: "Comfortable", luxury: "Luxury" };
+  const INT_L = { parks: "Theme parks", golf: "Golf", dining: "Dining", nightlife: "Nightlife", shopping: "Shopping", nature: "Nature", wellness: "Wellness", sports: "Sports", culture: "Culture" };
+  const ACC_L = { "step-free": "Step-free / wheelchair access", "limited-walking": "Limited walking", sensory: "Sensory-friendly / quieter options", stroller: "Stroller-friendly", hearing: "Hearing access", sight: "Sight access" };
+  function tripLines(t) {
+    if (!t) return [];
+    const out = [];
+    out.push(["Travel party", `${t.adults} adult${t.adults === 1 ? "" : "s"}${t.kids ? `, ${t.kids} kid${t.kids === 1 ? "" : "s"}${t.kid_ages.length ? ` (age${t.kid_ages.length === 1 ? "" : "s"} ${t.kid_ages.join(", ")})` : ""}` : ""}`]);
+    if (t.pace) out.push(["Pace", PACE_L[t.pace]]);
+    if (t.interests.length) out.push(["Trip interests", t.interests.map((i) => INT_L[i]).join(", ")]);
+    if (t.budget) out.push(["Budget feel", BUDGET_L[t.budget]]);
+    if (t.from || t.nights) out.push(["Trip dates", `${t.from ? fMDY(t.from) : "Dates open"}${t.nights ? ` · ${t.nights} night${t.nights === 1 ? "" : "s"}` : ""}`]);
+    if (t.home) out.push(["Home airport", t.home]);
+    if (t.access.length || t.access_note) out.push(["Accessibility needs", [...t.access.map((a) => ACC_L[a]), t.access_note].filter(Boolean).join(", ")]);
+    return out;
+  }
   /* readable sections; hotels and brands not in the current data are dropped */
   function sections(profile, d) {
     const out = [];
@@ -57,7 +74,20 @@
       return { id: s.id, title: src.title || "Saved event", dates: range(src.start_date, src.end_date) || "Date unknown", location: loc, url: VO_URL.test(src.url || "") ? src.url : "https://www.visitorlando.com/events/", end_date: src.end_date || "", listed: !!e };
     }).sort((a, b) => (a.end_date || "9").localeCompare(b.end_date || "9"));
     if (evs.length) out.push({ key: "events", kicker: "Visit Orlando", heading: "Saved events", entries: evs });
-    const hs = profile.hotels.map((id) => d.hotels.get(id)).filter(Boolean).map((h) => ({ id: h.id, title: h.name, dates: h.brand || "", location: [h.area, h.address].filter(Boolean).join(" · ") }));
+    const FH = window.AMBAR_FAV_HOTELS;
+    const hs = profile.hotels.map((id) => d.hotels.get(id)).filter(Boolean).map((h) => {
+      const x = { id: h.id, title: h.name, dates: h.brand || "", location: [h.area, h.address].filter(Boolean).join(" · ") };
+      /* PDF: the hotel's own figures from the comps data, "Not collected" where there are none */
+      const sm = FH && d.db ? FH.summarize(d.db, h.id) : null;
+      if (sm) {
+        x.dates = [sm.brand, sm.tier, sm.non_marriott ? "non-Marriott" : ""].filter(Boolean).join(" · ");
+        const wa = sm.weekAhead;
+        x.note = [`Tonight (${FH.fMD(sm.tonight.date)}): ${sm.tonight.rate != null ? FH.money(sm.tonight.rate) : sm.tonight.status}`,
+          `Week ahead (w/c ${FH.fMD(wa.week)}): ${wa.n ? `${FH.money(wa.mean)} mean of ${wa.n}/7 priced nights` : wa.status}`,
+          sm.recent.length ? `Recent: ${sm.recent.map((w) => `w/c ${FH.fMD(w.week)} ${w.n ? FH.money(w.mean) : w.status}`).join(", ")}` : ""].filter(Boolean).join(" · ") + ". Lowest public nightly rates observed; not ADR or a quote.";
+      }
+      return x;
+    });
     if (hs.length) out.push({ key: "hotels", kicker: "Market landscape", heading: "Favourite hotels", entries: hs });
     const byParent = new Map();
     for (const id of profile.brands) { const b = d.brandById.get(id); if (!b) continue; if (!byParent.has(b.parent)) byParent.set(b.parent, []); byParent.get(b.parent).push(b); }
@@ -66,7 +96,7 @@
     const other = P.cleanOther ? P.cleanOther(profile.other_brand || "") : "";
     if (other) bs.push({ title: "Other", dates: "1 brand · not on the list", location: other, other: true, n: 1 });
     if (bs.length) out.push({ key: "brands", kicker: "Hotel brands", heading: "Brands I know", note: `Brands with Orlando-area hotels, verified as of ${d.brands.as_of ? fMDY(d.brands.as_of) : "the date shown on the site"}.`, entries: bs });
-    const pl = prefsLines(profile.prefs);
+    const pl = prefsLines(profile.prefs).concat(tripLines(profile.trip));
     if (pl.length) out.push({ key: "prefs", kicker: "Events", heading: "My preferences", entries: pl.map(([k, v]) => ({ title: v, dates: k })) });
     return out;
   }
@@ -124,5 +154,5 @@
       catch (e) { if (e && e.name !== "AbortError") status("Sharing isn’t available here. Use Copy share link instead."); }
     });
   }
-  window.AMBAR_PROFILE_SHARE = { data, sections, prefsLines, url, pdf, wire, copyText, summary, profileBase };
+  window.AMBAR_PROFILE_SHARE = { data, sections, prefsLines, tripLines, loadScript, url, pdf, wire, copyText, summary, profileBase };
 })();

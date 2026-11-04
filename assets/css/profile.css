@@ -41,3 +41,100 @@
   .pf-shared-actions .btn{width:100%;justify-content:center}
 }
 .pf-other-note{font-size:.72rem;color:var(--brown);font-weight:600;letter-spacing:.04em}
+
+/* favourite hotels with their figures (assets/js/fav-hotels.js) */
+.pf-sec-hotels{grid-column:1/-1}
+.pf-list .pf-fh{display:block;padding:0;border:0;list-style:none}
+.pf-fh .fh-card{background:var(--card)}
+.pf-fh .fh-actions .pf-x{min-width:44px;min-height:44px}
+.pf-note{margin:0 0 12px;font-size:.8rem;color:var(--muted)}
+.pf-hero-cta{margin:16px 0 0}
+.pf-hero-cta .btn{min-height:44px}
+
+/* My Preferences */
+.pf-prefs{background:var(--card)}
+.tc-cta{display:flex;align-items:center;justify-content:space-between;gap:18px 28px;flex-wrap:wrap;background:linear-gradient(140deg,var(--forest) 0%,var(--forest-3) 100%);color:var(--cream);border-radius:var(--r);padding:22px 26px;margin:0 0 22px;box-shadow:var(--shadow)}
+.tc-cta h3{font-size:1.7rem;margin:0 0 4px;color:#fff}
+.tc-cta p{margin:0;max-width:60ch;color:rgba(244,239,231,.9)}
+.tc-cta .evh-kicker{color:var(--gold-2);margin:0 0 6px}
+.tc-go{min-height:48px;font-weight:600;border:0;cursor:pointer;font-family:var(--sans);font-size:1rem;padding:12px 26px}
+.tc-go:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+.tp-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.tp-set{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px 18px 18px;margin:0;min-width:0}
+.tp-set.tp-wide{grid-column:1/-1}
+.tp-set legend{font-family:var(--serif);font-size:1.35rem;font-weight:600;color:var(--forest);padding:0 6px}
+.tp-row{display:flex;flex-wrap:wrap;gap:12px 18px}
+.tp-num{display:flex;flex-direction:column;gap:4px;font-size:.82rem;font-weight:600;color:var(--olive)}
+.tp-num input,.tp-num select{font:inherit;font-weight:400;color:var(--ink);min-height:44px;padding:8px 12px;border:1px solid rgba(30,58,44,.3);border-radius:10px;background:#fff;min-width:7em}
+.tp-air select{min-width:min(100%,22em);max-width:100%}
+.tp-note{margin-top:12px}
+.tp-note input{width:100%;max-width:32em}
+.tp-other{margin-top:10px}
+.tp-num input:focus-visible,.tp-num select:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.tp-ages{display:flex;flex-wrap:wrap;gap:10px 14px;margin-top:12px}
+.tp-ages:empty{display:none}
+.tp-chips{display:flex;flex-wrap:wrap;gap:8px}
+.tp-chk{position:relative;display:inline-flex}
+.tp-chk input{position:absolute;opacity:0;width:1px;height:1px}
+.tp-chk span{display:inline-flex;align-items:center;min-height:44px;padding:8px 16px;border:1px solid rgba(30,58,44,.3);border-radius:999px;font-size:.9rem;cursor:pointer;background:#fff;color:var(--forest);transition:background .2s,color .2s}
+.tp-chk input:checked+span{background:var(--forest);border-color:var(--forest);color:var(--cream)}
+.tp-chk input:checked+span::before{content:"✓";margin-right:6px}
+.tp-chk input:focus-visible+span{outline:3px solid var(--amber);outline-offset:2px}
+.tp-status{min-height:1.4em;margin:12px 0 0}
+
+/* Travel Concierge itinerary */
+.tc-shared{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;background:var(--forest);color:var(--cream);border-radius:var(--r);padding:14px 20px;margin:0 0 18px}
+.tc-shared p{margin:0;flex:1 1 300px}
+.tc-shared .btn{color:var(--cream);border-color:rgba(227,198,138,.6);min-height:44px}
+.tc-ai{background:#fff;border-left:4px solid var(--gold);border-radius:10px;padding:12px 16px;margin:0 0 18px;font-size:.95rem}
+.tc-ai b{display:block;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--brown);margin-bottom:4px}
+.tc-days{display:grid;gap:16px}
+.tc-day{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px 22px;box-shadow:var(--shadow)}
+.tc-day-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:6px}
+.tc-day-head h3{font-size:1.5rem;margin:0}
+.tc-day-head h3 span{font-family:var(--sans);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--brown);font-weight:700;margin-right:8px;vertical-align:middle}
+.tc-day-head h3:focus{outline:none}
+.tc-day-head h3:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:4px}
+.tc-rmday{min-height:44px}
+.tc-items{list-style:none;margin:0;padding:0}
+.tc-item{display:grid;grid-template-columns:8.5em 1fr auto;grid-template-areas:"when title acts" "when note acts";gap:2px 16px;padding:12px 0;border-bottom:1px dashed var(--line);align-items:start}
+.tc-item:last-child{border-bottom:0}
+.tc-when{grid-area:when;margin:0;display:flex;flex-direction:column;gap:2px}
+.tc-time{font-weight:700;font-size:.86rem;color:var(--forest)}
+.tc-kind{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--olive)}
+.tc-title{grid-area:title;margin:0;font-family:var(--sans);font-size:1rem;font-weight:600;line-height:1.35}
+.tc-title a{color:var(--blue);text-underline-offset:3px;display:inline-flex;flex-wrap:wrap;gap:2px 8px;align-items:baseline;min-height:24px}
+.tc-title a:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:4px}
+.tc-cta-inline{font-size:.78rem;font-weight:700;color:var(--forest-3);background:var(--gold-2);border-radius:999px;padding:2px 10px;text-decoration:none}
+.tc-k-a{background:linear-gradient(90deg,rgba(201,163,90,.14),transparent 70%);border-radius:10px;padding-left:10px;padding-right:6px}
+.tc-note{grid-area:note;margin:0;font-size:.86rem;color:#4a4b42}
+.tc-acts{grid-area:acts;display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.tc-btn{min-width:44px;min-height:44px;padding:6px 12px;border:1px solid rgba(30,58,44,.25);border-radius:10px;background:#fff;color:var(--forest);font:600 .82rem var(--sans);cursor:pointer}
+.tc-btn:hover:not([disabled]){background:var(--cream)}
+.tc-btn[disabled]{opacity:.35;cursor:default}
+.tc-btn:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.tc-rm{color:#8a3b1e}
+.tc-empty{margin:10px 0;color:var(--muted);font-size:.9rem}
+.tc-add{margin:10px 0 0}
+.tc-edit{display:grid;grid-template-columns:5em 1fr;gap:8px 12px;align-items:center;background:var(--cream);border-radius:12px;padding:14px;margin:8px 0}
+.tc-edit label{font-size:.82rem;font-weight:600;color:var(--olive)}
+.tc-edit input,.tc-edit select,.tc-edit textarea{font:inherit;min-height:44px;padding:8px 12px;border:1px solid rgba(30,58,44,.3);border-radius:10px;background:#fff;width:100%}
+.tc-edit input[readonly]{background:var(--lgrey)}
+.tc-edit input:focus-visible,.tc-edit select:focus-visible,.tc-edit textarea:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.tc-edit-acts{grid-column:1/-1;margin:0;display:flex;gap:8px;flex-wrap:wrap}
+.tc-edit-acts .btn{min-height:44px;padding:10px 20px}
+.tc-tools{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:16px 0}
+.tc-tools .ev-link-btn{min-height:44px}
+.tc-share{margin-top:8px}
+.tc-sources{margin-top:16px}
+@media (max-width:900px){.tp-form{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .tc-cta{padding:18px}.tc-go{width:100%;justify-content:center}
+  .tc-day{padding:14px}
+  .tc-item{grid-template-columns:1fr;grid-template-areas:"when" "title" "note" "acts"}
+  .tc-when{flex-direction:row;gap:10px;align-items:baseline}
+  .tc-acts{justify-content:flex-start;margin-top:6px}
+  .tc-edit{grid-template-columns:1fr}
+}
+.tc-share .btn{min-height:44px}
+.pf-prefs [hidden],.tc [hidden]{display:none!important}

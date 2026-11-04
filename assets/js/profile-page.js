@@ -15,9 +15,9 @@
     events: { href: ROOT + "events/#events", label: "Browse Orlando events", empty: "No saved events yet." },
     hotels: { href: ROOT + "index.html#hotels", label: "Star hotels on the market page", empty: "No favourite hotels yet." },
     brands: { href: ROOT + "index.html#familiar", label: "Pick the brands you know", empty: "No brands picked yet." },
-    prefs: { href: ROOT + "events/#preferences", label: "Set your event preferences", empty: "No event preferences set." },
+    prefs: { href: ROOT + "events/#preferences", label: "Set your event preferences", empty: "No preferences set yet." },
   };
-  const HEAD = { events: "Saved events", hotels: "Favourite hotels", brands: "Brands I know", prefs: "My preferences" };
+  const HEAD = { events: "Saved events", hotels: "Favourite hotels", brands: "Brands I know", prefs: "Preferences" };
   let D = null;
 
   function brandsHtml(ids, editable, other) {
@@ -31,7 +31,14 @@
   function sectionHtml(key, sec, profile, editable) {
     const e = EDIT[key];
     let items = "";
+    const FH = window.AMBAR_FAV_HOTELS;
     if (key === "brands") items = brandsHtml(profile.brands, editable, profile.other_brand || "");
+    else if (key === "hotels" && FH && D.db && profile.hotels.length) {
+      /* favourite hotels with their own rates from the comps data; "Not collected" where there are none */
+      const sum = FH.summarizeAll(D.db, profile.hotels);
+      items = sum.hotels.length || sum.missing.length ? `<li class="pf-fh">${FH.panelHtml(sum, { root: ROOT, rm: editable, headingLevel: 4, idSuffix: editable ? "" : "-s" })}</li>` : "";
+      if (!sum.hotels.length && !sum.missing.length) items = "";
+    }
     else if (sec) items = sec.entries.map((x) => {
       const rm = !editable ? "" : key === "events" ? `<button type="button" class="pf-x" data-rm-event="${esc(x.id)}" aria-label="Remove ${esc(x.title)} from My Profile">×</button>`
         : key === "hotels" ? `<button type="button" class="pf-x" data-rm-hotel="${esc(x.id)}" aria-label="Remove ${esc(x.title)} from favourite hotels">×</button>` : "";
@@ -43,10 +50,11 @@
     const has = !!items;
     if (!has && !editable) return "";
     const note = key === "brands" && has ? `<p class="pf-note">Brands with Orlando-area hotels, verified as of ${esc(D.brands.as_of ? new Date(D.brands.as_of + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "the date shown on the site")}.</p>` : "";
-    const actions = editable ? `<p class="pf-sec-actions"><a href="${esc(e.href)}">${esc(e.label)}</a>${key === "prefs" && has ? ` <button type="button" class="ev-link-btn" data-clear-prefs>Clear preferences</button>` : ""}</p>` : "";
+    const fhNote = key === "hotels" && has && D.db ? `<p class="pf-note">Lowest public nightly rates observed on the market page’s snapshot dates (not ADR, not a quote). “Not collected” means there is no figure for that night or week.</p>` : "";
+    const actions = editable ? `<p class="pf-sec-actions"><a href="${esc(e.href)}">${esc(e.label)}</a>${key === "prefs" ? ` <a href="#preferences">Edit trip preferences</a>` : ""}${key === "prefs" && has ? ` <button type="button" class="ev-link-btn" data-clear-prefs>Clear preferences</button>` : ""}</p>` : "";
     return `<section class="pf-sec pf-sec-${key}" aria-labelledby="pf-h-${key}${editable ? "" : "-s"}">
       <h3 id="pf-h-${key}${editable ? "" : "-s"}">${HEAD[key]}${has && key !== "prefs" ? ` <span class="pf-n">${key === "brands" ? profile.brands.filter((id) => D.brandById.has(id)).length + (profile.other_brand ? 1 : 0) : sec.entries.length}</span>` : ""}</h3>
-      ${has ? `${note}<ul class="pf-list">${items}</ul>` : `<p class="pf-empty">${esc(e.empty)}</p>`}${actions}</section>`;
+      ${has ? `${note}${fhNote}<ul class="pf-list">${items}</ul>` : `<p class="pf-empty">${esc(e.empty)}</p>`}${actions}</section>`;
   }
   function render(profile, editable) {
     const secs = S.sections(profile, D);
@@ -69,7 +77,7 @@
     else if (t.dataset.rmHotel) { P.toggleHotel(t.dataset.rmHotel); status("Hotel removed from favourites."); }
     else if (t.dataset.rmBrand) { P.setBrands(P.get().brands.filter((b) => b !== t.dataset.rmBrand)); status("Brand removed."); }
     else if (t.dataset.rmOther) { P.setOtherBrand(""); status("Other brand removed."); }
-    else { P.clearPrefs(); status("Preferences cleared."); }
+    else { P.clearPrefs(); P.clearTrip(); status("Preferences cleared."); }
     $("pfMineTitle").setAttribute("tabindex", "-1");
     $("pfMineTitle").focus();
   });
