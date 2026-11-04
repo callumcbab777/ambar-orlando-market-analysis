@@ -40,8 +40,9 @@
       <div class="evh-copy">
         <p class="evh-dateline"><span>AMBAR Orlando</span><span aria-hidden="true"> · </span>Kept in this browser</p>
         <h1 id="pfTitle">My <em>Profile</em></h1>
-        <p class="evh-lede">The events you’ve saved, your favourite hotels, the hotel brands you know and your event preferences, all in one place. It stays in this browser; nothing is sent anywhere unless you share it.</p>
+        <p class="evh-lede">The events you’ve saved, your favourite hotels, the hotel brands you know and your trip preferences, all in one place. It stays in this browser; nothing is sent anywhere unless you share it.</p>
         <p class="pf-summary" id="pfSummary" aria-live="polite"></p>
+        <p class="pf-hero-cta"><a class="btn btn-gold" href="#preferences">Travel Concierge</a></p>
       </div>
     </div>
   </section>
@@ -86,6 +87,122 @@
     </div>
   </section>
 
+  <section class="section pf-prefs" id="preferences" aria-labelledby="tpTitle">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">My Preferences</p>
+        <h2 id="tpTitle">Your Orlando trip</h2>
+        <p class="section-sub">Tell us who’s coming and what you enjoy. It’s saved in this browser as you go, and the Travel Concierge uses it to plan your days.</p>
+      </header>
+      <aside class="tc-cta" id="tcCta" aria-labelledby="tcCtaTitle">
+        <div class="tc-cta-copy">
+          <p class="evh-kicker">Isla · ABI Group</p>
+          <h3 id="tcCtaTitle">Plan it with Isla</h3>
+          <p>Let Isla propose an itinerary for your upcoming trip. Share it with your family and plan it together.</p>
+        </div>
+        <button type="button" class="btn btn-gold tc-go" id="tcGo" aria-controls="concierge">Travel Concierge</button>
+      </aside>
+      <form class="tp-form" id="tpForm" novalidate>
+        <fieldset class="tp-set">
+          <legend>Travel party</legend>
+          <div class="tp-row">
+            <label class="tp-num">Adults <input type="number" name="adults" min="1" max="12" value="2" inputmode="numeric"></label>
+            <label class="tp-num">Kids <input type="number" name="kids" min="0" max="10" value="0" inputmode="numeric"></label>
+          </div>
+          <div class="tp-ages" id="tpAges" aria-live="polite"></div>
+        </fieldset>
+        <fieldset class="tp-set">
+          <legend>Pace</legend>
+          <div class="tp-chips">
+            <label class="tp-chk"><input type="radio" name="pace" value="relaxed"><span>Relaxed</span></label>
+            <label class="tp-chk"><input type="radio" name="pace" value="balanced"><span>Balanced</span></label>
+            <label class="tp-chk"><input type="radio" name="pace" value="packed"><span>Packed</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="tp-set tp-wide">
+          <legend>Interests</legend>
+          <div class="tp-chips">
+            <label class="tp-chk"><input type="checkbox" name="interests" value="parks"><span>Theme parks</span></label>
+            <label class="tp-chk"><input type="checkbox" name="interests" value="golf"><span>Golf</span></label>
+            <label class="tp-chk"><input type="checkbox" name="interests" value="dining"><span>Dining</span></label>
+            <label class="tp-chk"><input type="checkbox" name="interests" value="nightlife"><span>Nightlife</span></label>
+            <label class="tp-chk"><input type="checkbox" name="interests" value="shopping"><span>Shopping</span></label>
+            <label class="tp-chk"><input type="checkbox" name="interests" value="nature"><span>Nature</span></label>
+            <label class="tp-chk"><input type="checkbox" name="interests" value="wellness"><span>Wellness</span></label>
+            <label class="tp-chk"><input type="checkbox" name="interests" value="sports"><span>Sports</span></label>
+            <label class="tp-chk"><input type="checkbox" name="interests" value="culture"><span>Culture</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="tp-set">
+          <legend>Budget feel</legend>
+          <div class="tp-chips">
+            <label class="tp-chk"><input type="radio" name="budget" value="value"><span>Good value</span></label>
+            <label class="tp-chk"><input type="radio" name="budget" value="comfort"><span>Comfortable</span></label>
+            <label class="tp-chk"><input type="radio" name="budget" value="luxury"><span>Luxury</span></label>
+          </div>
+        </fieldset>
+        <fieldset class="tp-set">
+          <legend>Dates and trip length</legend>
+          <div class="tp-row">
+            <label class="tp-num tp-date">Arriving <input type="date" name="from"></label>
+            <label class="tp-num">Nights <input type="number" name="nights" min="1" max="21" inputmode="numeric" placeholder="4"></label>
+          </div>
+        </fieldset>
+        <fieldset class="tp-set">
+          <legend>Home airport</legend>
+          <label class="tp-num tp-air">Flying from <select name="home" id="tpHome"><option value="">Choose…</option></select></label>
+          <label class="tp-num tp-other" id="tpOtherWrap" hidden>Airport code <input type="text" name="home_other" maxlength="3" autocomplete="off" pattern="[A-Za-z]{3}" placeholder="e.g. BOS"></label>
+        </fieldset>
+        <fieldset class="tp-set tp-wide">
+          <legend>Accessibility needs</legend>
+          <div class="tp-chips">
+            <label class="tp-chk"><input type="checkbox" name="access" value="step-free"><span>Step-free / wheelchair access</span></label>
+            <label class="tp-chk"><input type="checkbox" name="access" value="limited-walking"><span>Limited walking</span></label>
+            <label class="tp-chk"><input type="checkbox" name="access" value="sensory"><span>Sensory-friendly / quieter options</span></label>
+            <label class="tp-chk"><input type="checkbox" name="access" value="stroller"><span>Stroller-friendly</span></label>
+            <label class="tp-chk"><input type="checkbox" name="access" value="hearing"><span>Hearing access</span></label>
+            <label class="tp-chk"><input type="checkbox" name="access" value="sight"><span>Sight access</span></label>
+          </div>
+          <label class="tp-num tp-note">Anything else <input type="text" name="access_note" maxlength="60" autocomplete="off"></label>
+        </fieldset>
+      </form>
+      <p class="ev-status tp-status" id="tpStatus" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <section class="section tc" id="concierge" aria-labelledby="tcTitle" hidden>
+    <div class="wrap">
+      <header class="section-head">
+        <p class="kicker">Travel Concierge</p>
+        <h2 id="tcTitle" tabindex="-1">Your Orlando itinerary</h2>
+        <p class="section-sub" id="tcSub"></p>
+      </header>
+      <div class="tc-shared" id="tcShared" hidden>
+        <p><b>Shared with you.</b> Edit it here and share it back; it only joins your own profile if you save it.</p>
+        <button type="button" class="btn btn-outline" id="tcKeep">Save to my profile</button>
+      </div>
+      <p class="tc-ai" id="tcAi" hidden></p>
+      <div class="tc-days" id="tcDays"></div>
+      <p class="tc-tools">
+        <button type="button" class="btn-more" id="tcAddDay">Add a day</button>
+        <button type="button" class="ev-link-btn" id="tcRegen">Start again from my preferences</button>
+      </p>
+      <div class="ev-share tc-share" id="tcShare">
+        <div>
+          <h3>Share this itinerary</h3>
+          <p>The link holds the whole plan, so your family can open it, edit it and share it back. The PDF is a copy to print or attach.</p>
+        </div>
+        <div class="ev-share-actions">
+          <button type="button" class="btn btn-solid" id="tcCopy">Copy itinerary link</button>
+          <button type="button" class="btn btn-outline" id="tcNative" hidden>Share…</button>
+          <button type="button" class="btn btn-outline" id="tcPdf">Download PDF</button>
+        </div>
+        <p class="ev-status" id="tcStatus" role="status" aria-live="polite"></p>
+      </div>
+      <p class="pl-sources tc-sources" id="tcSources"></p>
+    </div>
+  </section>
+
   <section class="section vh-end" aria-labelledby="evVisitTitle">
     <div class="wrap">
       <aside class="ev-visit-band" id="evVisitBand" aria-labelledby="evVisitTitle">
@@ -120,7 +237,11 @@
 <script src="../assets/js/profile.js"></script>
 <script src="../assets/js/events-pdf.js"></script>
 <script src="../assets/js/profile-share.js"></script>
+<script src="../assets/js/fav-hotels.js"></script>
+<script src="../assets/js/flights.js"></script>
+<script src="../assets/js/itinerary.js"></script>
 <script src="../assets/js/profile-page.js" data-root="../"></script>
+<script src="../assets/js/concierge.js" data-root="../"></script>
 <script src="../assets/js/visit-cta.js"></script>
 <script src="../assets/js/nav.js"></script>
 <script src="../assets/js/assistant-config.js"></script>

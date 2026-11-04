@@ -57,3 +57,11 @@
   .vh-art .vh-map-lg{display:none}
   .vh-art svg.vh-map-sm{display:block;height:auto;width:100%;filter:drop-shadow(0 18px 24px rgba(30,58,44,.22))}
 }
+/* flight links (assets/js/flights.js): every city opens Google Flights about a month out; seasonal routes outside their season are plain text */
+.pl-routes a.pl-fl{display:inline-flex;align-items:center;min-height:44px;margin:-8px 0;color:inherit;text-decoration:underline;text-decoration-color:rgba(201,163,90,.7);text-underline-offset:4px;text-decoration-thickness:1.5px}
+.pl-routes a.pl-fl:hover{color:var(--olive);text-decoration-color:var(--amber)}
+.pl-routes a.pl-fl:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:4px}
+.pl-routes li > a.pl-fl{font-weight:600;color:var(--forest)}
+.pl-routes a.pl-fl::after{content:"↗";font-family:var(--sans);font-size:.7em;margin-left:4px;opacity:.6}
+.pl-fl-off{color:#6b6a5e}
+.pl-seasonal.is-off{background:rgba(152,155,116,.2);color:#4a4b30;text-transform:none;letter-spacing:.02em;font-size:.72rem}

@@ -53,6 +53,27 @@ CLI alternative: `cd assistant-proxy && npx vercel link && npx vercel env add LL
 
 Other hosts: the handler is a plain Node `(req, res)` function, so it also runs on Netlify/Cloudflare with a thin adapter; Vercel is the documented path.
 
+## Travel Concierge (My Profile) · optional AI note
+
+The Travel Concierge on `profile/` builds every itinerary **rule-based in the browser** (`assets/js/itinerary.js`):
+Visit Orlando listings in the trip dates, the comp-set hotels, the visit guide and the Google Flights link for the
+home airport. It needs no key and no proxy, and that never changes.
+
+When `proxyUrl` is set, the same proxy adds one extra: after a fresh plan is built, `assets/js/concierge.js` POSTs one
+short request (user turn ≤ 500 chars, `context.page = "profile"`, the plan's Visit Orlando events) and shows the reply
+as "A note from Isla" above the days (rendered as plain text). If `proxyUrl` is empty, the endpoint errors, returns no
+`reply`, or takes longer than 12 s, nothing is shown and the plan is identical — a silent fallback.
+
+Switch it on (the same steps as above, once for the whole site):
+1. Deploy this folder to Vercel (Root Directory = `assistant-proxy`), with `LLM_API_KEY` set as a Sensitive
+   Production environment variable (plus `LLM_PROVIDER` / `LLM_MODEL` if not xAI defaults).
+2. Make sure `ALLOWED_ORIGINS` includes the site origin (`https://callumcbab777.github.io` is the default). For a
+   raw.githack preview add `https://raw.githack.com` temporarily.
+3. Test with the curl in step 6 above.
+4. Set `proxyUrl: "https://<project-name>.vercel.app/api/chat"` in `assets/js/assistant-config.js` and merge via a PR.
+   The site assistant and the Travel Concierge note both switch on. The key never goes in that file or anywhere in
+   the repo.
+
 ## Test locally (no key, no network)
 
 ```bash

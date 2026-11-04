@@ -262,6 +262,17 @@
     const favs = P.get().hotels;
     document.querySelectorAll("[data-fav]").forEach((b) => b.setAttribute("aria-pressed", String(favs.includes(b.dataset.fav))));
     document.querySelectorAll(".hcard").forEach((c) => c.classList.toggle("is-fav", favs.includes(c.dataset.hid)));
+    renderFavPanel(favs);
+  }
+  /* "Your favourite hotels": the starred hotels' own figures from the comps data (assets/js/fav-hotels.js) */
+  function renderFavPanel(favs) {
+    const FH = window.AMBAR_FAV_HOTELS, box = $("#favPanel");
+    if (!FH || !box) return;
+    const sum = FH.summarizeAll(DB, favs, todayISO);
+    box.hidden = !favs.length;
+    if (!favs.length) return;
+    $("#favPanelSub").textContent = `${sum.hotels.length} starred · tonight, the week ahead (w/c ${fMD(latest.week)}) and recent weeks, from the lowest public nightly rates on this page. “${FH.NC}” means no figure was collected.`;
+    $("#favPanelBody").innerHTML = FH.panelHtml(sum, { root: "", idSuffix: "-dash" });
   }
   function bindFavs() {
     if (!P) return;
