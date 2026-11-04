@@ -26,7 +26,8 @@ function mockRes() {
 async function call(opts) { const p = mockRes(); const res = mockRes.last; await handler(mockReq(opts), res); return p; }
 
 let upstream = null;
-global.fetch = async (url, init) => { upstream = { url, init: { ...init, body: JSON.parse(init.body) } }; return { ok: true, json: async () => ({ choices: [{ message: { content: "Try [Jazz Night](https://www.visitorlando.com/event/x/1/)." } }] }) }; };
+let mockReply = null; /* null → the default chat reply */
+global.fetch = async (url, init) => { upstream = { url, init: { ...init, body: JSON.parse(init.body) } }; return { ok: true, json: async () => ({ choices: [{ message: { content: mockReply || "Try [Jazz Night](https://www.visitorlando.com/event/x/1/)." } }] }) }; };
 const good = { messages: [{ role: "user", content: "jazz this weekend?" }], context: { page: "events", today: "2026-10-30", sections: [{ title: "Week ahead", url: "https://callumcbab777.github.io/ambar-orlando-market-analysis/index.html#week-ahead", about: "rates" }], events: [{ title: "Jazz Night", start_date: "2026-10-31", end_date: "2026-10-31", location: "Venue", area: "Orlando", categories: ["Concerts and Live Shows"], url: "https://www.visitorlando.com/event/x/1/" }, { title: "Evil", url: "https://evil.example/" }] } };
 
 (async () => {
@@ -115,6 +116,37 @@ const good = { messages: [{ role: "user", content: "jazz this weekend?" }], cont
   g = upstream.init.body.messages[0].content;
   assert.ok(g.includes("Fares and ticket prices are not on this site") && g.includes("gobrightline.com"));
   assert.strictEqual(upstream.init.body.messages[upstream.init.body.messages.length - 1].role, "user");
+
+  // structured tasks: strict JSON prompt + response_format, server validates and returns { data }
+  const evs = [{ id: "111", title: "Kids Fest", start_date: "2026-11-07", end_date: "2026-11-07", location: "Park", categories: ["Festivals"], url: "https://www.visitorlando.com/event/kids-fest/111/" },
+    { id: "222", title: "Jazz Night", start_date: "2026-11-08", end_date: "2026-11-08", location: "Club", categories: ["Concerts and Live Shows"], url: "https://www.visitorlando.com/event/jazz/222/" }];
+  mockReply = '{"adults":2,"kids":2,"kid_ages":[3,6],"from":"2027-04-01","nights":7,"interests":["parks","dining"],"home":"MAN"}';
+  r = await call({ body: { task: "trip_parse", messages: [{ role: "user", content: "Family of 4 from Manchester, kids 3 and 6, a week in April" }], context: { page: "profile", today: "2026-11-04" } }, ip: "10.0.2.1" });
+  assert.strictEqual(r.status, 200); assert.strictEqual(r.body.data.home, "MAN"); assert.ok(!r.body.reply);
+  assert.deepStrictEqual(upstream.init.body.response_format, { type: "json_object" });
+  assert.strictEqual(upstream.init.body.temperature, 0);
+  assert.ok(/ONE JSON object/.test(upstream.init.body.messages[0].content) && /Today is 2026-11-04/.test(upstream.init.body.messages[0].content));
+  mockReply = '{"adults":2,"password":"x"}';
+  r = await call({ body: { task: "trip_parse", messages: [{ role: "user", content: "two adults" }], context: { today: "2026-11-04" } }, ip: "10.0.2.2" });
+  assert.strictEqual(r.status, 502, "unknown keys are rejected");
+  mockReply = "Sure! Here you go";
+  r = await call({ body: { task: "trip_parse", messages: [{ role: "user", content: "two adults" }], context: {} }, ip: "10.0.2.3" });
+  assert.strictEqual(r.status, 502, "non-JSON is rejected");
+  mockReply = '```json\n{"event_ids":["222","999","111"]}\n```';
+  r = await call({ body: { task: "itinerary_picks", temperature: 5, messages: [{ role: "user", content: "pick" }], context: { today: "2026-11-04", events: evs, slots: 4, avoid: ["111"] } }, ip: "10.0.2.4" });
+  assert.strictEqual(r.status, 200); assert.deepStrictEqual(r.body.data.event_ids, ["222", "111"], "ids not sent are dropped");
+  assert.strictEqual(upstream.init.body.temperature, 1, "temperature clamped to 1");
+  assert.ok(upstream.init.body.messages[0].content.includes("id 222 | Jazz Night") && upstream.init.body.messages[0].content.includes('["111"]'));
+  mockReply = '{"answer":"Kids Fest suits little ones. See [this](https://evil.example).","event_ids":["111","31337"]}';
+  r = await call({ body: { task: "events_answer", messages: [{ role: "user", content: "for little kids this weekend?" }], context: { page: "events", today: "2026-11-04", events: evs } }, ip: "10.0.2.5" });
+  assert.strictEqual(r.status, 200); assert.deepStrictEqual(r.body.data.event_ids, ["111"], "invented id dropped");
+  assert.ok(/Never invent events/.test(upstream.init.body.messages[0].content));
+  mockReply = '{"event_ids":["111"]}';
+  r = await call({ body: { task: "events_answer", messages: [{ role: "user", content: "q" }], context: { events: evs } }, ip: "10.0.2.6" });
+  assert.strictEqual(r.status, 502, "events_answer needs an answer string");
+  mockReply = null;
+  r = await call({ body: { task: "drop_tables", messages: [{ role: "user", content: "jazz this weekend?" }], context: {} }, ip: "10.0.2.7" });
+  assert.strictEqual(r.status, 200); assert.ok(r.body.reply, "unknown task → plain chat");
 
   r = await call({ body: good, origin: "https://evil.example", ip: "10.0.0.2" });
   assert.strictEqual(r.status, 403); assert.ok(!r.headers["access-control-allow-origin"]);

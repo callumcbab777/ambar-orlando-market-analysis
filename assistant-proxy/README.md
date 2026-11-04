@@ -74,6 +74,44 @@ Switch it on (the same steps as above, once for the whole site):
    The site assistant and the Travel Concierge note both switch on. The key never goes in that file or anywhere in
    the repo.
 
+## Structured tasks: chat-box parsing, Generate, and "Ask Isla what's on"
+
+Three more features use the same endpoint with a `task` field. Each asks the model for **one JSON object**
+(`response_format: json_object` for xAI/OpenAI), the proxy parses and checks it, and returns `{ "data": … }`; anything
+else is a `502`. The browser checks the data **again** and uses its own rule-based answer on any error, invalid JSON or
+timeout, so with `proxyUrl` empty every feature still works, just without AI.
+
+| `task` | Used by | Model must return | Checks | Timeout / temperature |
+|---|---|---|---|---|
+| `trip_parse` | Travel Concierge chat box ("Tell Isla about your trip") | `{adults?, kids?, kid_ages?, pace?, interests?, budget?, from?, nights?, home?, access?}` | proxy: no unknown keys; browser: `AMBAR_TRIP_PARSE.validate` (types, ranges, allowed values, future date, 3-letter airport) | 8 s / 0 |
+| `itinerary_picks` | Travel Concierge **Generate** | `{event_ids: [...]}` | only ids from the ≤25 listings the browser sent (shuffled by the plan's seed); the rules then place them | 9 s / 0.9 (client-sent, clamped 0.2–1) |
+| `events_answer` | events page **Ask Isla what's on** | `{answer, event_ids}` | only ids that were sent AND exist in `data/visitorlando_events.json`; links are rebuilt from the data; markdown/URLs stripped | 9 s / 0.2 |
+
+The events subset is ranked in the browser (`assets/js/events-ask.js` `candidates()`), so the model only ever sees
+real listings and is told never to invent events. Without the proxy, the same module answers by rules (audience,
+dates, category, keywords) and says plainly when nothing matches.
+
+### Switch everything on: what Callum (or Karen) does
+
+Nothing in the repo holds a key; the only repo change is the endpoint URL.
+
+1. **Vercel login (Callum):** on any machine, `npx vercel login`, choose *Continue with GitHub/Email*, and approve the
+   device code / email link. (Or in the browser: vercel.com → sign up/in with the GitHub account that owns the repo.)
+2. **Create the project:** vercel.com → *Add New → Project* → import `callumcbab777/ambar-orlando-market-analysis`,
+   **Root Directory `assistant-proxy`**, preset *Other*, no build command.
+3. **Add the key yourself:** *Settings → Environment Variables* → `LLM_API_KEY` = your xAI key, **Production**,
+   marked *Sensitive*. Optional: `LLM_PROVIDER` (`xai` default, or `openai` / `custom` + `LLM_BASE_URL`),
+   `LLM_MODEL`, and `ALLOWED_ORIGINS` (default `https://callumcbab777.github.io`; add `https://raw.githack.com`
+   only while testing a preview). Never paste the key into chat, the repo or `assistant-config.js`.
+4. **Deploy**, then test (expect `{"data":{…"home":"MAN"…}}`):
+   ```bash
+   curl -s https://<project>.vercel.app/api/chat -H 'Origin: https://callumcbab777.github.io' -H 'Content-Type: application/json' \
+     -d '{"task":"trip_parse","messages":[{"role":"user","content":"Family of 4 from Manchester, kids 3 and 6, a week in April"}],"context":{"today":"2026-11-04"}}'
+   ```
+5. Tell the site agent the endpoint URL; it opens a PR setting `proxyUrl` in `assets/js/assistant-config.js`. When that
+   PR is merged, the site assistant, the concierge note, chat-box parsing, AI Generate picks and Ask Isla all switch on
+   together. To switch off again, set `proxyUrl: ""` (or delete the Vercel env var: everything falls back to rules).
+
 ## Test locally (no key, no network)
 
 ```bash

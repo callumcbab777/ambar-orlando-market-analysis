@@ -10,7 +10,7 @@
      short welcome note. If the proxy is not set or doesn't answer, the plan is exactly the same, with no message. */
 (function () {
   "use strict";
-  const P = window.AMBAR_PROFILE, S = window.AMBAR_PROFILE_SHARE, I = window.AMBAR_ITIN, F = window.AMBAR_FLIGHTS;
+  const P = window.AMBAR_PROFILE, S = window.AMBAR_PROFILE_SHARE, I = window.AMBAR_ITIN, F = window.AMBAR_FLIGHTS, TP = window.AMBAR_TRIP_PARSE;
   if (!P || !S || !I || !F || !document.getElementById("tpForm")) return;
   const me = document.currentScript;
   const ROOT = (me && me.dataset.root) || "../";
@@ -87,6 +87,85 @@
   fill(P.get().trip);
   P.subscribe((p) => { if (!writing && !form.contains(document.activeElement)) fill(p.trip); });
 
+  /* ---------------- AI proxy (optional; only when assistant-config.js has a proxyUrl) ---------------- */
+  const proxy = () => { const u = String((window.AMBAR_ASSISTANT_CONFIG || {}).proxyUrl || "").trim(); return /^https:\/\//.test(u) ? u : ""; };
+  async function task(name, content, context, extra, ms) {
+    const url = proxy(); if (!url) return null;
+    const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), ms || 8000);
+    try {
+      const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, signal: ctrl.signal,
+        body: JSON.stringify({ task: name, ...(extra || {}), messages: [{ role: "user", content: String(content).slice(0, 1500) }], context: { page: "profile", today, ...context } }) });
+      const j = await r.json().catch(() => ({}));
+      return r.ok && j && j.data && typeof j.data === "object" ? j.data : null;
+    } catch (e) { return null; /* offline, slow or switched off: the caller uses the rules */ } finally { clearTimeout(t); }
+  }
+  const voEvents = () => (window.VO_EVENTS_DATA || {}).events || [];
+
+  /* ---------------- chat-first entry: "Tell Isla about your trip" ---------------- */
+  const SET_OF = { adults: "adults", kids: "kids", kid_ages: "kids", pace: "pace", interests: "interests", budget: "budget", from: "from", nights: "nights", home: "home", access: "access" };
+  const NAMES = { relaxed: "relaxed pace", balanced: "balanced pace", packed: "packed days", value: "value budget", comfort: "comfort budget", luxury: "luxury budget" };
+  function airportName(code) { const k = Object.keys(F.ROUTES).find((r) => r.startsWith(code + "-")); return k ? `${F.ROUTES[k].name} (${code})` : code; }
+  function summary(f, found) {
+    const bits = [];
+    if (found.includes("adults") || found.includes("kids")) bits.push(`${f.adults || 2} adult${(f.adults || 2) === 1 ? "" : "s"}${f.kids ? ` + ${f.kids} kid${f.kids === 1 ? "" : "s"}${f.kid_ages && f.kid_ages.length ? ` (age${f.kid_ages.length === 1 ? "" : "s"} ${f.kid_ages.join(", ")})` : ""}` : ""}`);
+    if (found.includes("from")) bits.push(`arriving ${I.dayLabel(f.from)}`);
+    if (found.includes("nights")) bits.push(`${f.nights} night${f.nights === 1 ? "" : "s"}`);
+    if (found.includes("home")) bits.push(`flying from ${airportName(f.home)}`);
+    if (found.includes("pace")) bits.push(NAMES[f.pace]);
+    if (found.includes("budget")) bits.push(NAMES[f.budget]);
+    if (found.includes("interests")) bits.push(f.interests.join(", "));
+    if (found.includes("access")) bits.push(`access: ${f.access.join(", ")}`);
+    return bits.join(" · ");
+  }
+  const log = $("tcLog");
+  function say(who, text) {
+    const p = document.createElement("p");
+    p.className = `tc-msg tc-msg-${who}`;
+    p.innerHTML = `<span class="sr-only">${who === "me" ? "You" : "Isla"}: </span>`;
+    p.appendChild(document.createTextNode(text));
+    log.appendChild(p); log.hidden = false; log.scrollTop = log.scrollHeight;
+  }
+  function flash(found) {
+    const sets = new Set();
+    for (const f of found) {
+      const el = f === "home" ? homeSel : form.querySelector(`[name="${SET_OF[f]}"]`);
+      const fs = el && el.closest("fieldset"); if (fs) sets.add(fs);
+    }
+    for (const fs of sets) { fs.classList.remove("tp-filled"); void fs.offsetWidth; fs.classList.add("tp-filled"); setTimeout(() => fs.classList.remove("tp-filled"), 2600); }
+  }
+  async function understand(text) {
+    const rules = TP.parse(text, { today, routes: F.ROUTES });
+    if (!proxy()) return { ...rules, by: "rules" };
+    const data = await task("trip_parse", text, {}, null, 8000);
+    const ok = data && TP.validate(data, { today });
+    return ok && ok.found.length ? { ...ok, by: "ai" } : { ...rules, by: "rules" }; /* invalid, empty or timed out → rules */
+  }
+  let asked = false; /* one short follow-up (dates and/or home airport), asked once */
+  async function chat(text) {
+    text = String(text || "").trim(); if (!text) return;
+    say("me", text);
+    const btn = $("tcChatGo"); btn.disabled = true; $("tcFilled").textContent = "Reading your trip…";
+    const r = await understand(text);
+    btn.disabled = false;
+    const cur = P.get().trip || {};
+    const next = { adults: 2, kids: 0, kid_ages: [], pace: "", interests: [], budget: "", from: "", nights: 0, home: "", access: [], access_note: "", ...cur };
+    for (const f of r.found) next[f] = r.fields[f];
+    if (r.found.includes("kids") && !r.found.includes("kid_ages") && next.kid_ages.length > next.kids) next.kid_ages = next.kid_ages.slice(0, next.kids);
+    const clean = P.cleanTrip(next) || next;
+    if (r.found.length) { writing = true; P.setTrip(clean); writing = false; fill(P.get().trip || clean); flash(r.found); }
+    const trip = P.get().trip || clean;
+    const filled = r.found.length ? `Filled in: ${summary(trip, r.found)}.` : "";
+    $("tcFilled").textContent = filled ? `${filled} Everything stays editable below.` : "";
+    const fu = TP.followUp(trip);
+    if (!r.found.length) say("isla", "I couldn’t pick out trip details there. Try something like “2 adults and a 5-year-old, 5 nights from May 10, flying from Boston”.");
+    else if (fu.need.length && !asked) { asked = true; say("isla", `Got it. ${fu.ask}`); }
+    else if (fu.need.length) say("isla", "Thanks. You can add the rest in the form below whenever you know it, or press Travel Concierge now.");
+    else say("isla", "Thanks, that’s everything I need. Press Travel Concierge when you’re ready, or keep chatting to change anything.");
+    $("tcAsk").value = ""; $("tcAsk").focus();
+  }
+  $("tcChatForm").addEventListener("submit", (e) => { e.preventDefault(); chat($("tcAsk").value); });
+  $("tcAsk").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); chat($("tcAsk").value); } });
+
   /* ---------------- itinerary storage ---------------- */
   function load() { try { const o = JSON.parse(localStorage.getItem(KEY) || "null"); return o ? I.expand(o) : null; } catch (e) { return null; } }
   function store() { if (shared || !itin) return; try { localStorage.setItem(KEY, JSON.stringify(I.compact(itin))); } catch (e) { /* storage full or blocked: the plan still works on the page */ } }
@@ -106,7 +185,8 @@
       <p class="tc-when"><span class="tc-time">${esc(I.TIME_LABEL[x.time])}</span><span class="tc-kind">${KIND[x.k]}</span></p>
       <h4 class="tc-title">${title}</h4>
       ${x.note ? `<p class="tc-note">${esc(x.note)}</p>` : ""}
-      <div class="tc-acts" role="group" aria-label="Change ${who}">
+      ${x.p ? '<span class="tc-pin" title="You changed this, so Keep my edits keeps it">Edited</span>' : ""}
+      <div class="tc-acts" data-as-avoid role="group" aria-label="Change ${who}">
         <button type="button" class="tc-btn" data-act="edit" aria-label="Edit ${who}">Edit</button>
         <button type="button" class="tc-btn" data-act="up" aria-label="Move ${who} earlier"${d === 0 && i === 0 ? " disabled" : ""}>↑<span class="sr-only"> earlier</span></button>
         <button type="button" class="tc-btn" data-act="down" aria-label="Move ${who} later"${d === itin.days.length - 1 && i === n - 1 ? " disabled" : ""}>↓<span class="sr-only"> later</span></button>
@@ -147,6 +227,8 @@
       </section>`).join("");
     $("tcAddDay").disabled = n >= I.MAX.days;
     $("tcRegen").hidden = shared;
+    $("tcGenBar").hidden = shared; /* like Start again: a shared plan is saved or edited first, never regenerated over */
+    document.dispatchEvent(new CustomEvent("ambar:layout"));
     $("tcShared").hidden = !shared;
     const vo = window.VO_EVENTS_DATA || {};
     $("tcSources").innerHTML = `Events from the Visit Orlando calendar (captured ${esc(vo.fetched_at ? String(vo.fetched_at).slice(0, 10) : "recently")}); check each listing before you go. Hotels are from the comp set on the <a href="${ROOT}index.html#hotels">market page</a>. Flights open Google Flights for your dates; no fares are shown. The AMBAR visit is in person at the sales center, booked on <a href="${I.CALENDLY}" target="_blank" rel="noopener">Calendly<span class="sr-only"> (opens in a new tab)</span></a>.`;
@@ -192,13 +274,55 @@
   $("tcAddDay").addEventListener("click", () => { editing = null; setItin(I.addDay(itin), `Day ${itin.days.length + 1} added.`, `#tcDay${itin.days.length}`); });
 
   /* ---------------- generate (+ optional AI note) ---------------- */
-  function build() {
+  function build(opts) {
     const trip = P.get().trip || {};
-    return I.generate({ trip, today, events: (window.VO_EVENTS_DATA || {}).events || [], db: D.db, favs: P.get().hotels, flights: F });
+    return I.generate({ trip, today, events: voEvents(), db: D.db, favs: P.get().hotels, flights: F, ...(opts || {}) });
   }
+  /* Generate: every press is a new seed, steers away from the current plan's picks, and (AI on) asks for picks at temperature 0.9 */
+  const newSeed = () => (crypto.getRandomValues ? crypto.getRandomValues(new Uint32Array(1))[0] : Math.floor(Math.random() * 4294967296)) >>> 0 || 1;
+  async function aiPicks(seed, avoid) {
+    if (!proxy()) return [];
+    const trip = P.get().trip || {};
+    const start = trip.from && trip.from >= today ? trip.from : I.addDays(today, 30), end = I.addDays(start, Math.max(1, +trip.nights || 4));
+    const r = I.rng(seed);
+    const pool = voEvents().filter((e) => e.end_date >= start && e.start_date <= end && e.end_date >= today).map((e) => [r(), e]).sort((a, b) => a[0] - b[0]).slice(0, 25).map((x) => x[1]);
+    if (!pool.length) return [];
+    const ids = new Set(pool.map((e) => String(e.id)));
+    const data = await task("itinerary_picks", "Pick a fresh mix of events for this trip.", {
+      events: pool.map((e) => ({ id: String(e.id), title: e.title, start_date: e.start_date, end_date: e.end_date, location: e.location || "", area: e.city || "", categories: e.categories || [], url: e.url })),
+      slots: 8, avoid: avoid.filter((x) => x.startsWith("e:")).map((x) => x.slice(2)),
+      trip: { adults: trip.adults || 2, kids: trip.kids || 0, kid_ages: trip.kid_ages || [], interests: trip.interests || [], pace: trip.pace || "", budget: trip.budget || "" },
+    }, { temperature: 0.9 }, 9000);
+    return data && Array.isArray(data.event_ids) ? data.event_ids.map(String).filter((id) => ids.has(id)) : [];
+  }
+  let genN = 0;
+  async function regenerate(mode) {
+    if (!D) return;
+    const old = itin, seed = newSeed(), avoid = old ? I.picksOf(old) : [];
+    $("tcChoice").hidden = true;
+    $("tcGen").disabled = true; $("tcStatus").textContent = "Isla is putting together a new version…";
+    const prefer = await aiPicks(seed, avoid);
+    $("tcGen").disabled = false;
+    let fresh = build({ seed, avoid, prefer });
+    const kept = mode === "keep" && old ? old.days.flatMap((d) => d.items).filter((x) => x.p).length : 0;
+    if (mode === "keep" && old) fresh = I.keepEdits(fresh, old);
+    const before = new Set(avoid), now = I.picksOf(fresh), changed = now.filter((x) => !before.has(x)).length;
+    genN += 1; shared = false; editing = null;
+    setItin(fresh, `New version ${genN}: ${changed} new pick${changed === 1 ? "" : "s"}${prefer.length ? " chosen with Isla AI" : ""}${mode === "keep" ? `, your ${kept} edited item${kept === 1 ? "" : "s"} kept` : ""}. Press Generate again for another.`, null);
+    $("tcTitle").focus();
+  }
+  $("tcGen").addEventListener("click", () => {
+    if (!itin) { go(true); return; }
+    if (I.hasEdits(itin)) { $("tcChoice").hidden = false; $("tcKeepEdits").focus(); return; }
+    regenerate("all");
+  });
+  $("tcAll").addEventListener("click", () => regenerate("all"));
+  $("tcKeepEdits").addEventListener("click", () => regenerate("keep"));
+  $("tcChoiceX").addEventListener("click", () => { $("tcChoice").hidden = true; $("tcGen").focus(); });
+  $("tcChoice").addEventListener("keydown", (e) => { if (e.key === "Escape") { $("tcChoice").hidden = true; $("tcGen").focus(); } });
   async function aiNote(it) {
-    const url = String((window.AMBAR_ASSISTANT_CONFIG || {}).proxyUrl || "").trim();
-    if (!/^https:\/\//.test(url)) return;
+    const url = proxy();
+    if (!url) return;
     const trip = P.get().trip || {};
     const evs = it.days.flatMap((d) => d.items).filter((x) => x.k === "e").map((x) => D.ev.get(x.ref)).filter(Boolean).slice(0, 12);
     const q = `Write a warm 2-sentence welcome note (under 60 words) for our ${it.days.length}-day Orlando trip from ${it.start}: ${partyText(trip) || "a small group"}${trip.interests && trip.interests.length ? `, into ${trip.interests.join(", ")}` : ""}. Mention one event from EVENTS by name. No prices, no links.`.slice(0, 500);

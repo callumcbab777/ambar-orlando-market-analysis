@@ -3,6 +3,11 @@
    POST /api/chat  { messages:[{role:"user"|"assistant", content}],
                      context:{ page, today, calendar_url, events:[], knowledge_ids:[], profile:{hotels,brands,other_brand,events,prefs}, sections:[] } }
    → 200 { reply }   | 4xx/5xx { error }
+   Structured tasks (body.task), each answered as strict JSON that the server parses and checks before returning { data }:
+     "trip_parse"      the Travel Concierge chat box: one plain-words trip description → My Preferences fields
+     "itinerary_picks" a new itinerary version: choose event ids from the candidates the browser sent (body.temperature 0.2–1)
+     "events_answer"   the events page "Ask Isla": answer from the event subset sent, citing event ids from that subset only
+   The browser validates every reply again and falls back to its rule-based answer on any error or timeout.
    Grounding: the prompt is built here from ../knowledge.json (the site's own index, copied in by tools/build_knowledge.py),
    never from text the browser sends. The browser only names doc ids; ids that aren't in the index are dropped, and the
    server adds its own retrieval for the latest question (events included: one doc per Visit Orlando listing, plus
@@ -62,7 +67,7 @@ function sanitize(body) {
   if (!messages.length || messages[messages.length - 1].role !== "user") return { error: "The last message must be from the user." };
   const c = body.context && typeof body.context === "object" ? body.context : {};
   const events = (Array.isArray(c.events) ? c.events : []).slice(0, 25).filter((e) => e && isVO(e.url)).map((e) => ({
-    title: clip(e.title, 160), start_date: clip(e.start_date, 10), end_date: clip(e.end_date, 10),
+    id: /^\d{1,9}$/.test(String(e.id || "")) ? String(e.id) : "", title: clip(e.title, 160), start_date: clip(e.start_date, 10), end_date: clip(e.end_date, 10),
     location: clip(e.location, 120), area: clip(e.area, 60),
     categories: (Array.isArray(e.categories) ? e.categories : []).slice(0, 5).map((x) => clip(x, 40)), url: clip(e.url, 300),
   }));
@@ -85,10 +90,65 @@ function sanitize(body) {
     } : null,
   } : null;
   const sections = (Array.isArray(c.sections) ? c.sections : []).slice(0, 20).filter((s) => s && /^https?:\/\//.test(String(s.url || ""))).map((s) => ({ title: clip(s.title, 80), url: clip(s.url, 300), about: clip(s.about, 200) }));
+  const task = TASKS.includes(body.task) ? body.task : "chat";
+  const t = Number(body.temperature);
+  const temperature = task === "itinerary_picks" && isFinite(t) ? Math.min(1, Math.max(0.2, t)) : task === "chat" ? 0.2 : task === "events_answer" ? 0.2 : 0;
+  const slots = Math.max(1, Math.min(40, parseInt(c.slots, 10) || 8));
+  const avoid = (Array.isArray(c.avoid) ? c.avoid : []).filter((x) => /^\d{1,9}$/.test(String(x))).slice(0, 40).map(String);
+  const trip = c.trip && typeof c.trip === "object" ? {
+    adults: Math.max(1, Math.min(12, parseInt(c.trip.adults, 10) || 2)), kids: Math.max(0, Math.min(10, parseInt(c.trip.kids, 10) || 0)),
+    kid_ages: words(c.trip.kid_ages && c.trip.kid_ages.map(String), 10, 2), interests: words(c.trip.interests, 9, 12), pace: clip(c.trip.pace, 10), budget: clip(c.trip.budget, 10),
+  } : null;
   return {
+    task, temperature, slots, avoid, trip,
     messages,
     context: { page: clip(c.page, 20), today: /^\d{4}-\d{2}-\d{2}$/.test(c.today || "") ? c.today : "", calendar_url: isVO(c.calendar_url) ? clip(c.calendar_url, 400) : "https://www.visitorlando.com/events/", sections, events, knowledge_ids: ids, profile },
   };
+}
+
+const TASKS = ["chat", "trip_parse", "itinerary_picks", "events_answer"];
+/* ---- structured tasks: strict JSON in, strict JSON out ---- */
+const TRIP_SCHEMA = `{"adults"?: integer 1-12, "kids"?: integer 0-10, "kid_ages"?: [integers 0-17], "pace"?: "relaxed"|"balanced"|"packed",
+ "interests"?: subset of ["parks","golf","dining","nightlife","shopping","nature","wellness","sports","culture"], "budget"?: "value"|"comfort"|"luxury",
+ "from"?: "YYYY-MM-DD" arrival date, "nights"?: integer 1-21, "home"?: 3-letter IATA airport code, "access"?: subset of ["step-free","limited-walking","sensory","stroller","hearing","sight"]}`;
+function taskPrompt(clean) {
+  const ctx = clean.context, today = ctx.today || orlandoToday();
+  if (clean.task === "trip_parse") return [
+    "You turn one visitor's plain-words description of an Orlando trip into JSON for a trip-planning form. Today is " + today + ".",
+    "Reply with ONE JSON object and nothing else, using only these keys (omit any the visitor did not say or clearly imply):", TRIP_SCHEMA,
+    "Rules: 'in April' = the next April on or after today, starting the 1st (or about a week from today if that April has started); 'a week' = 7 nights; 'long weekend' = 3 nights; 'N days' = N-1 nights.",
+    "'family of 4, kids 3 and 6' = adults 2, kids 2, kid_ages [3,6]. Theme parks/Disney/Universal → parks; food/restaurants → dining; museums/shows → culture; wheelchair → step-free; mobility/walking → limited-walking; stroller/pram → stroller.",
+    "Map a city to its main airport code (Manchester → MAN, London → LHR unless Gatwick is named, New York → JFK unless LaGuardia/Newark is named). Never guess anything not stated.",
+  ].join("\n");
+  if (clean.task === "itinerary_picks") return [
+    "You choose Orlando events for a visitor's trip plan from a fixed list. Today is " + today + ".",
+    "Reply with ONE JSON object and nothing else: {\"event_ids\": [up to " + clean.slots + " ids from EVENTS, best first]}. Use ONLY ids from EVENTS. Never invent events.",
+    "Suit the party and interests: " + JSON.stringify(clean.trip || {}) + ". Avoid adult-only events when kids are coming. Prefer variety (different types and venues) and prefer ids NOT in AVOID: " + JSON.stringify(clean.avoid) + ".",
+    "EVENTS:", ...(ctx.events.length ? ctx.events.filter((e) => e.id).map((e) => `- id ${e.id} | ${e.title} | ${e.start_date}${e.end_date !== e.start_date ? " to " + e.end_date : ""} | ${e.location} | ${e.categories.join(", ")}`) : ["- (none)"]),
+  ].join("\n");
+  return [
+    "You are Isla (Isla AI by ABI Group) answering a question about Orlando events on the AMBAR Orlando site. Today is " + today + ".",
+    "Use ONLY the EVENTS below (Visit Orlando listings collected by the site). Never invent events, times or prices. If none fit, say so plainly.",
+    "Reply with ONE JSON object and nothing else: {\"answer\": \"2-4 short plain sentences, no links, no markdown\", \"event_ids\": [the ids of the events you recommend, best first, at most 5, only from EVENTS]}.",
+    "Say that listings can change and to check each one before going. No financial advice.",
+    "EVENTS:", ...(ctx.events.length ? ctx.events.filter((e) => e.id).map((e) => `- id ${e.id} | ${e.title} | ${e.start_date}${e.end_date !== e.start_date ? " to " + e.end_date : ""} | ${[e.location, e.area].filter(Boolean).join(", ")} | ${e.categories.join(", ")}`) : ["- (none)"]),
+  ].join("\n");
+}
+/* parse the model's JSON (tolerating a code fence) and check its shape; anything else is a 502 so the browser falls back */
+function taskData(task, text, clean) {
+  let j;
+  try { j = JSON.parse(String(text).trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "")); } catch (e) { return null; }
+  if (!j || typeof j !== "object" || Array.isArray(j)) return null;
+  const sent = new Set(clean.context.events.map((e) => e.id).filter(Boolean));
+  if (task === "trip_parse") {
+    const ok = ["adults", "kids", "kid_ages", "pace", "interests", "budget", "from", "nights", "home", "access"];
+    return Object.keys(j).every((k) => ok.includes(k)) ? j : null;
+  }
+  if (!Array.isArray(j.event_ids)) return null;
+  const ids = [...new Set(j.event_ids.map(String))].filter((id) => sent.has(id));
+  if (task === "itinerary_picks") return { event_ids: ids.slice(0, clean.slots) };
+  if (typeof j.answer !== "string" || !j.answer.trim()) return null;
+  return { answer: j.answer.trim().slice(0, 1200), event_ids: ids.slice(0, 6) };
 }
 
 const orlandoToday = () => { try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date()); } catch (e) { return new Date().toISOString().slice(0, 10); } };
@@ -211,13 +271,20 @@ async function handler(req, res) {
     const r = await fetch(`${c.base}/chat/completions`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${c.key}` },
-      body: JSON.stringify({ model: c.model, temperature: 0.2, max_tokens: 500, messages: [{ role: "system", content: systemPrompt(clean.context, grounding(clean.context, clean.messages[clean.messages.length - 1].content, c.site), c.site) }, ...clean.messages] }),
+      body: JSON.stringify(clean.task === "chat"
+        ? { model: c.model, temperature: 0.2, max_tokens: 500, messages: [{ role: "system", content: systemPrompt(clean.context, grounding(clean.context, clean.messages[clean.messages.length - 1].content, c.site), c.site) }, ...clean.messages] }
+        : { model: c.model, temperature: clean.temperature, max_tokens: 400, ...(c.provider === "custom" ? {} : { response_format: { type: "json_object" } }),
+            messages: [{ role: "system", content: taskPrompt(clean) }, clean.messages[clean.messages.length - 1]] }),
       signal: ctrl.signal,
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) { console.error("upstream", r.status, j && j.error ? JSON.stringify(j.error).slice(0, 300) : ""); return send(res, 502, { error: "The AI provider returned an error." }); }
     const reply = j && j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content;
     if (typeof reply !== "string" || !reply.trim()) return send(res, 502, { error: "Empty reply from the AI provider." });
+    if (clean.task !== "chat") {
+      const data = taskData(clean.task, reply, clean);
+      return data ? send(res, 200, { data }) : send(res, 502, { error: "The AI reply was not valid JSON for this task." });
+    }
     return send(res, 200, { reply: reply.trim().slice(0, 4000) });
   } catch (e) {
     return send(res, 504, { error: e.name === "AbortError" ? "The AI provider timed out." : "Could not reach the AI provider." });
@@ -225,4 +292,4 @@ async function handler(req, res) {
 }
 
 module.exports = handler;
-module.exports._test = { cfg, sanitize, systemPrompt, grounding, limited, hits, knowledgeLoaded: () => !!IX };
+module.exports._test = { cfg, sanitize, systemPrompt, grounding, limited, hits, taskPrompt, taskData, knowledgeLoaded: () => !!IX };
