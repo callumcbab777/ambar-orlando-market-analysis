@@ -420,8 +420,14 @@ body,h1,h2,h3,h4,.hero-stats dd,.tier-label h3{font-variant-numeric:lining-nums}
 .site-nav a.nav-profile{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(227,198,138,.5)}
 .nav-count{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--amber);color:var(--dark);font-size:.7rem;font-weight:700;letter-spacing:0;line-height:1}
 .nav-count[hidden]{display:none}
-/* ten links on the market page: tighter spacing so they still fit beside the pill at 1181–1440px */
-@media (min-width:1181px){.site-nav{gap:0}.site-nav a{padding:8px 6px}.site-nav a.nav-profile{gap:5px}}
+/* eleven links on the market page: tighter spacing so they still fit beside the pill at 1181–1440px */
+@media (min-width:1181px){
+  .header-inner{gap:12px}
+  .site-nav{gap:0;overflow-x:visible}
+  .site-nav a{padding:8px 4px;font-size:.82rem;letter-spacing:0}
+  .site-nav a.nav-profile{gap:4px;padding-left:8px;padding-right:8px}
+  .update-pill{padding:6px 8px;letter-spacing:.08em;font-size:.68rem}
+}
 /* Favourite hotels (star toggle, saved to My Profile) */
 .fav-star{appearance:none;flex:none;display:inline-grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:transparent;color:var(--brown);cursor:pointer;transition:background .2s,color .2s}
 .fav-star svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}

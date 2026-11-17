@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en" class="moments-page">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Orlando · Moments · AMBAR Orlando</title>
+<meta name="description" content="My Orlando · Moments — internal concept demo for the AMBAR Orlando buyer portal, shown with the AMBAR Orlando Market Landscape.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1E3A2C">
+<link rel="icon" href="../assets/ambar-logo.png">
+<link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/vendor/leaflet.css">
+<link rel="stylesheet" href="../assets/css/styles.css">
+<link rel="stylesheet" href="assets/css/styles.css?v=1793754000">
+</head>
+<body class="moments-page">
+<a class="skip" href="#main">Skip to content</a>
+<div class="demo-tag">Internal concept demo</div>
+
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="brand-mark" href="../index.html" aria-label="AMBAR Orlando Market Landscape, home">
+      <img src="../assets/ambar-logo.png" alt="AMBAR Residences · Orlando" width="156" height="66">
+    </a>
+    <nav class="site-nav" aria-label="Site">
+      <a href="../index.html">← Market landscape</a>
+      <a href="../index.html#week-ahead">Week ahead</a>
+      <a href="../index.html#hotels">Hotels</a>
+      <a href="../events/">Orlando events</a>
+      <a href="../visit/">Plan your visit</a>
+      <a href="index.html" class="active" aria-current="page">Moments</a>
+      <a href="../profile/" class="nav-profile" data-profile-label>My Profile <span class="nav-count" data-profile-count hidden></span></a>
+    </nav>
+    <span class="update-pill">My Orlando · Moments</span>
+  </div>
+</header>
+
+<main id="main">
+<div class="mo-root">
+  <div class="top">
+    <nav class="wrap tabs" aria-label="My Orlando areas">
+      <a class="tab" href="#explore" data-tab="explore">Explore <small>Discover Orlando map</small></a>
+      <a class="tab" href="#saved" data-tab="saved">Saved <small>your pins</small></a>
+      <a class="tab active" href="#moments" data-tab="moments" aria-current="page">Moments <small>tell us about you</small></a>
+    </nav>
+  </div>
+
+  <section data-view="explore" hidden class="view-explore">
+    <div class="wrap ex-head"><p class="eyebrow">Explore</p><h2>Discover Orlando</h2><p class="lede-s">Your pinned places are highlighted. Tap any place to pin or unpin it.</p><p id="pin-count" class="hint"></p></div>
+    <div class="wrap"><div id="cat-filter" class="g-chips cat-filter" role="group" aria-label="Categories"></div></div>
+    <div class="wrap ex-grid"><div id="map" class="map" role="region" aria-label="Discover Orlando map"></div><div id="place-list" class="place-list"></div></div>
+    <p class="wrap hint map-foot">Place locations from OpenStreetMap. The AMBAR marker is shown for reference at street level.</p>
+  </section>
+  <section data-view="saved" hidden class="view-saved">
+    <div class="wrap ex-head"><p class="eyebrow">Saved</p><h2>Your pinned places</h2><p class="lede-s">Everything you’ve pinned, including the starter pins from Orlando Days. Unpin anything, any time.</p></div>
+    <div class="wrap"><div id="saved-list" class="saved-list"></div></div>
+  </section>
+  <div data-view="moments">
+    <section class="hero wrap">
+      <p class="eyebrow">Moments</p>
+      <h2>Make Orlando yours, one moment at a time.</h2>
+      <p class="lede">Tell us about the Orlando you picture, and this space becomes more useful and more yours.</p>
+      <div class="reassure">
+        <span>No right answers. Skip anything you like.</span>
+        <span>Your answers can change. So can you.</span>
+      </div>
+    </section>
+
+    <section class="wrap">
+      <div id="cards" class="cards"><noscript>
+  <article class="card static"><div class="c-img"><img src="assets/img/hotel-feeling.jpg" alt="" loading="lazy" width="800" height="500"><span class="c-time">about 2 minutes</span></div><div class="c-body"><h3>Why Orlando</h3><p class="c-invite">Tell us what’s drawing you to Orlando right now.</p><p class="c-desc">The pull of the place, in your own words.</p><div class="c-foot"><span class="c-open">Turn on JavaScript to open this Moment</span></div></div></article>
+  <article class="card static"><div class="c-img"><img src="assets/img/picture-it.jpg" alt="" loading="lazy" width="800" height="500"><span class="c-time">about 3 minutes</span></div><div class="c-body"><h3>Orlando Days</h3><p class="c-invite">Tell us about your Orlando days.</p><p class="c-desc">Parks, dining and the things you love doing.</p><div class="c-foot"><span class="c-open">Turn on JavaScript to open this Moment</span></div></div></article>
+  <article class="card static"><div class="c-img"><img src="assets/img/your-visit.jpg" alt="" loading="lazy" width="800" height="500"><span class="c-time">about 3 minutes</span></div><div class="c-body"><h3>The Hotel Feeling</h3><p class="c-invite">Tell us what great service feels like to you.</p><p class="c-desc">Service, Bonvoy and the brand experiences you value.</p><div class="c-foot"><span class="c-open">Turn on JavaScript to open this Moment</span></div></div></article>
+  <article class="card static"><div class="c-img"><img src="assets/img/x-pool.jpg" alt="" loading="lazy" width="800" height="500"><span class="c-time">about 3 minutes</span></div><div class="c-body"><h3>Picture It</h3><p class="c-invite">How do you picture your time there?</p><p class="c-desc">The view, the space, the style and how you’d spend your time.</p><div class="c-foot"><span class="c-open">Turn on JavaScript to open this Moment</span></div></div></article>
+  <article class="card static"><div class="c-img"><img src="assets/img/x-spa.jpg" alt="" loading="lazy" width="800" height="500"><span class="c-time">about 3 minutes</span></div><div class="c-body"><h3>On Your Mind</h3><p class="c-invite">Tell us what’s on your mind today.</p><p class="c-desc">Your questions and hesitations, and the one thing you’d ask us.</p><div class="c-foot"><span class="c-open">Turn on JavaScript to open this Moment</span></div></div></article>
+  <article class="card static"><div class="c-img"><img src="assets/img/x-v-pool.jpg" alt="" loading="lazy" width="800" height="500"><span class="c-time">about 2 minutes</span></div><div class="c-body"><h3>Your Visit</h3><p class="c-invite">Tell us how you’d like your tour day to feel.</p><p class="c-desc">Planning your tour, once it’s booked.</p><div class="c-foot"><span class="c-open">Turn on JavaScript to open this Moment</span></div></div></article>
+  <article class="card static"><div class="c-img"><img src="assets/img/x-bright.jpg" alt="" loading="lazy" width="800" height="500"><span class="c-time">about 1 minute</span></div><div class="c-body"><h3>Who’s Part of This</h3><p class="c-invite">Tell us who you’re deciding with.</p><p class="c-desc">The people in the conversation, and how you like to decide.</p><div class="c-foot"><span class="c-open">Turn on JavaScript to open this Moment</span></div></div></article>
+  </noscript></div>
+    </section>
+
+    <section class="wrap board-wrap" aria-labelledby="board-h">
+      <div class="board-head">
+        <div><p class="eyebrow">Your Orlando board</p><h2 id="board-h">The picture so far</h2></div>
+        <p class="board-note">Each Moment you share adds a tile here. Share a Moment and its tile appears here.</p>
+      </div>
+      <div id="board" class="board"></div>
+    </section>
+
+    <section class="wrap summary">
+      <div class="summary-inner">
+        <p class="eyebrow">All Moments</p>
+        <h2>Your Orlando, on one page</h2>
+        <p>Bring every Moment together into a shareable one-page <em>Your Orlando</em> summary — something to keep, and to pass to the people deciding with you.</p>
+        <div class="sum-page"><div id="sum-text" class="sum-text" aria-label="Your Orlando summary, editable"></div>
+        <div id="sum-tools" class="sum-tools" hidden><span class="hint">Click into the text to edit it.</span><button class="btn ghost sm" id="sum-refresh">Rewrite from my answers</button><button class="btn primary sm" id="sum-print">Print or save as PDF</button></div></div>
+      </div>
+    </section>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer ev-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <img src="../assets/ambar-logo.png" alt="AMBAR Residences · Orlando" width="156" height="66">
+      <div>
+        <p class="kicker on-dark">My Orlando · Moments</p>
+        <h2>The picture so far</h2>
+      </div>
+    </div>
+    <div class="footer-copy">
+      <p class="promise">Your advisor will already know what matters to you, so your first call skips the basics.</p>
+      <p class="small">My Orlando · Moments — an internal concept demo by ABI Group for the AMBAR Orlando team. Not for distribution to buyers.</p>
+      <p class="small"><a href="#" id="reset">Reset demo</a></p>
+      <p class="small credits">Images: AMBAR renderings courtesy of AMBAR Residences Orlando, approved for external use. Orlando photos via Wikimedia Commons — Lake Eola at dusk by DoctorDotDJ (CC BY-SA 4.0); Falcon’s Fire Golf Course by ReunionVacationHomes.com (CC BY-SA 4.0); Lake Eola swans by LeonidasB (CC BY-SA 4.0); Orlando sunset skyline by Steve Willis (CC BY-SA 2.0). Other photos CC0 via Unsplash/Wikimedia Commons. Full credits in the README.</p>
+    </div>
+    <p class="fineprint on-dark">Compiled by Callum Brown · Headings in Cormorant Garamond, body in DM Sans (SIL Open Font License) · Map: Leaflet &amp; OpenStreetMap</p>
+  </div>
+</footer>
+
+<div class="mo-root">
+  <div id="modal" class="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <article class="modal-card" role="dialog" aria-modal="true" aria-labelledby="m-title">
+      <button class="close" data-close aria-label="Close">×</button>
+      <div class="m-img"><img id="m-img" alt=""></div>
+      <div class="m-body" id="m-body" aria-live="polite"></div>
+    </article>
+  </div>
+  <div id="toast" class="toast" role="status"></div>
+</div>
+<script src="assets/vendor/leaflet.js"></script>
+<script src="assets/js/places.js?v=1792088133"></script>
+<script src="assets/js/data.js?v=1792088133"></script>
+<script src="assets/js/tiles.js?v=1793754000"></script>
+<script src="assets/js/app.js?v=1793754000"></script>
+<script src="../assets/js/profile.js"></script>
+<script src="../assets/js/nav.js"></script>
+</body>
+</html>

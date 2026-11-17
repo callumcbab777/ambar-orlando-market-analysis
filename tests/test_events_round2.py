@@ -251,7 +251,7 @@ class NavTest(unittest.TestCase):
         labels = [re.sub(r"<[^>]+>", "", a).strip() for a in re.findall(r"<a[^>]*>(.*?)</a>", nav, re.S)]
         self.assertTrue(labels)
         # total label length budget keeps the bar on one line at 1280px (measured in render QA)
-        self.assertLessEqual(sum(len(l) for l in labels), 90, labels)
+        self.assertLessEqual(sum(len(l) for l in labels), 100, labels)
 
 
 if __name__ == "__main__":
