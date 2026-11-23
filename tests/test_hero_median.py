@@ -37,13 +37,13 @@ class HeroMedianAllNightsTest(unittest.TestCase):
 
     def test_priced_nights_count_matches_hero(self):
         # Hero "Priced nights" is the count of OK rates with rate > 0.
-        self.assertEqual(len(self.vals), 478)
+        self.assertEqual(len(self.vals), 555)
 
     def test_true_median_not_weekly_or_nested(self):
         # Flat median of every priced night observation (not median-of-medians).
         med = median_all_nights(self.db)
         self.assertIsNotNone(med)
-        self.assertEqual(med, 350.0)
+        self.assertEqual(med, 345.0)
         # Sanity vs mean-of-hotel-medians so we know it is not a nested median.
         by_hotel: dict[str, list[float]] = {}
         for r in self.db["rates"]:

@@ -6,7 +6,7 @@
   "events/index.html": "b8fe67f4e61bec2a",
   "visit/index.html": "2f57b7fb190762a8",
   "profile/index.html": "991e684b4d97934f",
-  "data/comps.json": "fa3ccb46338c9d24",
+  "data/comps.json": "4d4f3d95c112e040",
   "data/brands.json": "093da256d376b6cd",
   "assets/js/plan.js": "dbf5ee80a4653236",
   "data/visitorlando_events.json": "1178b16ea7c3299d"
@@ -508,9 +508,9 @@
    "kind": "hotel",
    "title": "Walt Disney World Swan Reserve",
    "url": "index.html#hotel-swan-reserve",
-   "text": "Walt Disney World Swan Reserve (Swan Reserve) is a Autograph Collection hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Walt Disney World® Resort, EPCOT Resort Area. Address: 1255 Epcot Resorts Blvd, Lake Buena Vista, FL 32830. About 0.9 miles straight-line to EPCOT, on Walt Disney World property. Newest of the three Swan & Dolphin hotels (opened 2021), managed by Marriott International on Disney property. Lowest public nightly rates observed for the week of Nov 16, 2026: $328 to $452 across 5 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "Walt Disney World Swan Reserve (Swan Reserve) is a Autograph Collection hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Walt Disney World® Resort, EPCOT Resort Area. Address: 1255 Epcot Resorts Blvd, Lake Buena Vista, FL 32830. About 0.9 miles straight-line to EPCOT, on Walt Disney World property. Newest of the three Swan & Dolphin hotels (opened 2021), managed by Marriott International on Disney property. Lowest public nightly rates observed for the week of Nov 23, 2026: $337 to $599 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "swandolphin.com (Our Resorts)",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "swan-reserve",
     "Autograph Collection",
@@ -523,9 +523,9 @@
    "kind": "hotel",
    "title": "JW Marriott Orlando Bonnet Creek Resort & Spa",
    "url": "index.html#hotel-jw-bonnet-creek",
-   "text": "JW Marriott Orlando Bonnet Creek Resort & Spa (JW Bonnet Creek) is a JW Marriott hotel, Luxury tier, parent Marriott International; part of the Marriott set in the landscape. Area: Bonnet Creek, Orlando. Address: Chelonia Pkwy, Orlando, FL 32830. About 1.7 miles straight-line to EPCOT. JW Marriott resort in the Bonnet Creek resort enclave, with on-site group and conference business. Lowest public nightly rates observed for the week of Nov 16, 2026: $224 to $281 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "JW Marriott Orlando Bonnet Creek Resort & Spa (JW Bonnet Creek) is a JW Marriott hotel, Luxury tier, parent Marriott International; part of the Marriott set in the landscape. Area: Bonnet Creek, Orlando. Address: Chelonia Pkwy, Orlando, FL 32830. About 1.7 miles straight-line to EPCOT. JW Marriott resort in the Bonnet Creek resort enclave, with on-site group and conference business. Lowest public nightly rates observed for the week of Nov 23, 2026: $221 to $310 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "OpenStreetMap",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "jw-bonnet-creek",
     "JW Marriott",
@@ -539,9 +539,9 @@
    "kind": "hotel",
    "title": "Walt Disney World Dolphin",
    "url": "index.html#hotel-dolphin",
-   "text": "Walt Disney World Dolphin (WDW Dolphin) is a Sheraton hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Walt Disney World® Resort, EPCOT Resort Area. Address: 1500 Epcot Resorts Blvd, Lake Buena Vista, FL 32830. About 0.8 miles straight-line to EPCOT, on Walt Disney World property. Largest of the Swan & Dolphin hotels and home to much of the complex's meeting space. Lowest public nightly rates observed for the week of Nov 16, 2026: $331 to $469 across 6 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "Walt Disney World Dolphin (WDW Dolphin) is a Sheraton hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Walt Disney World® Resort, EPCOT Resort Area. Address: 1500 Epcot Resorts Blvd, Lake Buena Vista, FL 32830. About 0.8 miles straight-line to EPCOT, on Walt Disney World property. Largest of the Swan & Dolphin hotels and home to much of the complex's meeting space. Lowest public nightly rates observed for the week of Nov 23, 2026: $259 to $519 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "swandolphin.com (Our Resorts)",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "dolphin",
     "Sheraton",
@@ -555,9 +555,9 @@
    "kind": "hotel",
    "title": "JW Marriott Orlando Grande Lakes",
    "url": "index.html#hotel-jw-grande-lakes",
-   "text": "JW Marriott Orlando Grande Lakes (JW Grande Lakes) is a JW Marriott hotel, Luxury tier, parent Marriott International; part of the Marriott set in the landscape. Area: Grande Lakes, South Orlando. Address: 4040 Central Florida Pkwy, Orlando, FL 32837. About 7.6 miles straight-line to EPCOT. Resort shared with The Ritz-Carlton Orlando, Grande Lakes; meeting-space renovation completed Oct 2026 (West Orlando News). Lowest public nightly rates observed for the week of Nov 16, 2026: $353 to $562 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "JW Marriott Orlando Grande Lakes (JW Grande Lakes) is a JW Marriott hotel, Luxury tier, parent Marriott International; part of the Marriott set in the landscape. Area: Grande Lakes, South Orlando. Address: 4040 Central Florida Pkwy, Orlando, FL 32837. About 7.6 miles straight-line to EPCOT. Resort shared with The Ritz-Carlton Orlando, Grande Lakes; meeting-space renovation completed Oct 2026 (West Orlando News). Lowest public nightly rates observed for the week of Nov 23, 2026: $262 to $390 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "OpenStreetMap",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "jw-grande-lakes",
     "JW Marriott",
@@ -570,9 +570,9 @@
    "kind": "hotel",
    "title": "Gaylord Palms Resort & Convention Center",
    "url": "index.html#hotel-gaylord-palms",
-   "text": "Gaylord Palms Resort & Convention Center (Gaylord Palms) is a Gaylord Hotels hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Kissimmee / Celebration area, Osceola County. Address: Gaylord Way, Osceola County, FL. About 2.5 miles straight-line to EPCOT. Convention resort with a heavy group calendar; rates often move with on-site events. Lowest public nightly rates observed for the week of Nov 16, 2026: $355 to $549 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "Gaylord Palms Resort & Convention Center (Gaylord Palms) is a Gaylord Hotels hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Kissimmee / Celebration area, Osceola County. Address: Gaylord Way, Osceola County, FL. About 2.5 miles straight-line to EPCOT. Convention resort with a heavy group calendar; rates often move with on-site events. Lowest public nightly rates observed for the week of Nov 23, 2026: $296 to $448 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "OpenStreetMap",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "gaylord-palms",
     "Gaylord Hotels",
@@ -585,9 +585,9 @@
    "kind": "hotel",
    "title": "Walt Disney World Swan",
    "url": "index.html#hotel-swan",
-   "text": "Walt Disney World Swan (WDW Swan (Westin)) is a Westin hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Walt Disney World® Resort, EPCOT Resort Area. Address: 1200 Epcot Resorts Blvd, Lake Buena Vista, FL 32830. About 0.8 miles straight-line to EPCOT, on Walt Disney World property. Westin-branded sister to the Dolphin across Crescent Lake's inlet. Lowest public nightly rates observed for the week of Nov 16, 2026: $352 to $484 across 6 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "Walt Disney World Swan (WDW Swan (Westin)) is a Westin hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Walt Disney World® Resort, EPCOT Resort Area. Address: 1200 Epcot Resorts Blvd, Lake Buena Vista, FL 32830. About 0.8 miles straight-line to EPCOT, on Walt Disney World property. Westin-branded sister to the Dolphin across Crescent Lake's inlet. Lowest public nightly rates observed for the week of Nov 23, 2026: $173 to $596 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "swandolphin.com (Our Resorts)",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "swan",
     "Westin",
@@ -601,9 +601,9 @@
    "kind": "hotel",
    "title": "The Inn at Celebration, Autograph Collection",
    "url": "index.html#hotel-inn-celebration",
-   "text": "The Inn at Celebration, Autograph Collection (Inn at Celebration) is a Autograph Collection hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Celebration Village, Osceola County. Address: 700 Bloom St, Celebration, FL 34747. About 3.8 miles straight-line to EPCOT. Boutique Autograph Collection hotel in Celebration's town centre. Lowest public nightly rates observed for the week of Nov 16, 2026: $136 to $442 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "The Inn at Celebration, Autograph Collection (Inn at Celebration) is a Autograph Collection hotel, Premium tier, parent Marriott International; part of the Marriott set in the landscape. Area: Celebration Village, Osceola County. Address: 700 Bloom St, Celebration, FL 34747. About 3.8 miles straight-line to EPCOT. Boutique Autograph Collection hotel in Celebration's town centre. Lowest public nightly rates observed for the week of Nov 23, 2026: $151 to $269 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "OpenStreetMap",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "inn-celebration",
     "Autograph Collection",
@@ -617,9 +617,9 @@
    "kind": "hotel",
    "title": "Hyatt Regency Grand Cypress Resort",
    "url": "index.html#hotel-hyatt-grand-cypress",
-   "text": "Hyatt Regency Grand Cypress Resort (Hyatt Regency Grand Cypress) is a Hyatt Regency hotel, Premium tier, parent Hyatt; a non-Marriott hotel in the landscape. Area: Lake Buena Vista area, next to Disney Springs. Address: 1 Grand Cypress Blvd, Orlando, FL 32836. About 2.5 miles straight-line to EPCOT. Large Hyatt Regency resort set on the Grand Cypress estate beside Disney Springs, with a lake, golf and extensive meeting space. 779 keys. Lowest public nightly rates observed for the week of Nov 16, 2026: $200 to $279 across 6 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "Hyatt Regency Grand Cypress Resort (Hyatt Regency Grand Cypress) is a Hyatt Regency hotel, Premium tier, parent Hyatt; a non-Marriott hotel in the landscape. Area: Lake Buena Vista area, next to Disney Springs. Address: 1 Grand Cypress Blvd, Orlando, FL 32836. About 2.5 miles straight-line to EPCOT. Large Hyatt Regency resort set on the Grand Cypress estate beside Disney Springs, with a lake, golf and extensive meeting space. 779 keys. Lowest public nightly rates observed for the week of Nov 23, 2026: $150 to $249 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "Google Hotels listing / OpenStreetMap",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "hyatt-grand-cypress",
     "Hyatt Regency",
@@ -632,9 +632,9 @@
    "kind": "hotel",
    "title": "Wyndham Grand Orlando Resort Bonnet Creek",
    "url": "index.html#hotel-wyndham-grand-bonnet-creek",
-   "text": "Wyndham Grand Orlando Resort Bonnet Creek (Wyndham Grand Bonnet Creek) is a Wyndham Grand hotel, Premium tier, parent Wyndham; a non-Marriott hotel in the landscape. Area: Bonnet Creek, bordering Walt Disney World® Resort. Address: 14651 Chelonia Pkwy, Orlando, FL 32821. About 1.2 miles straight-line to EPCOT. Wyndham's upper-upscale lakeside resort in the gated Bonnet Creek enclave on the edge of Walt Disney World®, a neighbour of JW Marriott Orlando Bonnet Creek. 400 keys. Lowest public nightly rates observed for the week of Nov 16, 2026: $140 to $171 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "Wyndham Grand Orlando Resort Bonnet Creek (Wyndham Grand Bonnet Creek) is a Wyndham Grand hotel, Premium tier, parent Wyndham; a non-Marriott hotel in the landscape. Area: Bonnet Creek, bordering Walt Disney World® Resort. Address: 14651 Chelonia Pkwy, Orlando, FL 32821. About 1.2 miles straight-line to EPCOT. Wyndham's upper-upscale lakeside resort in the gated Bonnet Creek enclave on the edge of Walt Disney World®, a neighbour of JW Marriott Orlando Bonnet Creek. 400 keys. Lowest public nightly rates observed for the week of Nov 23, 2026: $121 to $218 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "OpenStreetMap (location) / Wyndham Grand",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "wyndham-grand-bonnet-creek",
     "Wyndham Grand",
@@ -647,9 +647,9 @@
    "kind": "hotel",
    "title": "Conrad Orlando at Evermore Resort",
    "url": "index.html#hotel-conrad-evermore",
-   "text": "Conrad Orlando at Evermore Resort (Conrad Orlando) is a Conrad Hotels & Resorts hotel, Luxury tier, parent Hilton; a non-Marriott hotel in the landscape. Area: Evermore Orlando Resort, west of Walt Disney World® Resort. Address: 1500 Eastbeach Way, Orlando, FL 32836. About 2.9 miles straight-line to EPCOT. Hilton's luxury Conrad resort (opened 2024) inside the 1,100-acre Evermore Orlando Resort, with an 8-acre lagoon and two Jack Nicklaus golf courses. 433 keys. Lowest public nightly rates observed for the week of Nov 16, 2026: $418 to $913 across 7 of 7 nights (source: Google Hotels (google.com/travel)). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "Conrad Orlando at Evermore Resort (Conrad Orlando) is a Conrad Hotels & Resorts hotel, Luxury tier, parent Hilton; a non-Marriott hotel in the landscape. Area: Evermore Orlando Resort, west of Walt Disney World® Resort. Address: 1500 Eastbeach Way, Orlando, FL 32836. About 2.9 miles straight-line to EPCOT. Hilton's luxury Conrad resort (opened 2024) inside the 1,100-acre Evermore Orlando Resort, with an 8-acre lagoon and two Jack Nicklaus golf courses. 433 keys. Lowest public nightly rates observed for the week of Nov 23, 2026: $387 to $541 across 7 of 7 nights (source: Google Hotels (google.com/travel)). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "Cvent venue page / Apple Maps / OpenStreetMap",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "conrad-evermore",
     "Conrad Hotels & Resorts",
@@ -662,9 +662,9 @@
    "kind": "hotel",
    "title": "ette Luxury Hotel & Spa, Orlando/Kissimmee",
    "url": "index.html#hotel-ette-orlando",
-   "text": "ette Luxury Hotel & Spa, Orlando/Kissimmee (ette Hotel) is a Independent hotel, Luxury tier, parent Independent; a non-Marriott hotel in the landscape. Area: Kissimmee (ChampionsGate side of the parks). Address: 3001 Sherberth Rd, Kissimmee, FL 34747. About 3.5 miles straight-line to EPCOT. Independent luxury boutique hotel and spa with 126 rooms and suites, positioned as an adult-leaning retreat a short drive from the parks. 126 keys. Lowest public nightly rates observed for the week of Nov 16, 2026: $264 to $302 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
+   "text": "ette Luxury Hotel & Spa, Orlando/Kissimmee (ette Hotel) is a Independent hotel, Luxury tier, parent Independent; a non-Marriott hotel in the landscape. Area: Kissimmee (ChampionsGate side of the parks). Address: 3001 Sherberth Rd, Kissimmee, FL 34747. About 3.5 miles straight-line to EPCOT. Independent luxury boutique hotel and spa with 126 rooms and suites, positioned as an adult-leaning retreat a short drive from the parks. 126 keys. Lowest public nightly rates observed for the week of Nov 23, 2026: $345 to $365 across 7 of 7 nights (source: trivago.com U.S.). These are lowest public rates, not ADR; taxes and resort fees are generally excluded.",
    "source": "ettehotels.com",
-   "as_of": "2026-11-16",
+   "as_of": "2026-11-23",
    "tags": [
     "ette-orlando",
     "Independent",
@@ -722,7 +722,7 @@
    "title": "How hotel rates are gathered (methodology)",
    "url": "index.html#sources",
    "text": "Lowest public nightly rate observed: the lowest price shown for a one-night stay on a public booking site on the snapshot date. It is not ADR, it is not occupancy, and room types are often unspecified. Currency USD. Straight-line ('as the crow flies') distance from each hotel to EPCOT, computed from OpenStreetMap coordinates. It is not a driving distance. Figures are public lowest rates shown on trivago.com U.S. or Google Hotels at the time of the snapshot. Taxes are usually excluded and resort fees, parking and member-only prices can change the total. UNAVAILABLE means no offer was returned for that one-night search. It is a scarcity signal, not a confirmed hotel sell-out. NOT COLLECTED means the rate calendar returned no prices for that hotel and week. Weekly means are simple arithmetic means of the nights that showed a price. They are illustrative and are not ADR. Occupancy for individual hotels is not publicly available. Market occupancy shown in Demand Context is metro-wide (CoStar), not for these hotels. Rates are dynamic. Prices moved between page loads on some snapshot mornings (noted where the brief recorded it). Hyatt Regency Grand Cypress, Wyndham Grand Bonnet Creek, Conrad Orlando and ette were added on Oct 14, 2026. They have no rates for weeks before Oct 12, and nights before the add date (Oct 12–13) were not collected; their Oct 14–18 rates are Google Hotels lowest shown one-night prices captured on Oct 14. Key counts for Hyatt Regency Grand Cypress (779) and Wyndham Grand Bonnet Creek (400) are as provided by Callum Brown; Conrad Orlando (433) and ette (126) match their official fact sheets. Key counts for the Marriott hotels are not shown.",
-   "as_of": "2026-11-16"
+   "as_of": "2026-11-23"
   },
   {
    "id": "demand:2026-09-21",
@@ -845,18 +845,34 @@
    "as_of": "2026-11-16"
   },
   {
+   "id": "demand:2026-11-23",
+   "kind": "demand",
+   "title": "Demand context · week of Nov 23, 2026",
+   "url": "index.html#demand",
+   "text": "Thu 26 Nov: Thanksgiving (U.S.) (Holiday). AAA projects 81.5 million U.S. travelers Tue 24–Mon 30 Nov (slightly below 2025, near record). Orlando is AAA's No. 1 domestic booking destination. Peak outbound is Tue–Wed; peak return is Sun–Mon. Source: AAA; Mon 23 Nov Marriott Orlando brief. Sun 22 – Tue 24 Nov: APS Division of Fluid Dynamics at OCCC (Convention). Typically 3,000+ attendees; I-Drive hotels. Overlaps Mon 23 and Tue 24 of this week, then ends before Thanksgiving. Source: OCCC/APS; Mon 23 Nov Marriott Orlando brief. Wed 25 and Fri 27 – Sun 29 Nov: I/ITSEC exhibitor move-in at OCCC (Convention). Exhibitor move-in this week; Thanksgiving Day is closed with no setup. The show itself is 30 Nov–3 Dec (next week). Source: iitsec.org; Mon 23 Nov Marriott Orlando brief. Tue 24, Wed 25, Fri 27 and Sun 29 Nov: Mickey's Very Merry Christmas Party (sold out) (Theme park). Party nights 24, 25, 27 and 29 Nov, all sold out, per the Mon 23 Nov brief. Source: Disney; Mon 23 Nov Marriott Orlando brief. 13 Nov 2026 – 3 Jan 2027: ice! featuring The Polar Express at Gaylord Palms (Group). Gaylord Palms ICE! is open this week. Coca-Cola Holiday Caravan 23–26 Nov.",
+   "as_of": "2026-11-23"
+  },
+  {
+   "id": "demand:2026-11-23:2",
+   "kind": "demand",
+   "title": "Demand context · week of Nov 23, 2026",
+   "url": "index.html#demand",
+   "text": "Source: Mon 23 Nov Marriott Orlando brief; news.marriott.com (12 Nov 2026 release). Tue 24 Nov: Orlando Magic vs Detroit Pistons at Kia Center (Other). Magic vs Pistons on Tue 24, plus Solar Bears and concerts during the week. Camping World Stadium appears dark this week. Source: Kia Center; Mon 23 Nov Marriott Orlando brief.",
+   "as_of": "2026-11-23"
+  },
+  {
    "id": "demand:looking-ahead",
    "kind": "demand",
    "title": "Demand context · looking ahead",
    "url": "index.html#demand",
-   "text": "Thu 26 Nov: Thanksgiving (U.S.). Pre-holiday travel builds from about Sat 21 / Mon 23 per the Mon 16 Nov brief. Source: Mon 16 Nov Marriott Orlando brief. Mon 30 Nov – Thu 3 Dec: I/ITSEC at OCCC. I/ITSEC at OCCC 30 Nov–3 Dec per the Mon 16 Nov brief. Source: Mon 16 Nov Marriott Orlando brief. 13 Nov 2026 – 3 Jan 2027: ice! featuring The Polar Express at Gaylord Palms. Holiday demand driver for Gaylord Palms; Coca-Cola Holiday Caravan 23–26 Nov. Source: news.marriott.com (19 and 29 Oct 2026 releases). 14 Nov 2026 – 3 Jan 2027: Holidays at Universal Orlando. Holiday season starts after the HHN-to-holidays gap week. Source: universalfamilyvacations.com / Universal Orlando news."
+   "text": "Mon 30 Nov – Thu 3 Dec: I/ITSEC at OCCC. I/ITSEC at OCCC 30 Nov–3 Dec. Exhibitor move-in is this week (Wed 25 and Fri 27–Sun 29; closed Thanksgiving Day). Source: iitsec.org; Mon 23 Nov Marriott Orlando brief. 13 Nov 2026 – 3 Jan 2027: ice! featuring The Polar Express at Gaylord Palms. Holiday demand driver for Gaylord Palms; Coca-Cola Holiday Caravan 23–26 Nov. Source: news.marriott.com (19 and 29 Oct 2026 releases); Mon 23 Nov brief confirms ICE! is open. 14 Nov 2026 – 3 Jan 2027: Holidays at Universal Orlando. Holiday season starts after the HHN-to-holidays gap week. Universal calendars were not checked in the Mon 23 Nov brief. Source: universalfamilyvacations.com / Universal Orlando news."
   },
   {
    "id": "demand:market",
    "kind": "demand",
    "title": "Metro Orlando market indicators",
    "url": "index.html#demand",
-   "text": "Week ending Sep 26, 2026: Metro Orlando hotel occupancy 68.3% (+18.6% YoY). Source: CoStar weekly release (search result) [verify]. Week ending Oct 3, 2026: Metro Orlando hotel occupancy 66.0% (+17.3% YoY; largest occupancy gain among the top 25 U.S. markets). Source: CoStar via Asian Hospitality (Oct 12, 2026). Week ending Oct 10, 2026: Metro Orlando hotel occupancy 67.3% (−3.6% YoY; ADR $196.20). Source: Visit Orlando research (LinkedIn post) [verify primary release]. Week ending Oct 17, 2026: Metro Orlando hotel occupancy 76.5% (+5.2% YoY; ADR $225.62; highest since April). Source: Visit Orlando research (cited in Mon 2 Nov brief) [verify primary release]. August 2026: Metro Orlando hotel occupancy 62.4% (−5.8% YoY; ADR $174.95). Source: Visit Orlando / CoStar (cited in Mon 26 brief). Oct–Dec 2026 (pacing): Metro Orlando demand pacing 6% ahead of last year (Forward look cited in Mon 26 brief — not a weekly CoStar print). Source: Mon 26 Marriott Orlando brief (Visit Orlando / CoStar context) [verify primary release]."
+   "text": "Week ending Sep 26, 2026: Metro Orlando hotel occupancy 68.3% (+18.6% YoY). Source: CoStar weekly release (search result) [verify]. Week ending Oct 3, 2026: Metro Orlando hotel occupancy 66.0% (+17.3% YoY; largest occupancy gain among the top 25 U.S. markets). Source: CoStar via Asian Hospitality (Oct 12, 2026). Week ending Oct 10, 2026: Metro Orlando hotel occupancy 67.3% (−3.6% YoY; ADR $196.20). Source: Visit Orlando research (LinkedIn post) [verify primary release]. Week ending Oct 17, 2026: Metro Orlando hotel occupancy 76.5% (+5.2% YoY; ADR $225.62; highest since April). Source: Visit Orlando research (cited in Mon 2 Nov brief) [verify primary release]. August 2026: Metro Orlando hotel occupancy 62.4% (−5.8% YoY; ADR $174.95). Source: Visit Orlando / CoStar (cited in Mon 26 brief). Oct–Dec 2026 (pacing): Metro Orlando demand pacing 6% ahead of last year (Forward look cited in Mon 26 brief — not a weekly CoStar print). Source: Mon 26 Marriott Orlando brief (Visit Orlando / CoStar context) [verify primary release]. Week ending Nov 14, 2026: Metro Orlando hotel occupancy 77.6% (+5.1% YoY; ADR $221.05, +9.5%; up from 76.5% the prior reported period). Source: Visit Orlando corporate blog (Give the Gift of Orlando Memories), cited in Mon 23 Nov brief."
   },
   {
    "id": "news:1",
@@ -1199,6 +1215,42 @@
    "text": "10 Nov: Canada Amex: new no-fee Marriott Bonvoy Bright Amex card launches 9 Feb 2027; existing card fee rises $120 to $150. Source: Marriott News Center.",
    "source": "Marriott News Center",
    "as_of": "2026-11-16"
+  },
+  {
+   "id": "news:39",
+   "kind": "news",
+   "title": "Marriott.com / Bonvoy app sign-in outage lasting hours on 17 Nov, restored the same day; company said it was n",
+   "url": "https://www.hoteldive.com/news/marriott-technology-disruption/875122/",
+   "text": "17 Nov: Marriott.com / Bonvoy app sign-in outage lasting hours on 17 Nov, restored the same day; company said it was not a cybersecurity issue. Source: Hotel Dive / Skift.",
+   "source": "Hotel Dive / Skift",
+   "as_of": "2026-11-23"
+  },
+  {
+   "id": "news:40",
+   "kind": "news",
+   "title": "Marriott's EMEA branded-residential portfolio reached 115 open and pipeline properties.",
+   "url": "https://news.marriott.com/news/2026/11/17/marriott-international-reaches-115-branded-residential-properties-in-its-total-portfolio-across-europe-middle-east-and-africa",
+   "text": "17 Nov: Marriott's EMEA branded-residential portfolio reached 115 open and pipeline properties. Source: Marriott News Center.",
+   "source": "Marriott News Center",
+   "as_of": "2026-11-23"
+  },
+  {
+   "id": "news:41",
+   "kind": "news",
+   "title": "First Fairfield by Marriott in the UAE signed for Abu Dhabi, opening 2027.",
+   "url": "https://marriott.pressarea.com/en/news/marriott-international-signs-agreement-to-introduce-fairfield-by-marriott-to-the-united-arab-emirates/19112026",
+   "text": "19 Nov: First Fairfield by Marriott in the UAE signed for Abu Dhabi, opening 2027. Source: Marriott pressarea.",
+   "source": "Marriott pressarea",
+   "as_of": "2026-11-23"
+  },
+  {
+   "id": "news:42",
+   "kind": "news",
+   "title": "Marriott Bonvoy Cyber Week sale runs 24 Nov–1 Dec on stays through 2 May 2027 (announced 12 Nov).",
+   "url": "https://news.marriott.com/news/2026/11/12/marriott-bonvoys-cyber-week-sale-turns-one-week-of-deals-into-five-months-of-getaways",
+   "text": "12 Nov (sale 24 Nov–1 Dec): Marriott Bonvoy Cyber Week sale runs 24 Nov–1 Dec on stays through 2 May 2027 (announced 12 Nov). Source: Marriott News Center.",
+   "source": "Marriott News Center",
+   "as_of": "2026-11-23"
   },
   {
    "id": "brands:marriott",
