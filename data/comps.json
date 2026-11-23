@@ -24,7 +24,7 @@
       "Key counts for Hyatt Regency Grand Cypress (779) and Wyndham Grand Bonnet Creek (400) are as provided by Callum Brown; Conrad Orlando (433) and ette (126) match their official fact sheets. Key counts for the Marriott hotels are not shown."
     ],
     "last_updated": "2026-11-16",
-    "built": "2026-11-16T08:16"
+    "built": "2026-11-23T07:41"
   },
   "tiers": [
     {
@@ -549,7 +549,7 @@
       "label": "Mon 12 Oct – Sun 18 Oct 2026",
       "generated": "2026-10-12",
       "brief_file": "marriott-orlando-brief-week-of-2026-10-12.md",
-      "rate_sources": "trivago.com U.S. lowest recommended / card prices for calendars covering 12–18 Oct 2026 (Swan Reserve 100-24280046; Bonnet Creek 100-17593768; Dolphin 100-1059330; Grande Lakes 100-8272; Gaylord Palms 100-102759) — snapshot morning of 12 Oct ET; trivago then IP-blocked further pulls. Google Hotels (google.com/travel) for WDW Swan, Inn at Celebration, and Celeste (lowest shown + Official Site when displayed). Demand: Disney Tourist Blog October 2026 crowd guide; Theme Park Forecast; IFPA / freshproduce.com; Gaylord Palms exhibitor calendar; Gartner IT Symposium venue pages; CoStar weekly via Asian Hospitality (week ending 3 Oct); Disney MNSSHP sold-out notice; Universal HHN ticket pricing pages. News: marriott / PR Newswire, Skift, Hospitality Net, West Orlando News."
+      "rate_sources": "trivago.com U.S. lowest recommended / card prices for calendars covering 12–18 Oct 2026 (Swan Reserve 100-24280046; Bonnet Creek 100-17593768; Dolphin 100-1059330; Grande Lakes 100-8272; Gaylord Palms 100-102759) — snapshot morning of 12 Oct ET; trivago then IP-blocked further pulls. Google Hotels (google.com/travel) for WDW Swan and Inn at Celebration (lowest shown + Official Site when displayed). Demand: Disney Tourist Blog October 2026 crowd guide; Theme Park Forecast; IFPA / freshproduce.com; Gaylord Palms exhibitor calendar; Gartner IT Symposium venue pages; CoStar weekly via Asian Hospitality (week ending 3 Oct); Disney MNSSHP sold-out notice; Universal HHN ticket pricing pages. News: marriott / PR Newswire, Skift, Hospitality Net, West Orlando News. Non-Marriott hotels added Oct 14, 2026 (Hyatt Regency Grand Cypress, Wyndham Grand Bonnet Creek, Conrad Orlando, ette): Google Hotels (google.com/travel) lowest shown one-night price, captured Oct 14 for nights Oct 14–18; Oct 12–13 not collected."
     },
     {
       "week": "2026-10-19",
@@ -1775,6 +1775,18 @@
       "note": ""
     },
     {
+      "hotel": "conrad-evermore",
+      "brand": "Conrad Hotels & Resorts",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-12",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Night had passed before this hotel was added on Oct 14, 2026; past nights cannot be collected."
+    },
+    {
       "hotel": "dolphin",
       "brand": "Sheraton",
       "tier": "Premium",
@@ -1787,6 +1799,18 @@
       "note": ""
     },
     {
+      "hotel": "ette-orlando",
+      "brand": "Independent",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-12",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Night had passed before this hotel was added on Oct 14, 2026; past nights cannot be collected."
+    },
+    {
       "hotel": "gaylord-palms",
       "brand": "Gaylord Hotels",
       "tier": "Premium",
@@ -1797,6 +1821,18 @@
       "source": "trivago.com U.S.",
       "source_date": "2026-10-12",
       "note": ""
+    },
+    {
+      "hotel": "hyatt-grand-cypress",
+      "brand": "Hyatt Regency",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-12",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Night had passed before this hotel was added on Oct 14, 2026; past nights cannot be collected."
     },
     {
       "hotel": "inn-celebration",
@@ -1859,6 +1895,30 @@
       "note": ""
     },
     {
+      "hotel": "wyndham-grand-bonnet-creek",
+      "brand": "Wyndham Grand",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-12",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Night had passed before this hotel was added on Oct 14, 2026; past nights cannot be collected."
+    },
+    {
+      "hotel": "conrad-evermore",
+      "brand": "Conrad Hotels & Resorts",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-13",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Night had passed before this hotel was added on Oct 14, 2026; past nights cannot be collected."
+    },
+    {
       "hotel": "dolphin",
       "brand": "Sheraton",
       "tier": "Premium",
@@ -1871,6 +1931,18 @@
       "note": ""
     },
     {
+      "hotel": "ette-orlando",
+      "brand": "Independent",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-13",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Night had passed before this hotel was added on Oct 14, 2026; past nights cannot be collected."
+    },
+    {
       "hotel": "gaylord-palms",
       "brand": "Gaylord Hotels",
       "tier": "Premium",
@@ -1881,6 +1953,18 @@
       "source": "trivago.com U.S.",
       "source_date": "2026-10-12",
       "note": ""
+    },
+    {
+      "hotel": "hyatt-grand-cypress",
+      "brand": "Hyatt Regency",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-13",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Night had passed before this hotel was added on Oct 14, 2026; past nights cannot be collected."
     },
     {
       "hotel": "inn-celebration",
@@ -1943,6 +2027,30 @@
       "note": ""
     },
     {
+      "hotel": "wyndham-grand-bonnet-creek",
+      "brand": "Wyndham Grand",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-13",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Night had passed before this hotel was added on Oct 14, 2026; past nights cannot be collected."
+    },
+    {
+      "hotel": "conrad-evermore",
+      "brand": "Conrad Hotels & Resorts",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-14",
+      "rate": 487,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
+    },
+    {
       "hotel": "dolphin",
       "brand": "Sheraton",
       "tier": "Premium",
@@ -1955,6 +2063,18 @@
       "note": ""
     },
     {
+      "hotel": "ette-orlando",
+      "brand": "Independent",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-14",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Google Hotels did not return a verifiable price for this hotel and night on Oct 14, 2026."
+    },
+    {
       "hotel": "gaylord-palms",
       "brand": "Gaylord Hotels",
       "tier": "Premium",
@@ -1964,6 +2084,18 @@
       "status": "OK",
       "source": "trivago.com U.S.",
       "source_date": "2026-10-12",
+      "note": ""
+    },
+    {
+      "hotel": "hyatt-grand-cypress",
+      "brand": "Hyatt Regency",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-14",
+      "rate": 245,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
       "note": ""
     },
     {
@@ -2027,6 +2159,30 @@
       "note": ""
     },
     {
+      "hotel": "wyndham-grand-bonnet-creek",
+      "brand": "Wyndham Grand",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-14",
+      "rate": 199,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
+    },
+    {
+      "hotel": "conrad-evermore",
+      "brand": "Conrad Hotels & Resorts",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-15",
+      "rate": 795,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
+    },
+    {
       "hotel": "dolphin",
       "brand": "Sheraton",
       "tier": "Premium",
@@ -2039,6 +2195,18 @@
       "note": ""
     },
     {
+      "hotel": "ette-orlando",
+      "brand": "Independent",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-15",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Google Hotels did not return a verifiable price for this hotel and night on Oct 14, 2026."
+    },
+    {
       "hotel": "gaylord-palms",
       "brand": "Gaylord Hotels",
       "tier": "Premium",
@@ -2048,6 +2216,18 @@
       "status": "OK",
       "source": "trivago.com U.S.",
       "source_date": "2026-10-12",
+      "note": ""
+    },
+    {
+      "hotel": "hyatt-grand-cypress",
+      "brand": "Hyatt Regency",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-15",
+      "rate": 260,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
       "note": ""
     },
     {
@@ -2111,6 +2291,30 @@
       "note": "No offer returned for a one-night search (scarcity signal, not a confirmed sell-out)."
     },
     {
+      "hotel": "wyndham-grand-bonnet-creek",
+      "brand": "Wyndham Grand",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-15",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Google Hotels did not return a verifiable price for this hotel and night on Oct 14, 2026."
+    },
+    {
+      "hotel": "conrad-evermore",
+      "brand": "Conrad Hotels & Resorts",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-16",
+      "rate": 793,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
+    },
+    {
       "hotel": "dolphin",
       "brand": "Sheraton",
       "tier": "Premium",
@@ -2123,6 +2327,18 @@
       "note": "No offer returned for a one-night search (scarcity signal, not a confirmed sell-out)."
     },
     {
+      "hotel": "ette-orlando",
+      "brand": "Independent",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-16",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Google Hotels did not return a verifiable price for this hotel and night on Oct 14, 2026."
+    },
+    {
       "hotel": "gaylord-palms",
       "brand": "Gaylord Hotels",
       "tier": "Premium",
@@ -2132,6 +2348,18 @@
       "status": "OK",
       "source": "trivago.com U.S.",
       "source_date": "2026-10-12",
+      "note": ""
+    },
+    {
+      "hotel": "hyatt-grand-cypress",
+      "brand": "Hyatt Regency",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-16",
+      "rate": 227,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
       "note": ""
     },
     {
@@ -2195,6 +2423,30 @@
       "note": "No offer returned for a one-night search (scarcity signal, not a confirmed sell-out)."
     },
     {
+      "hotel": "wyndham-grand-bonnet-creek",
+      "brand": "Wyndham Grand",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-16",
+      "rate": 264,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
+    },
+    {
+      "hotel": "conrad-evermore",
+      "brand": "Conrad Hotels & Resorts",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-17",
+      "rate": 692,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
+    },
+    {
       "hotel": "dolphin",
       "brand": "Sheraton",
       "tier": "Premium",
@@ -2207,6 +2459,18 @@
       "note": "17 Oct “Sign in to unlock” $299; next $449"
     },
     {
+      "hotel": "ette-orlando",
+      "brand": "Independent",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-17",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Google Hotels did not return a verifiable price for this hotel and night on Oct 14, 2026."
+    },
+    {
       "hotel": "gaylord-palms",
       "brand": "Gaylord Hotels",
       "tier": "Premium",
@@ -2217,6 +2481,18 @@
       "source": "trivago.com U.S.",
       "source_date": "2026-10-12",
       "note": "No offer returned for a one-night search (scarcity signal, not a confirmed sell-out)."
+    },
+    {
+      "hotel": "hyatt-grand-cypress",
+      "brand": "Hyatt Regency",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-17",
+      "rate": 263,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
     },
     {
       "hotel": "inn-celebration",
@@ -2279,6 +2555,30 @@
       "note": ""
     },
     {
+      "hotel": "wyndham-grand-bonnet-creek",
+      "brand": "Wyndham Grand",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-17",
+      "rate": 625,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
+    },
+    {
+      "hotel": "conrad-evermore",
+      "brand": "Conrad Hotels & Resorts",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-18",
+      "rate": 538,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
+    },
+    {
       "hotel": "dolphin",
       "brand": "Sheraton",
       "tier": "Premium",
@@ -2291,6 +2591,18 @@
       "note": "No offer returned for a one-night search (scarcity signal, not a confirmed sell-out)."
     },
     {
+      "hotel": "ette-orlando",
+      "brand": "Independent",
+      "tier": "Luxury",
+      "week": "2026-10-12",
+      "date": "2026-10-18",
+      "rate": null,
+      "status": "NOT_COLLECTED",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": "Google Hotels did not return a verifiable price for this hotel and night on Oct 14, 2026."
+    },
+    {
       "hotel": "gaylord-palms",
       "brand": "Gaylord Hotels",
       "tier": "Premium",
@@ -2300,6 +2612,18 @@
       "status": "OK",
       "source": "trivago.com U.S.",
       "source_date": "2026-10-12",
+      "note": ""
+    },
+    {
+      "hotel": "hyatt-grand-cypress",
+      "brand": "Hyatt Regency",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-18",
+      "rate": 269,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
       "note": ""
     },
     {
@@ -2361,6 +2685,18 @@
       "source": "trivago.com U.S.",
       "source_date": "2026-10-12",
       "note": "No offer returned for a one-night search (scarcity signal, not a confirmed sell-out)."
+    },
+    {
+      "hotel": "wyndham-grand-bonnet-creek",
+      "brand": "Wyndham Grand",
+      "tier": "Premium",
+      "week": "2026-10-12",
+      "date": "2026-10-18",
+      "rate": 279,
+      "status": "OK",
+      "source": "Google Hotels (google.com/travel)",
+      "source_date": "2026-10-14",
+      "note": ""
     },
     {
       "hotel": "conrad-evermore",
@@ -7439,6 +7775,30 @@
       "week": "2026-11-16",
       "rate_note": "",
       "demand_note": "Fully bookable; softens Sun."
+    },
+    {
+      "hotel": "hyatt-grand-cypress",
+      "week": "2026-10-12",
+      "rate_note": "Google Hotels lowest shown one-night prices captured Oct 14 (pre-tax). Oct 14 $245 (first dated load); Oct 15 $260 (later load after an earlier $280); Oct 16–18 as shown.",
+      "demand_note": ""
+    },
+    {
+      "hotel": "wyndham-grand-bonnet-creek",
+      "week": "2026-10-12",
+      "rate_note": "Google Hotels lowest shown one-night prices captured Oct 14 (pre-tax). Oct 15 searches returned other hotels, so that night is not collected. Sat Oct 17 at $625 is a real observed price and is capped on the history chart.",
+      "demand_note": ""
+    },
+    {
+      "hotel": "conrad-evermore",
+      "week": "2026-10-12",
+      "rate_note": "Google Hotels lowest shown one-night prices captured Oct 14 (pre-tax).",
+      "demand_note": ""
+    },
+    {
+      "hotel": "ette-orlando",
+      "week": "2026-10-12",
+      "rate_note": "Google Hotels resolved searches to other hotels or to other dates (e.g. Nov 2), so no verifiable price was captured for Oct 14–18.",
+      "demand_note": ""
     }
   ],
   "news": [
