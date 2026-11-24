@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-24T14:29Z",
+ "generated": "2026-11-24T15:36Z",
  "max_age_days": 21,
  "source": "Google News RSS search feeds (news.google.com/rss), one query per category; headlines and links are the publishers' own.",
  "categories": [
@@ -49,16 +49,27 @@
    "query": "Orlando tourism OR \"Visit Orlando\" OR \"Central Florida\" tourism"
   }
  ],
- "errors": [],
+ "errors": [
+  "mco: HTTPError"
+ ],
  "items": [
   {
-   "id": "5a163044a725",
-   "cat": "mco",
-   "title": "Orlando Airport Shares Tips for a Smoother Thanksgiving Trip, Reveals Busiest Days",
-   "source": "Blog Mickey",
-   "source_site": "https://blogmickey.com",
-   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxPVFJZT1lOY2JWMUN3QkNYMV9lYmNpcHBBVWQzejlUZXNNbXlIbnFtRlgwaVdvdkM2WGpGN3hBN01qdGpGWG02eHREUDQ1cm5FNC1qbXRBa3pFNDZvSnJoSm5kVHZET2VnNmRuRTBoTkZMS0lYeGdoZlJ1ZXJHMWhneEtYaVhWTE83enoyUXAzc3BtX3ltWTRhYXhwVzBSaklmLXktekVqVGZ5a2ZVUnNHR3VEQQ?oc=5",
-   "published": "2026-11-24T14:03Z"
+   "id": "c6666e0a07e0",
+   "cat": "theme-parks",
+   "title": "Magic Kingdom, EPCOT & Disney's Hollywood Studios Park Icon Sweatshirts Arrive at Walt Disney World",
+   "source": "WDW News Today",
+   "source_site": "https://wdwnt.com",
+   "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxPeXZJR2E4QjRGY0QzNDY0ZVEzME9lNWo2UnR0ck5xYW5Sd19VWEsxVDROSG5fTXZ0WjBGMXRGZzdZdFA3R2V2Yzhqc1FmTkVKTC1aU2dRcUlkVC1sMGttUV9SbmZaX3lZZDRkTE5zNThkb2VTdmtUTXhLdDRXTkFUU2paT1BtaEJ3UFU3QmtnQ2lqSExqNjdRa1JNQ3lQUFRaYy1tZHhKNzBRVlRGZG9FcjZ3RE5IWkJUNjF2empudw?oc=5",
+   "published": "2026-11-24T15:14Z"
+  },
+  {
+   "id": "a587d1f79b27",
+   "cat": "theme-parks",
+   "title": "Universal Overhauls Annual Passes for Epic Universe With Strict Rules",
+   "source": "Yahoo",
+   "source_site": "https://travel.yahoo.com",
+   "url": "https://news.google.com/rss/articles/CBMilwFBVV95cUxPUkxMQ3Y5Q1FzMnBYaUpvT2Iyd2d4bk9HY2czaGx3bThYcjJkZmVNVm9mXy1OYWR0WnJyWXlOaENKRzN4eWVOTlM2clZsT2VxcmkwNDNZZ19TV2RudFRKdHNxV092MXA3LWlibkdwV0ZwSWRWQUZUcWluVUVYSDltbVRVLWZENkswODN3bktLcWFwZzN2WEQ0?oc=5",
+   "published": "2026-11-24T12:37Z"
   },
   {
    "id": "f66619743085",
@@ -70,24 +81,6 @@
    "published": "2026-11-24T11:02Z"
   },
   {
-   "id": "738677df1601",
-   "cat": "mco",
-   "title": "Orlando airport’s busiest Thanksgiving days: 1.9 million travelers",
-   "source": "Pirates and Princesses",
-   "source_site": "https://piratesandprincesses.net",
-   "url": "https://news.google.com/rss/articles/CBMinwFBVV95cUxPdy1FTzRXWF9WSGs2eHNsdlZaem1nLUMwZFFnbkt4WTgtcVc1cWRaUUV3dVZVMDVVMkJUc3YtdjVXNklNWGt4YUM2Q0JyZ1RQXzdfNU1nMFJOWkhKbmlRSUJXVVM2U0Z4ZF82aUxJNHZ4OWFEMmI2RWxYTmVfX3Q1QzNJRmxRZ2RoQ01keG1fN3A2NDVET2s0bGJsaWNuR1k?oc=5",
-   "published": "2026-11-24T10:06Z"
-  },
-  {
-   "id": "29b7d94e7d30",
-   "cat": "development",
-   "title": "WWE Eyes $100 Million Orlando Headquarters and NXT Center",
-   "source": "NGSC Sports -",
-   "source_site": "https://ngscsports.com",
-   "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOLTRHQ0pUTkp3X1FZdUtfb1dGUTQyY01DU0N3ZF9VdU9wSjFUWHlWdVU2TVBzazUzNVpzbkI4VGwwVHJtV1NoM3VTWlVnZzJTc2ZBejJ1T2o3cFY1MmN3QkRYaHV2OXdJWnpuZ1huQW9xQS03dTE4VkZJWFRpcUY3ZlJXZnp0OGc?oc=5",
-   "published": "2026-11-23T23:04Z"
-  },
-  {
    "id": "fe1a2ddce532",
    "cat": "theme-parks",
    "title": "Flo Rida, Shaggy, Ginuwine, Lil Jon, and Soulja Boy Headline SeaWorld Orlando's 29-Concert 2027 Seven Seas Food Festival Lineup",
@@ -95,15 +88,6 @@
    "source_site": "https://foxy99.com",
    "url": "https://news.google.com/rss/articles/CBMi6AFBVV95cUxPa1dFYnBsTlVPanBzeHZXV3lvZXI0dGtDRmdQYmJLY01UbWoybWQza2dBYXZrZENPWTFneDZQbDlyNVRuRHVYNUxDMUVHVWppd0d0Y3JtRmlZMkJtX0VRY2wzU0ZYQm91ZDlxTDQ5YThRMW0xdXJKN2dvX1F6TWdpcUNMT2NWaXpINUpoazdCeUpDSHRRMjM3bWN2VEViUjFEMzEzc2RsWGJobHQtanBiV0cxQzdKOWpRNUVQYk1oVmJ2SmRwVGhEM3gtR3UtS2ktZ2ktYWdIUUUtWmg2Ny1WQXp0V3dHWm1U?oc=5",
    "published": "2026-11-23T22:05Z"
-  },
-  {
-   "id": "56c66edbcc2c",
-   "cat": "mco",
-   "title": "Orlando International Airport (MCO) Expects 1.9 Million Travelers for Thanksgiving Holiday, Reveals Busiest Days",
-   "source": "WDW News Today",
-   "source_site": "https://wdwnt.com",
-   "url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxNcUN5b3pTMVNrcnRTWXlGNlpxeTRZWmhBYzdmWDQyOHk1TEI1LUJWUW15OEJzVG9JQ1pKQzY2a3hnU1JXSW1jU2ZRQlczMjZsT2ktY1ZsOWFSVWtTZ1hzZmFmSUZweDYwMVN6bnFpdFJ2U0hLcWtSaU5oN1pQa3RPczVyOVAxN0Zuci1ld0hzQ1p2M2RlQnp3cnhMSEh2ZVVvcjlwamJFdE1YZ1dlVmFVQk5IcVM2eUFwT2RwY3ZHQlZFMG1CcXJ5Z0xzOVFUN1dQcVE?oc=5",
-   "published": "2026-11-23T20:40Z"
   },
   {
    "id": "9b9da87f2ad0",
@@ -124,6 +108,15 @@
    "published": "2026-11-23T20:17Z"
   },
   {
+   "id": "52cd3005195b",
+   "cat": "theme-parks",
+   "title": "Disney's Blizzard Beach Closing This Week at Walt Disney World Due to Forecasted Rain",
+   "source": "WDW News Today",
+   "source_site": "https://wdwnt.com",
+   "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOWTdtdlNpYVNVVG5jZkptenpTTGU1YkE2YmVCelZSZUw4RlZBakhhTXBacmQwQVl2dzNCZ2JFTzRZQ2NrX0lhcjBHYmw2MVVRR3ZRZkctdmZCOHdzRjlwaTlXWTFfeEs1c1pKWWczSUtSQXg5dEZ6anB4VTZDVDh3U1pxWFBxY0ctMmhIWUdaZVBjOHdoSzFINGNOaHUzMFNmSVVYTTJsbzFGbGdMYjR6RA?oc=5",
+   "published": "2026-11-23T18:43Z"
+  },
+  {
    "id": "fdff73ad62bb",
    "cat": "theme-parks",
    "title": "Universal Orlando to Update Annual Pass Program",
@@ -133,12 +126,12 @@
    "published": "2026-11-23T18:30Z"
   },
   {
-   "id": "1f8a85a15b8c",
+   "id": "5de972cb99a9",
    "cat": "orlando",
    "title": "Air Canada cancelling non-stop service between Ottawa and Orlando in the new year",
    "source": "CTV News",
    "source_site": "https://www.ctvnews.ca",
-   "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPTjdfNW9wRFJTZzlKRVFxTUk2TXQ2NGVOcVMzdldkODhLbVd3Vkk1RWtfT1I3ekxjOEwwanp6eUFNTWVoRU9HZlQ3N1lYY3hWYVVCdVNURlBELXNUY2REZ3JKN25RUnlZbjk5Zkltb0ZkRWFFMW9NeDBadDVhUUhrVGRIVEY5dEROU2ktSHlKMU1pMk5WZUJTUFBWb0s3UWNyalFBOExiUmNyRzlNM1o0a2I4cVI5ck8wS21JTQ?oc=5",
+   "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNVTl1YkRzZFJkbFNFOXhOaWE0TzN3YV9KSnJqanJ4UFluR1hpd3MzQUZXUGtLc2xrNFZqcWVFMi1ZVTd2c0ttLVRudUFYaTlVSjEwUlhjLTZISDFMenBLQ1BTOWtmQ2haSmVMak5GdktsUzVGMTcxdXdyTl9jeDNXN1RJVmwwbzk0SmRMeTl5aWVsTVRjTUZEZDg2emJYTUJ1QTNfTDk1eHJUZHRMU213RTQtU2p5MXNXcGgyR0N5MTcyM2kwSXc?oc=5",
    "published": "2026-11-23T17:23Z"
   },
   {
@@ -158,42 +151,6 @@
    "source_site": "https://www.laughingplace.com",
    "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxQdlpuamRiaXFvdUd6bEI2UklmNmtjaUY2aXFBRWYtUndnWEZLS1dMWUQxS2pteEdMc3JIZGdDSWxqdHR5WTdsX21zMDB0S1BjTWJFU04wSFhNVExIMmxqQzBEYmQyNHFMQXYxajFmWWVZdHhFU3FqQm1YTnpGWGMwVFZIM0Q2ZENKTDVvZ1NMZXVya0U?oc=5",
    "published": "2026-11-23T17:14Z"
-  },
-  {
-   "id": "2387a4d7f8f8",
-   "cat": "theme-parks",
-   "title": "Thanksgiving Crowds Arrive at Walt Disney World With Long Waits at All Four Parks",
-   "source": "wdwmagic",
-   "source_site": "https://www.wdwmagic.com",
-   "url": "https://news.google.com/rss/articles/CBMi9AFBVV95cUxOaHQ2YUpoaDg0SEQwcVFUbzZuV254TlpQdjhsdWlfLVB0YlBuanY4dkZkRlVNVS0zenlhN0tBWEtudXp0VTJXVUdmSUxmNGhkemVjbF9ZYXNRNFNlRVBOTzUxOWZmN2ZjZjlEMUx0aGdYRG9tUm9UZWJwTU1LcGpzT1NtNktYbWVxa1ZNYndQTXBVbW9POFd3ajMzSFdlT2pFel96YTJFUjRvSjdncGxhLWZRX1dHNGo1d0RsTl81ZmpOcEVQZFBibm9kVnJmNGVINkkwU1JIVWJNaW0xM1lLMmFoekc2b1dJUE96Ni1MS01tRVVz?oc=5",
-   "published": "2026-11-23T17:11Z"
-  },
-  {
-   "id": "4192c9e85d9f",
-   "cat": "theme-parks",
-   "title": "Film Review: Lacey Chabert Gets Her Disney Princess Moment in Hallmark’s Walt Disney World Movie",
-   "source": "LaughingPlace.com",
-   "source_site": "https://www.laughingplace.com",
-   "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxORTI1M0h4cmh4TndtV3J5alhEOHlWYk9kS3RQRlFQQ0ZRRzFSRGtSRXF3STE4UkY4WmhpZzB4RXRFelJpc0NkLXZuaEN2MUJUbXRFMmNOb05oNmJ1akhNRGV6MGhxc1JqeHFwTzNvX3Jyanh1eXdzYjF6SzlUZERLX2dqT1F4bHU4emtzVEx0OGRaZThrYVBoWGNiakR2cmVVVWlDeDZTdzA?oc=5",
-   "published": "2026-11-23T17:04Z"
-  },
-  {
-   "id": "4186c41bb27f",
-   "cat": "theme-parks",
-   "title": "When your favorite TV shows go to Walt Disney World",
-   "source": "WFLA",
-   "source_site": "https://www.wfla.com",
-   "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxQWXczNTllc05IWldLb1VEOXh5S1dJenlfYUpTRmtIOUw5ZjFXbXd6TFVkQkk2ejNzc3dXbnBHc0J1THRmN2xna2xaQ3lUeFV3N2dfeFlnZ3gwUl9KMW5jZEhYMllZVGE3WVV5NWc5eGNFTzJyRUFETERObVJOYnJ2SENYODZYaVZo0gGOAUFVX3lxTE15ZEJCVWJYRjNkdlkzd1ZXLVBzUG1QZktEdGg1X1JjeVdvM3EwU0ZYTnV1OEhjUU4wWFBHdzIzUGlqWUpqQzB0M2w4NmJJNDFkczRmb29Pc1VTYXRERUtjTEpzMFl1dEN4OGtoMElnZUs3QktZTmpYaEFvYi1tRXAtQ1RMMjJYZEh0cnRFZ3c?oc=5",
-   "published": "2026-11-23T16:51Z"
-  },
-  {
-   "id": "e408eeba4999",
-   "cat": "mco",
-   "title": "Thanksgiving Travel at Orlando International Airport: Busiest Days and Tips",
-   "source": "wdwmagic",
-   "source_site": "https://www.wdwmagic.com",
-   "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPMFBvcDZWc0ZJVW9KSm0tOHNFYWhkRHc5ZUxlb1Z4enI3MkozTUdlSnF0YzktbEpnWkNTUGlVLXNlbW5rcU13UWlwT29SNlphT042VkdaazNtWEhKS0d6SzZPbXBDVFBjMGNLbDVueGxWcTVERnpzZ1FKLWNyblV4ODZhaHNXWW5NM1c1ZUtxMTkyZTBlTkR5NzJPeVBfMUZHQ3pfNG1mdDcxUWd2TGxySW1nWi10eG9ZcnVfWVZnd3RrSWVSREdSRjMtNGtsam5sN3hpOVBzbHJtLVk?oc=5",
-   "published": "2026-11-23T16:43Z"
   },
   {
    "id": "a4ed6c6b3b4a",
@@ -241,6 +198,15 @@
    "published": "2026-11-22T07:04Z"
   },
   {
+   "id": "fc2cf75be953",
+   "cat": "marriott",
+   "title": "Walt Disney World Dolphin Resort Fact Sheet",
+   "source": "AllEars.Net",
+   "source_site": "https://allears.net",
+   "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxNOXhZZzZEVHJKczFSeDdDck5XSk9XQWRYT21SOXAyYW1QUGhrdDJ0dnBILXQ1S2FTWk1naDR0blZld3VBbHowZGxyaktncEZOOURRWUFjLVFiZW9aN3ZmMTBKdWhwMnMyemJlb1JUWWpELTRQdHdIeDVBZTVYUk1iUmxJYWI4RlNleGlOQTRESlBSMVNEM2VaNzVUY2VmdHBRNzBWWG9R?oc=5",
+   "published": "2026-11-21T20:34Z"
+  },
+  {
    "id": "f81693464f95",
    "cat": "orlando",
    "title": "Florida Flooding Emergency Halts Orlando Train Service, Threatening Disney World Holiday Vacations",
@@ -248,15 +214,6 @@
    "source_site": "https://www.disneydining.com",
    "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPZEdfQnZaYTNZTU5ZWlloT0RzQ3A5RENOVkhMNkNPOVh0RUkzX1Z4T3F2YVJZZVpEOERBR3NiU0p5cmIyY3lJNFJRUGpYRlJaUEh3NGRxSHVMMnluMzVkNVBxbjJSaE83aXRsUjNNV19JQmtuUEhRQlVlVFhDRkdLMjZhUGZ6OW50a0xUNkQ1aG12MXNkdTVwMDhSVVNUUjAy?oc=5",
    "published": "2026-11-21T19:11Z"
-  },
-  {
-   "id": "5900f8fd2b07",
-   "cat": "mco",
-   "title": "Brightline Resumes Orlando Service After Flooding",
-   "source": "Wisevoter",
-   "source_site": "https://wisevoter.com",
-   "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxPQ093VzU0UWxDeU4wZjhpNkp3TWlXcGFiN1RkbGZzcmRVYWFnNWM3VmdrMDhkYW5wbzNwcFFodmhWVDBWNDFkZXVzYWs3Z2F4ZkJKR291UUVEU1YzaVZnTXhNbVZwTnZFOUVHR09BenFfVi1qa0VFSWxlRFVQbGxCV05Vai1XUmxKWE1WRi1EUzRwWUdfYUtGYzVR?oc=5",
-   "published": "2026-11-21T15:16Z"
   },
   {
    "id": "4fa91384a263",
@@ -275,15 +232,6 @@
    "source_site": "https://www.thetraveler.org",
    "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPN3U2eFFra0Z4NVZIa0M1ajhsQ0NEcDJiSzgtQ2ppTUVVc2dmWnBoZ3FacUxSNXQ4N0xadnRROGlEOXlQNHJqMEY3WHg4WUliNHh2RVJXemtaRjhyWGNsVFU2dVRmZXFjbl9fZkV0b0RoRFpCTjR1dVotZ1pZUVRxbW84czVKM3RwbjNxSDJZb0EzY0VsU1E?oc=5",
    "published": "2026-11-21T04:39Z"
-  },
-  {
-   "id": "b3dcf3f3916e",
-   "cat": "mco",
-   "title": "Orlando International Airport Issues Ground Stop Two Days After Nationwide Incident",
-   "source": "WDW News Today",
-   "source_site": "https://wdwnt.com",
-   "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxNR3paNEgxLURLX3BXWWdYY245cFJTaDRyN0RmbnhweGJUbFBNRXp1QW1OVVRJMXVNenhWWkpqSVhBR1VkRGg2WXM1VUdPbWY1WHVwYU0tUEl2b2tuVmRvTWJuYUVxZUNhVlhweHhMcHJNNkJFSUJHRG55X0JzQ2FkM09zSUU3MGJTcnBDejdoYmNWUzJKMHZKVjR6blFQQTJXY1lpei1kOFJCNzBoNDRoLU1vR3dSd2k0cnc?oc=5",
-   "published": "2026-11-20T21:39Z"
   },
   {
    "id": "4009cdbbdda9",
@@ -320,15 +268,6 @@
    "source_site": "https://www.bizjournals.com",
    "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxNYWU0SEp1TDdwbVBXY3JXblZDWEZZel9ZNHhVbl9LaDZrQXY4VXQyOXJZUVBFWmtOZXNkZEJ2X0oxVFZyV0tKUnM5bmxOMUJObTZNOVdUM190VVRiWTUwd19sVFRzSUwzNXNtNFg1bGVHN3RtUHRiZnNkYzFuTWkxaHVqWjFRcUhGR3NDMzNJQ29SZ25sdVJwUVg0bllXY0xvNUQzZ2dOakkwQQ?oc=5",
    "published": "2026-11-20T19:30Z"
-  },
-  {
-   "id": "0b74ed84c076",
-   "cat": "mco",
-   "title": "Flooding Halts Brightline's Orlando Rail Line, Leaving Disney World Travelers Facing Extra Costs",
-   "source": "Inside the Magic",
-   "source_site": "https://insidethemagic.net",
-   "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPZ2lLejJtenZRaWFTTjY0eVh6TzdpUGM2Szhrd0dYZlROejB2Zkw3Nm9hbW5ETjVyZlVKeDhvM0pweFkwcmpOMEtaWkwwd0pHSEFMSldMeXctM3hYNzR6bHNMbzNYdnVBeU9zMU9qX2NiSVFCS0RxS2lROXY0MjZ2MkY0R1A4ak5BMlJWSktiUTFudkhudllWZHg0UGplbE0yczkwOHJJTk9ON21EVGlF?oc=5",
-   "published": "2026-11-20T19:26Z"
   },
   {
    "id": "ff3159a7ad59",
@@ -404,21 +343,12 @@
   },
   {
    "id": "743e29b95f99",
-   "cat": "mco",
+   "cat": "orlando",
    "title": "Orlando airport lands new nonstop route to Washington, D.C.",
    "source": "The Business Journals",
    "source_site": "https://www.bizjournals.com",
    "url": "https://news.google.com/rss/articles/CBMiowFBVV95cUxOZUZVeFAyZHlndjNEYXItdDF2U3Q0VDlVUHowR1N1THE1Vm8zZ05MOVZQdFJOelFjM1dSVWM3UXNXSmtFMEpla1k0bTdCQkM5ODNrTW9uS1lwUmhuWDMwU2p1WG5oeXllQmV3TnotSXJlVVhiaUZyY3Q0cWo1OS02VngwbGFXbjlYUTQtZjlIMWQ3M04wNFpFTlYwRDdmZ0VTSVhj?oc=5",
    "published": "2026-11-19T11:00Z"
-  },
-  {
-   "id": "88c4d41aa053",
-   "cat": "mco",
-   "title": "The Rules for Orlando Airport Are Changing in 2027",
-   "source": "AllEars.Net",
-   "source_site": "https://allears.net",
-   "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxQa05wNV94eklfRHZLUmZiM0pSWjNTUlVERmNEUkJDTE1iOUhPVHFpNG5DQ2d0dW4zZ0VqWEhUVWMxbWoxX19BOXdtaDJ4MnBzR2NSZmJrY3J2c2Z5YjlfXzNWZkhTZUladk44MFA3S1oydTFkNXVJZ3JVV3YtU3lGaGE2eDlFaElvaVE?oc=5",
-   "published": "2026-11-18T15:00Z"
   },
   {
    "id": "1d51779d8ed7",
@@ -430,15 +360,6 @@
    "published": "2026-11-18T11:00Z"
   },
   {
-   "id": "56adc027cbd3",
-   "cat": "development",
-   "title": "Voyance Real Estate Now Offers Residential and Commercial Property Management in Central Florida",
-   "source": "openPR.com",
-   "source_site": "https://www.openpr.com",
-   "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxPd3JtTDkxcmFSQzAwWGwza0RWN0g3cVdmN0lfV0xnajhhOUxlZndmU3VUdHBrd2lsNXhHNC1rc3JOUzh6djEtOHE3cFh6VUxWb25DR05wa2I2RjVPVFU4SlNsd1NkUjRTSlRHMjhaYjNNS3BLUDE1N1pzUDhYdFA5Xy1OcTFETzgzWDd6MTIwaENNd1Jud1Nkag?oc=5",
-   "published": "2026-11-18T06:52Z"
-  },
-  {
    "id": "7c377ab31466",
    "cat": "dining",
    "title": "Fresh Kitchen Opens in Former Chicken Guy! Space in Winter Park",
@@ -446,15 +367,6 @@
    "source_site": "https://bungalower.com",
    "url": "https://news.google.com/rss/articles/CBMingFBVV95cUxOUUxnSnQxaV95XzNTX0x4WnJmem9LdFN2WlZrM0xFdlVqWWJEdm9OMUpTd0xLWGNKTGZENG56S2htamNtSmNudEsyM1otZjRlTjFvQkJxbVllSlR5ZUc2RzFCZmIxQWx1SmVtYWQzM3VXY2pLWWZoZXhyS3NNZFB3VmxGQjVFRTU0YVlGbWxiYk9VaG1scnE3NWVLT1ZHUQ?oc=5",
    "published": "2026-11-18T01:39Z"
-  },
-  {
-   "id": "4b810cadcf1e",
-   "cat": "events",
-   "title": "IAAPA Expo Expands Into West Building in Orlando",
-   "source": "Wisevoter",
-   "source_site": "https://wisevoter.com",
-   "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQNk40dWNSZTJGQnNEcXU5Sm9UZFdQV25FNzRCX2kzY1dnd3JlUVF1QXlKQllLWlVMN2V2YnFJSl91NkZtVEt2OHlpbHl4U2Z5Tk5yMjRid19QRmZWZlJSZ0JCaDZMbkJDMk5VenhvSVI4Z1RvU2ZBY2tmeWtMU0Z6QzZLNGdVaVJRcjU5Ml8ydDA5dGx2UGNfMQ?oc=5",
-   "published": "2026-11-17T23:36Z"
   },
   {
    "id": "6d9488bebf3d",
@@ -482,15 +394,6 @@
    "source_site": "https://slamwrestling.net",
    "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPbXZuWlBpdlVfY1VRTmo3d0d5MWpjRU5nYmNZRzhwempYYnlGVnVqclI0SHE1dGxNbzFjb0ZnYkdVTS1TVW5pNUVoYXJrQlJ6VFRIMlJLblRNZnZYTklfcE9QTUYwME5RY3ZQd3Z3RFVwUmlOYW0wTTFmTVdtYm1vbDExMVZmcFJETmF3MGZGY1I5b2VLM3c?oc=5",
    "published": "2026-11-17T18:00Z"
-  },
-  {
-   "id": "ce3abad1c488",
-   "cat": "mco",
-   "title": "Electric air taxis to undergo extensive testing at Orlando International Airport",
-   "source": "WFTV",
-   "source_site": "https://www.wftv.com",
-   "url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxObTE1cXVZcElOOWh0ZDJkbWY3NWxDZFFWSG00NHpZN3BiSEJqTDA3MTh5NVVkc2xaa3RvTUxvQW83LXZlVkY1V0RQRVFUMXdjR1F0dDRBOGlvSC15WTBVdWxyZzJYdHg4SVFKTFFNZ2lVQU1VcXRveGFBdy1KS3pqVTB4MHZOR3NfbFZJRDRLeHBXQVlrUndDZ3Z6TmZYSjFxRWJNdGhFVHFaX3JtWXJNU0JPSUVETXYwWWdBZVF2Z0kxUFJ3X3hNRm1RTE1WcTNHbzJsWQ?oc=5",
-   "published": "2026-11-17T16:17Z"
   },
   {
    "id": "cc7028143b4d",
@@ -529,15 +432,6 @@
    "published": "2026-11-16T14:00Z"
   },
   {
-   "id": "341765d78fdf",
-   "cat": "events",
-   "title": "Review and setlist: Olivia Rodrigo blossoms in sold-out Orlando concert",
-   "source": "Tampa Bay Times",
-   "source_site": "https://www.tampabay.com",
-   "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNZUdJVmRBT0JRRUxJS0drOGtYaTNhUlBxWlp2VVdjMW5jcmlrTWVzWUxnSGRWNjg3aDdLWkJTb2x6cnlId09wbWI2VW1qb2taZ0J1TUU1U3JnVmtOVlFyejhuMkRqZl9CeWYzamNwNDZDUmd2MmJoS2VwTEtlTWI0ZnBKdVFDTkxadTZjaVN3Y0tkQ3VVdFVxcGl2R2M0LWI0WUhrQ2E1QjFGRGxjczZoRHdwcVk5d1ZmYkFtQjlxMHJUTy0zeXlWcm55S3pqUQ?oc=5",
-   "published": "2026-11-16T11:55Z"
-  },
-  {
    "id": "bab0742ec1df",
    "cat": "events",
    "title": "UFC 337 to Headline Kia Center in Orlando",
@@ -554,15 +448,6 @@
    "source_site": "https://www.rustourismnews.com",
    "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQcWN2WkVxaHNtSmFFY1hoRzdvY3ZuTlpiWlk5SFJCMHBWRXFISUpfTW5yMFpXLV9sUjRGd2Z3N242ZmUyNnpBdTdCVEpNQXB4dUZrRUgwaDVfeVdIZEJPU0ZBTkt4aTc1S3VuOVBUQ3JjQ2hUZHVLaHItcWhIUjU1VXdVVXhCd04zaXhkNS1CSmJZUGJsUGRvU0Y2ZGVERHlwYnRBVzA1dWw5djdSYVJtVDU5RjhFRWM5SVFreFMyS09hVlhmX3c?oc=5",
    "published": "2026-11-15T11:02Z"
-  },
-  {
-   "id": "e4369ffdd37d",
-   "cat": "events",
-   "title": "Olivia Rodrigo plays Orlando at Kia Center on November 15",
-   "source": "ad-hoc-news.de",
-   "source_site": "https://www.ad-hoc-news.de",
-   "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNOXNxZHdpXzNiQVZsUS1kLWktYWRBRlpWcjk4YmM2OEpaZXFxM2ZCeUVQWTRjWWUwcl9VUm9VTkUtS3YxVWpkRnFvNkRkdXgyME5GdGszbUEyTGd1SGJhd0J1SG9yMjF6elM1bjBLMmJUSklSVUc3SHd5SmNVOVNITmE4X3hXU09qY05IMnJMaUthYUpJbUdpSUhPSlRod0tzellVd2Rkd1EtcGZhZkltTEVn?oc=5",
-   "published": "2026-11-15T09:33Z"
   },
   {
    "id": "a303de4a27c4",
@@ -583,6 +468,33 @@
    "published": "2026-11-15T08:16Z"
   },
   {
+   "id": "c914b796fb20",
+   "cat": "events",
+   "title": "Alex Warren schedules Orlando Kia Center debut for 2027 concerts",
+   "source": "WFTV",
+   "source_site": "https://www.wftv.com",
+   "url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPQ2c3ell3TzhzTC1LZ1BwbUxlT0h6Z2NyNFozZFpKMG4zaTNrNjdpc3ZpUDVPSm1TZjlpTFYzd3czakhzWFRxU3I2VjFFUUVsdC1hc01ibkl6Y21lREpJUktLcEdxUERQa2hxQlZMNnJMcGJscThYSlNqQXI5UzByOFd2MFByTC1NSTkxNm9Lc1E0NHIzTjR1OFZOZ1kxTVdKaERGSEZ5OUVuejJLSDNxZS1JdXFuU3o1Wk5VZdIB0AFBVV95cUxORGhHSmVQeDB2VDdWUlRmWEhpdGoyRXNnT3pxa2duMGxaeEc4QjNiQ25OdjlXOGxRMVp6b3lNQ2hETDk4WGV0OFRwblk3d3BYVlVZRDhOQnYwem5kb2E2aW1tajdxTzBRQ1hQRm1TS1d6ZTJ1V3pRQjdZRUdfZ2wzX085dHhnTUk4ZFVBYklWUEVTcmFsQ2NZdERaeG9sVHZObEplRUI2bkVSamZGNXcybHN5Ri1faWtRTy01aUlUdnRHX052bmpNQzVlTEVZYWEw?oc=5",
+   "published": "2026-11-15T08:00Z"
+  },
+  {
+   "id": "8f4895667ca0",
+   "cat": "events",
+   "title": "UFC 337 Confirms Orlando Return At Kia Center",
+   "source": "Yardbarker",
+   "source_site": "https://www.yardbarker.com",
+   "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQVms4bGt6SEVfT2tsSTRmVm0wZ2tYdWNBTExBVGVUR2dlOExoSkZIWEtqaFhkVE9jNTczLWR6bEFFc2dnVnFyNjlZOVBMRDZYLVBlb2NoUXVKSVEtbGN5OWpnMC1GV1ZHQXZ6V1RSVVJXWE5nUHNqUDR3QlBCS09VczQ1bEpTdU1XZktXUlMzQXlpbTV4MjIxc2FlcFRnaUNBX0lPVUFn?oc=5",
+   "published": "2026-11-15T04:04Z"
+  },
+  {
+   "id": "0b288e0b7e3e",
+   "cat": "development",
+   "title": "Is Voyance Real Estate legit? Orlando brokerage publishes its broker and brokerage license numbers for public verification",
+   "source": "mykxlg.com",
+   "source_site": "https://www.mykxlg.com",
+   "url": "https://news.google.com/rss/articles/CBMirgJBVV95cUxNTFE2d0MtRG1YTV93czZYVzl5ZmR0aTFla05adEpTaE5mOHA1eldWWEtqc0tXNEFTTHlUcGtHX0dmOGNXRGM0elFzZjRCWVQyTHRqYkkxN1RwOE1pdmFuN05vYVhDaVYyLTZPTlhodDNZbFVVYndXWHdMVXFYNmx2RktTeFZPNTRMcDZTdGZkVWdGbWhlNVV0Xzg4M2tURUxYMkc1bUFMWUtHWl9FZjBVeGFFemhrS0FRM1lNN21Fc3E2SkxSd1BwSHQwSGpJUnZiQjVvZHhSd3dqWEJBRFZJY0JGOGtpM1p4VjdzVDNIWVpOVHNrUjliaFVqU3cwS2VuWURpVDg0M2gzbEY2VmpaVkJpbDFyT0xJQVR6UnJ2MXFlbWotWlZtbjZnWGNLQQ?oc=5",
+   "published": "2026-11-14T08:40Z"
+  },
+  {
    "id": "dfd98bb0bf8d",
    "cat": "lake-nona",
    "title": "Lake Nona, Alexandra Snyder win second girls golf title in three years",
@@ -592,22 +504,22 @@
    "published": "2026-11-14T08:00Z"
   },
   {
-   "id": "c74c7f33ba27",
-   "cat": "lake-nona",
-   "title": "Cañonita Lake Nona: Mexican-Inspired Design Debuts",
-   "source": "Food & Beverage Magazine",
-   "source_site": "https://www.fb101.com",
-   "url": "https://news.google.com/rss/articles/CBMikgFBVV95cUxNRDB0dlM3a25uRXZtaTYyemVvb1FDT2RXYXQ3VTBmcFBpVzl1R01fSXd3M05CTkpxTlFRQU1VajRNaEJ3Uk9lYjVoaGtpbElYeDB4UkxaczYyb1pmeWh1VU51V01FN21fTVY1QWhLX0FCcmhINUsydDJiZi1iSHFIQThNdGlVdjVZME50b0NQc0pkUQ?oc=5",
-   "published": "2026-11-11T08:00Z"
+   "id": "735ca0c646f9",
+   "cat": "events",
+   "title": "UFC 337 heads to Orlando for fifth event at Kia Center",
+   "source": "Sherdog",
+   "source_site": "https://www.sherdog.com",
+   "url": "https://news.google.com/rss/articles/CBMimwFBVV95cUxQNEUxSXRJSk42enlTaFNvelJQODJiLTkxM1pXTFJvZVBmTG5rbkI5a2txQmVxUmRzNkpJZDViMlVvRUo3YVY4RHZZSzRCS0xoSF94LVluNmZRTmNTTHAxbG5nc0ZjMk1Lc1JLLW1zQTZRLWxsTFJuXy11ZmU0M21hbFA5alJyOHNaUThzQVV0cXdCU1RHMmxoTFg5MNIBoAFBVV95cUxOMHhwaW9GYnR5eGpXdU05THU0MURGTlRsOGMtUzBfQS1mQkJmWmZJZUhIVGVzOXA5MWFONlFxV3pFQ1pDQ0c2cURmcHROYk8yMEZYaXVDVDBxMUtTTlJ5ZVBSMDZGU2xJMExjanU5VTJMM2VrOHhmazk0RFk4UEFCa2VVRmY4QTNYVmNUc0dKVXdzMG5ZS0JIZUo2UEMxWlFw?oc=5",
+   "published": "2026-11-14T08:00Z"
   },
   {
-   "id": "031b9c2a2dc5",
-   "cat": "lake-nona",
-   "title": "Oh, What Fun 5K (Lake Nona Town Center)",
-   "source": "City of Orlando (.gov)",
-   "source_site": "https://www.orlando.gov",
-   "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxObjI0aUs5dDNMVmNKYmZReGkwaGh3UWFkTGY0emJuTkhjSDdGLWdFdnhuME1Xbm1qTUIxLUk1ZFc1WWN1VWFvaG1zamk1OWRMVzdQdjhLckx1ay1nUnNES0EzSkdRYU10ZU5xcjBSbGdGRTVla0xiUV8tTXp4dVN5bUt6bFdMLUhSYlNQcWFES05GS01JeWtkSnVmdWVFeTQ3dU1RVXFfX0pUTEU?oc=5",
-   "published": "2026-11-10T14:55Z"
+   "id": "32d230f3f7a4",
+   "cat": "development",
+   "title": "Michelin-recognized chef curates $400M luxury condo, restaurant project on I-Drive",
+   "source": "The Business Journals",
+   "source_site": "https://www.bizjournals.com",
+   "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxOb21GRnp1ZVk4Ym5XbkZhdnNFQkhtM3poNmprLUZ4Tm9pNkRucVhlYjI3ejFDWTBUUDV6SEtTX1FOZklMcU1YLXV3OTFKTnlPSHBzY1ZqTnNNbVdwNDVwVGlzYkVTMTdjU3psdDRoNE5VTWpOek13Zkg5UWxKS2pVRnBfa2NQWHlkZTNyNE1UZFdyeE5qWW5hbmhNMkN4OVBwXzZfTXV1SlhMZw?oc=5",
+   "published": "2026-11-14T08:00Z"
   }
  ]
 }
