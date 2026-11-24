@@ -12,15 +12,17 @@ const topo = req("topojson-client");
 const us = JSON.parse(fs.readFileSync(require.resolve(process.env.NODE_MODS ? path.join(process.env.NODE_MODS, "us-atlas/states-10m.json") : "us-atlas/states-10m.json")));
 const fl = topo.feature(us, us.objects.states).features.find((f) => f.id === "12");
 const W = 440, H = 520;
-/* frame the peninsula (Ocala to Miami) and leave the right-hand third for station labels over the ocean */
-const frame = { type: "MultiPoint", coordinates: [[-83.0, 25.1], [-79.9, 25.1], [-79.9, 29.3], [-83.0, 29.3]] };
+/* frame the Orlando-to-Miami corridor (25.2N to 28.9N) so the coast is as large as possible,
+   and leave the right-hand third for station labels over the ocean. Everything (outline,
+   rail line, stations, AMBAR, latitude ticks) goes through the same projection. */
+const frame = { type: "MultiPoint", coordinates: [[-82.35, 25.2], [-79.95, 25.2], [-79.95, 28.9], [-82.35, 28.9]] };
 const proj = d3.geoMercator().fitExtent([[6, 10], [W - 150, H - 10]], frame);
 const p = d3.geoPath(proj);
 const r = (n) => Math.round(n * 10) / 10;
 /* north to south; lon, lat approximate */
 const ST = [
   { id: "orl", name: "Orlando (MCO)", lon: -81.3081, lat: 28.4312, side: "r" },
-  { id: "wpb", t: "about 2h 15m", name: "West Palm Beach", lon: -80.0560, lat: 26.7114, side: "r" },
+  { id: "wpb", t: "about 2h 15m", name: "West Palm Beach", lon: -80.0573, lat: 26.7119, side: "r" },
   { id: "boca", t: "about 2h 40m", name: "Boca Raton", lon: -80.0890, lat: 26.3500, side: "r" },
   { id: "fll", t: "about 2h 55m", name: "Fort Lauderdale", lon: -80.1470, lat: 26.1205, side: "r" },
   { id: "ave", t: "about 3h 10m", name: "Aventura", lon: -80.1430, lat: 25.9580, side: "r" },
@@ -37,6 +39,11 @@ let s = `<svg class="bl-map" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby=
 <path class="bl-rail" d="${lineD}"/>
 <path class="bl-rail-run" d="${lineD}"/>
 `;
+/* latitude reference lines so station placement can be checked by eye */
+[26, 27, 28].forEach((lat) => {
+  const [, gy] = pt(-81, lat);
+  s += `<g class="bl-lat"><path d="M0,${gy}H${W - 150}"/><text x="4" y="${r(gy - 4)}">${lat}°N</text></g>\n`;
+});
 const [ax, ay] = pt(AMBAR.lon, AMBAR.lat);
 const [ox, oy] = pt(-81.3081, 28.4312);
 s += `<path class="bl-drive" d="M${ax},${ay}L${ox},${oy}"/>
@@ -49,7 +56,7 @@ ST.forEach((st) => {
   /* labels sit in a column to the right; the four close South Florida stations get at least 30px apart */
   let ty = y + 4;
   if (st.id === "orl") ty = y - 12;
-  else { ty = ly == null ? y + 4 : Math.max(y + 4, ly + 34); ly = ty; }
+  else { ty = ly == null ? y + 4 : Math.max(y + 4, ly + 32); ly = ty; }
   const lx = W - 142;
   s += `<g class="bl-st${end ? " is-end" : ""}" data-st="${st.id}"><path class="bl-lead" d="M${r(x + 7)},${r(y)}L${r(lx - 6)},${r(ty - 4)}"/><circle cx="${x}" cy="${y}" r="${end ? 6.5 : 5}"/><text x="${lx}" y="${r(ty)}">${st.name}</text>${st.t ? `<text class="bl-t" x="${lx}" y="${r(ty + 13)}">${st.t}</text>` : ""}</g>\n`;
 });
