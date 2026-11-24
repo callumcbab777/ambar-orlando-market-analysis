@@ -1,0 +1,58 @@
+/* KCOS-4 · Moments page brought into the AMBAR facelift: image-led hero, square brand
+   geometry, brand type and palette, the same motion layer as the rest of the site. */
+.mo-root{--forest:#171717;--blue:#5A5A37;--amber:#B37D50;--line:rgba(1,1,1,.12);font-weight:400}
+.mo-root h1,.mo-root h2,.mo-root h3{font-family:var(--serif);color:var(--charcoal)}
+.mo-root .eyebrow{font-family:var(--din);font-weight:600;font-size:1.05rem;letter-spacing:.135em;color:var(--olive)}
+body.moments-page .demo-tag{background:var(--black);border:1px solid rgba(255,169,74,.5);border-radius:0;color:var(--amber)}
+
+/* tabs */
+.mo-root .top{background:var(--black);border-bottom:1px solid rgba(255,169,74,.35)}
+.mo-root .tab{color:rgba(255,255,255,.66);font-family:var(--sans);text-transform:uppercase;letter-spacing:.08em;font-size:.82rem;transition:var(--t)}
+.mo-root .tab small{color:rgba(255,255,255,.5);letter-spacing:.06em;text-transform:none;font-size:.72rem}
+.mo-root .tab.active{color:#fff;border-color:var(--amber)}
+.mo-root .tab:hover{color:#fff}
+
+/* image-led hero */
+.mo-root .hero.mo-hero{position:relative;max-width:none;margin:0;min-height:min(78vh,720px);display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding:120px 24px 64px;text-align:center;color:#fff;isolation:isolate;overflow:hidden;background:var(--black)}
+.mo-hero .img-band{position:absolute;inset:0;height:auto;z-index:-1}
+.mo-hero .img-band::after{background:rgba(1,1,1,.48)}
+.mo-hero .img-band figcaption{bottom:auto;top:18px;left:auto;right:0;width:auto;align-items:flex-end;padding:0 24px}
+.mo-hero .img-band .ib-k,.mo-hero .img-band .ib-t{display:none}
+.mo-root .mo-hero .eyebrow{color:var(--amber)}
+.mo-root .mo-hero h2{color:#fff;font-size:clamp(2.6rem,6vw,5rem);max-width:900px;line-height:1.05}
+.mo-root .mo-hero .lede{color:#F1EDE6;font-size:1.15rem}
+.mo-root .mo-hero>*:not(.img-band){animation:ambar-in 1s var(--ease) both}
+.mo-root .mo-hero>.eyebrow{animation-delay:.1s}.mo-root .mo-hero>h2{animation-delay:.25s}.mo-root .mo-hero>.lede{animation-delay:.45s}.mo-root .mo-hero>.reassure{animation-delay:.6s}
+.mo-root .reassure span{background:rgba(1,1,1,.35);border:1px solid rgba(255,255,255,.45);color:#fff;border-radius:0}
+
+/* cards */
+.mo-root .cards{padding-top:56px}
+.mo-root .card{border-radius:0;box-shadow:var(--shadow);transition:transform .45s var(--ease),box-shadow .45s var(--ease)}
+.mo-root .card:hover,.mo-root .card:focus-visible{transform:translateY(-6px);box-shadow:var(--shadow-strong)}
+.mo-root .card:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.mo-root .c-img{aspect-ratio:4/3}
+.mo-root .c-img::after{content:"";position:absolute;inset:0;background:rgba(1,1,1,0);transition:background .45s var(--ease)}
+.mo-root .card:hover .c-img::after{background:rgba(1,1,1,.12)}
+.mo-root .c-img img{transition:transform 1.2s var(--ease)}
+.mo-root .card:hover .c-img img{transform:scale(1.07)}
+.mo-root .c-time{border-radius:0;background:var(--black);color:var(--amber);font-family:var(--din);letter-spacing:.1em;text-transform:uppercase;font-size:.8rem}
+.mo-root .card.is-shared .c-img::after{border-radius:0}
+.mo-root .c-invite,.mo-root .m-invite{color:var(--terracotta)}
+.mo-root .c-open{color:var(--charcoal);text-transform:uppercase;letter-spacing:.06em;font-size:.8rem}
+.mo-root .c-edit{border-radius:0}
+
+/* board, summary, modal */
+.mo-root .board{border-radius:0;box-shadow:var(--shadow)}
+.mo-root .tile{border-radius:0}
+.mo-root .tile.filled figcaption{background:rgba(1,1,1,.62)}
+.mo-root .summary-inner{border-radius:0;background:var(--olive)}
+.mo-root .summary-inner .eyebrow{color:var(--amber)}
+.mo-root .modal-card{border-radius:0}
+.mo-root .btn{border-radius:0;text-transform:uppercase;letter-spacing:.06em;font-size:.82rem}
+.mo-root .g-chips button,.mo-root .chip{border-radius:0}
+@media (max-width:820px){.mo-root .hero.mo-hero{min-height:70vh;padding:100px 20px 48px}}
+@media (prefers-reduced-motion:reduce){.mo-root .mo-hero>*{animation:none}.mo-root .card,.mo-root .c-img img{transition:none}}
+.mo-root .tile .cap{background:rgba(1,1,1,.62)}
+.mo-root .c-img{background:var(--olive)}
+.mo-hero .img-band .ib-plate{background:none;border:0;padding:0}
+.mo-root .c-flag{border-radius:0;background:var(--black);color:#fff}
