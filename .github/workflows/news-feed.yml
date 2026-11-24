@@ -1,0 +1,36 @@
+# Refreshes the News hub feed (data/news_feed.json + .js) from public Google News RSS every 6 hours.
+# Only these two generated files are ever committed, as github-actions[bot]; it never force-pushes (rebases and retries).
+# Scheduled runs only happen on the default branch, so nothing runs until this file is merged.
+name: news-feed
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: news-feed
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Refresh feed
+        run: python3 scripts/update_news.py
+      - name: Commit if changed (no force-push)
+        run: |
+          FILES="data/news_feed.json data/news_feed.js"
+          if git diff --quiet -- $FILES; then echo "Feed unchanged."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add $FILES
+          git commit -m "News hub: refresh feed"
+          for i in 1 2 3; do
+            git pull --rebase origin main && git push && exit 0
+            echo "Push attempt $i failed; retrying"; sleep $((i * 5))
+          done
+          exit 1

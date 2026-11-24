@@ -381,8 +381,10 @@
       const u = await link();
       const n = itin.days.length;
       const gen = new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+      const who = await S.nameForPdf();
       await window.AMBAR_EV_PDF.download(ROOT, I.pdfSections(itin, { ...ctx(), root: new URL(ROOT, location.href).href }), {
-        title: "Our Orlando itinerary",
+        preparedFor: who,
+        title: who ? S.titleFor(who, "itinerary") : "Our Orlando itinerary",
         subtitle: `${I.dayLabel(itin.start)} – ${I.dayLabel(I.addDays(itin.start, n - 1))} · ${n} day${n === 1 ? "" : "s"}  ·  Generated ${gen}`,
         generated: gen, pageUrl: u || S.profileBase(ROOT),
         footnote: "Planned with the Travel Concierge on the AMBAR Orlando site. Events from Visit Orlando listings; check each before you go. No fares or rates are quoted. The AMBAR visit is in person, booked on Calendly.",

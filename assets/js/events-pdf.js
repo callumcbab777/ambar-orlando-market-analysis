@@ -39,7 +39,7 @@
     const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight(), M = 54;
     const font = (f, st, size, col) => { doc.setFont(f, st); doc.setFontSize(size); doc.setTextColor(...col); };
     const title = meta.title || "My Orlando profile";
-    doc.setProperties({ title, subject: "Saved from the AMBAR Orlando site", creator: "AMBAR Orlando · My Profile" });
+    doc.setProperties({ title, subject: "Saved from the AMBAR Orlando site", creator: "AMBAR Orlando", ...(meta.preparedFor ? { author: String(meta.preparedFor) } : {}) });
 
     /* cover band: title with "Orlando" in gold italic */
     doc.setFillColor(...COL.forest); doc.rect(0, 0, W, 158, "F");
@@ -48,10 +48,26 @@
     font(sans, "bold", 8, COL.gold2); doc.text("AMBAR RESIDENCES  ·  ORLANDO", M, 52, { charSpace: 1.6 });
     const i = title.indexOf("Orlando");
     const parts = i < 0 ? [[title, "normal", COL.cream]] : [[title.slice(0, i), "normal", COL.cream], ["Orlando", "italic", COL.gold2], [title.slice(i + 7), "normal", COL.cream]];
+    /* the title shrinks to stay clear of the seal on the right (long names) */
+    let tsz = 36;
+    const tw = (sz) => parts.reduce((w, [t, st]) => { if (!t) return w; font(serif, st, sz, COL.cream); return w + doc.getTextWidth(t); }, 0);
+    while (tsz > 20 && tw(tsz) > W - M - 172) tsz -= 1;
     let x = M;
-    for (const [t, st, col] of parts) { if (!t) continue; font(serif, st, 36, col); doc.text(t, x, 100); x += doc.getTextWidth(t); }
+    for (const [t, st, col] of parts) { if (!t) continue; font(serif, st, tsz, col); doc.text(t, x, 100); x += doc.getTextWidth(t); }
     font(sans, "normal", 10, [215, 208, 191]); doc.text(meta.subtitle || "", M, 128);
-    font(serif, "italic", 15, COL.gold2); doc.text("My", W - 96, 61, { align: "center" }); doc.text("Profile", W - 96, 77, { align: "center" });
+    /* seal: "Prepared for" + the visitor's name (shrunk to fit the circle); without a name, "Your Orlando" */
+    const who = String(meta.preparedFor || "").trim();
+    if (who) {
+      font(sans, "bold", 6.5, COL.gold2); doc.text("PREPARED FOR", W - 96, 54, { align: "center", charSpace: 0.8 });
+      const words = who.split(" ");
+      const lines = words.length > 1 && who.length > 11 ? [words[0], words.slice(1).join(" ")] : [who];
+      let size = 15;
+      font(serif, "italic", size, COL.gold2);
+      while (size > 8 && Math.max(...lines.map((l) => doc.getTextWidth(l))) > 70) { size -= 0.5; doc.setFontSize(size); }
+      lines.forEach((l, k) => doc.text(l, W - 96, 70 + k * (size + 1), { align: "center" }));
+    } else {
+      font(serif, "italic", 15, COL.gold2); doc.text("Your", W - 96, 61, { align: "center" }); doc.text("Orlando", W - 96, 77, { align: "center" });
+    }
 
     const footer = () => {
       const n = doc.getNumberOfPages();

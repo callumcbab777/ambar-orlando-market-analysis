@@ -18,7 +18,7 @@ KNOW = json.loads((ROOT / "data/knowledge.json").read_text())
 class SectionNumberingTest(unittest.TestCase):
     def test_05_and_06_are_demand_and_news(self):
         self.assertRegex(INDEX, r'id="demand"[\s\S]{0,300}05 · Demand context')
-        self.assertRegex(INDEX, r'id="news"[\s\S]{0,300}06 · Orlando &amp; hospitality news')
+        self.assertRegex(INDEX, r'id="news"[\s\S]{0,300}06 · News')
 
 
 class SharedToggleTest(unittest.TestCase):

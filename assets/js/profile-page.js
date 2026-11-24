@@ -11,13 +11,13 @@
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const plural = (n, w) => `${n} ${w}${n === 1 ? "" : "s"}`;
-  const EDIT = {
+  const EDIT = { news: { href: ROOT + "index.html#news", label: "Browse the News hub", empty: "No stories saved yet. Tap Save on any story in the News hub." },
     events: { href: ROOT + "events/#events", label: "Browse Orlando events", empty: "No saved events yet." },
     hotels: { href: ROOT + "index.html#hotels", label: "Star hotels on the market page", empty: "No favourite hotels yet." },
     brands: { href: ROOT + "index.html#familiar", label: "Pick the brands you know", empty: "No brands picked yet." },
     prefs: { href: ROOT + "events/#preferences", label: "Set your event preferences", empty: "No preferences set yet." },
   };
-  const HEAD = { events: "Saved events", hotels: "Favourite hotels", brands: "Brands I know", prefs: "Preferences" };
+  const HEAD = { news: "Saved news stories", events: "Saved events", hotels: "Favourite hotels", brands: "Brands I know", prefs: "Preferences" };
   let D = null;
 
   function brandsHtml(ids, editable, other) {
@@ -41,8 +41,9 @@
     }
     else if (sec) items = sec.entries.map((x) => {
       const rm = !editable ? "" : key === "events" ? `<button type="button" class="pf-x" data-rm-event="${esc(x.id)}" aria-label="Remove ${esc(x.title)} from My Profile">×</button>`
-        : key === "hotels" ? `<button type="button" class="pf-x" data-rm-hotel="${esc(x.id)}" aria-label="Remove ${esc(x.title)} from favourite hotels">×</button>` : "";
-      const title = x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}<span class="sr-only"> (Visit Orlando, opens in a new tab)</span></a>` : esc(x.title);
+        : key === "hotels" ? `<button type="button" class="pf-x" data-rm-hotel="${esc(x.id)}" aria-label="Remove ${esc(x.title)} from favourite hotels">×</button>`
+        : key === "news" ? `<button type="button" class="pf-x" data-rm-story="${esc(x.id)}" aria-label="Remove ${esc(x.title)} from saved stories">×</button>` : "";
+      const title = x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}<span class="sr-only"> (${key === "news" ? "original publisher" : "Visit Orlando"}, opens in a new tab)</span></a>` : esc(x.title);
       const meta = [x.dates, x.location].filter(Boolean).map(esc).join(" · ");
       const gone = key === "events" && x.listed === false ? ` <span class="pf-gone">no longer listed</span>` : "";
       return `<li class="pf-item"><div><b class="pf-item-t">${title}</b>${gone}${meta ? `<span class="pf-item-m">${meta}</span>` : ""}</div>${rm}</li>`;
@@ -59,7 +60,7 @@
   function render(profile, editable) {
     const secs = S.sections(profile, D);
     const by = Object.fromEntries(secs.map((s) => [s.key, s]));
-    return ["events", "hotels", "brands", "prefs"].map((k) => sectionHtml(k, by[k], profile, editable)).join("");
+    return ["events", "news", "hotels", "brands", "prefs"].map((k) => sectionHtml(k, by[k], profile, editable)).join("");
   }
   function paintMine() {
     const p = P.get();
@@ -70,10 +71,11 @@
     $("pfSummary").textContent = secs.length ? `In your profile: ${S.summary(secs)}.` : "Your profile is empty for now. Save an event, star a hotel or pick the brands you know to start it.";
   }
   document.addEventListener("click", (ev) => {
-    const t = ev.target.closest("[data-rm-event],[data-rm-hotel],[data-rm-brand],[data-rm-other],[data-clear-prefs]");
+    const t = ev.target.closest("[data-rm-event],[data-rm-story],[data-rm-hotel],[data-rm-brand],[data-rm-other],[data-clear-prefs]");
     if (!t || !$("pfSections").contains(t)) return;
     const status = (m) => { $("pfStatus").textContent = m; };
     if (t.dataset.rmEvent) { P.removeEvent(t.dataset.rmEvent); status("Event removed."); }
+    else if (t.dataset.rmStory) { P.removeStory(t.dataset.rmStory); status("Story removed."); }
     else if (t.dataset.rmHotel) { P.toggleHotel(t.dataset.rmHotel); status("Hotel removed from favourites."); }
     else if (t.dataset.rmBrand) { P.setBrands(P.get().brands.filter((b) => b !== t.dataset.rmBrand)); status("Brand removed."); }
     else if (t.dataset.rmOther) { P.setOtherBrand(""); status("Other brand removed."); }
@@ -81,8 +83,22 @@
     $("pfMineTitle").setAttribute("tabindex", "-1");
     $("pfMineTitle").focus();
   });
+  /* Your name: shown on the PDFs (never in share links) */
+  const nameIn = $("pfName");
+  if (nameIn) {
+    nameIn.value = P.getName();
+    const saveName = () => {
+      const raw = nameIn.value.trim();
+      const v = P.cleanName(raw);
+      if (raw && !v) { $("pfNameStatus").textContent = "Use letters, spaces, apostrophes or hyphens (up to 60)."; return; }
+      P.setName(v);
+      $("pfNameStatus").textContent = v ? `Saved. Your PDFs will say “Prepared for ${v}”.` : "Name removed. You’ll be asked for one when you download a PDF.";
+    };
+    nameIn.addEventListener("change", saveName);
+    P.subscribe(() => { if (document.activeElement !== nameIn) nameIn.value = P.getName(); });
+  }
   $("pfClear").addEventListener("click", () => {
-    if (!window.confirm("Clear your whole profile? This removes saved events, favourite hotels, brands and preferences from this browser.")) return;
+    if (!window.confirm("Clear your whole profile? This removes your name, saved events, saved stories, favourite hotels, brands and preferences from this browser.")) return;
     P.clearAll();
     $("pfStatus").textContent = "Your profile has been cleared.";
   });

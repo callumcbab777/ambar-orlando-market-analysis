@@ -275,7 +275,7 @@
     try {
       const sorted = entries.slice().sort((a, b) => (a.end_date || "9").localeCompare(b.end_date || "9"));
       await window.AMBAR_EV_PDF.download(ROOT, sorted, {
-        title, generated: genDate(),
+        title, generated: genDate(), preparedFor: await window.AMBAR_PROFILE_SHARE.nameForPdf(),
         subtitle: `${sorted.length} event${sorted.length === 1 ? "" : "s"} from the Visit Orlando calendar  ·  Generated ${genDate()}`,
         pageUrl: link,
       }, `orlando-events-${todayISO}.pdf`);

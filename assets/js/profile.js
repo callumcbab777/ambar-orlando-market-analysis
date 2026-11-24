@@ -18,7 +18,7 @@
   const BRAND_ID = /^[a-z0-9][a-z0-9-]{0,47}$/;
   const BRAND_CODE = /^[a-z][0-9a-f]{1,2}$/;
   /* link: the whole ?p= value. A Travel Concierge itinerary (tag i, compressed by assets/js/itinerary.js) can add a few KB. */
-  const LIMITS = { events: 60, hotels: 20, brands: 120, link: 9000 };
+  const LIMITS = { events: 60, hotels: 20, brands: 120, news: 40, link: 9000 };
   const PARTY = ["any", "solo", "couple", "group", "family"];
   const TEXT_RE = /^[\p{L}\p{N} &'’,.\/()+:-]{1,60}$/u;
   const KW_RE = /^[\p{L}\p{N} '&-]{2,30}$/u;
@@ -99,6 +99,16 @@
       location: str(s.location, 200), area: str(s.area, 80), saved_at: str(s.saved_at, 40),
     };
   }
+  /* the visitor's own name (My Profile > Your name), used on their PDFs; never put in share links */
+  const NAME_RE = /^[\p{L}\p{M} .'’-]{1,60}$/u;
+  function cleanName(v) { const t = String(v ?? "").replace(/\s+/g, " ").trim().slice(0, 60); return t && NAME_RE.test(t) ? t : ""; }
+  /* a saved News story (index.html#news): id = a short hash of its source URL */
+  const STORY_ID = /^[a-z0-9]{4,16}$/;
+  const HTTPS = /^https:\/\/[^\s"<>]+$/;
+  function cleanStory(s) {
+    if (!s || typeof s !== "object" || !STORY_ID.test(String(s.id ?? "")) || !HTTPS.test(String(s.url || ""))) return null;
+    return { id: String(s.id), title: str(s.title, 240), url: str(s.url, 600), source: str(s.source, 80), cat: str(s.cat, 30), date: ISO_RE.test(String(s.date || "").slice(0, 10)) ? String(s.date).slice(0, 10) : "", saved_at: str(s.saved_at, 40) };
+  }
   function normalise(raw) {
     const p = raw && typeof raw === "object" ? raw : {};
     const events = [];
@@ -107,9 +117,17 @@
       if (e && !events.some((x) => x.id === e.id)) events.push(e);
       if (events.length >= LIMITS.events) break;
     }
+    const news = [];
+    for (const s of Array.isArray(p.news) ? p.news : []) {
+      const n = cleanStory(s);
+      if (n && !news.some((x) => x.id === n.id)) news.push(n);
+      if (news.length >= LIMITS.news) break;
+    }
     return {
       v: 1,
+      ...(cleanName(p.name) ? { name: cleanName(p.name) } : {}),
       events,
+      ...(news.length ? { news } : {}),
       hotels: uniq(p.hotels, HOTEL_ID, LIMITS.hotels),
       brands: uniq((Array.isArray(p.brands) ? p.brands : []).filter((id) => !RETIRED_BRANDS.has(String(id ?? "").trim())), BRAND_ID, LIMITS.brands),
       other_brand: cleanOther(p.other_brand),
@@ -120,7 +138,7 @@
     };
   }
   const empty = () => normalise({});
-  const isEmpty = (p) => !p.events.length && !p.hotels.length && !p.brands.length && !p.other_brand && !p.prefs && !p.trip;
+  const isEmpty = (p) => !p.events.length && !(p.news || []).length && !p.hotels.length && !p.brands.length && !p.other_brand && !p.prefs && !p.trip;
 
   /* ---------- migration from the events page's old keys ---------- */
   function parseJSON(s) { try { return s ? JSON.parse(s) : null; } catch (e) { return null; } }
@@ -271,9 +289,9 @@
       trip: A.trip || B.trip,
     });
   }
-  const counts = (p) => { const nb = p.brands.length + (p.other_brand ? 1 : 0); const np = (p.prefs ? 1 : 0) + (p.trip ? 1 : 0); return { events: p.events.length, hotels: p.hotels.length, brands: nb, prefs: np, total: p.events.length + p.hotels.length + nb + np }; };
+  const counts = (p) => { const nb = p.brands.length + (p.other_brand ? 1 : 0); const np = (p.prefs ? 1 : 0) + (p.trip ? 1 : 0); const nn = (p.news || []).length; return { events: p.events.length, hotels: p.hotels.length, brands: nb, prefs: np, news: nn, total: p.events.length + p.hotels.length + nb + np + nn }; };
 
-  const core = { KEY, LEGACY, LIMITS, OTHER_MAX, RETIRED_BRANDS, cleanOther, normalise, cleanPrefs, hasPrefs, cleanTrip, hasTrip, PACE, BUDGET_FEEL, INTERESTS, ACCESS, migrate, encode, decode, shareUrl, merge, brandIndex, counts, empty, isEmpty, b64e, b64d };
+  const core = { KEY, LEGACY, LIMITS, OTHER_MAX, RETIRED_BRANDS, cleanOther, cleanName, cleanStory, normalise, cleanPrefs, hasPrefs, cleanTrip, hasTrip, PACE, BUDGET_FEEL, INTERESTS, ACCESS, migrate, encode, decode, shareUrl, merge, brandIndex, counts, empty, isEmpty, b64e, b64d };
 
   /* ---------- browser store ---------- */
   const ls = (() => { try { return root && root.localStorage ? root.localStorage : null; } catch (e) { return null; } })();
@@ -337,6 +355,14 @@
     setTrip: (trip) => update((p) => { p.trip = trip; return p; }),
     clearTrip: () => update((p) => { p.trip = null; return p; }),
     clearAll: () => write(empty()),
+    getName: () => read().name || "",
+    setName: (n) => update((p) => { const c = cleanName(n); if (c) p.name = c; else delete p.name; return p; }),
+    hasStory: (id) => (read().news || []).some((n) => n.id === String(id)),
+    toggleStory(snapshot) {
+      const id = String(snapshot && snapshot.id);
+      return update((p) => { const cur = p.news || []; p.news = cur.some((n) => n.id === id) ? cur.filter((n) => n.id !== id) : [...cur, { ...snapshot, saved_at: new Date().toISOString() }]; return p; });
+    },
+    removeStory: (id) => update((p) => { p.news = (p.news || []).filter((n) => n.id !== String(id)); return p; }),
     counts: (p) => counts(p || read()),
     paintCounts,
   });

@@ -1,0 +1,26 @@
+# Weekly check that every figure in data/verification.json is still on the site and still matches its source.
+# Read-only: it never commits. A failed run (GitHub emails the repo owner) means a figure needs fixing;
+# the run summary lists OK / FAIL / MANUAL per figure. Manual items follow docs/DATA_VERIFICATION.md.
+name: data-verify
+on:
+  schedule:
+    - cron: "0 14 * * 1"
+  pull_request:
+    paths:
+      - "data/comps.json"
+      - "data/verification.json"
+      - "visit/index.html"
+      - "scripts/verify_data.py"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify figures against sources
+        run: python3 scripts/verify_data.py

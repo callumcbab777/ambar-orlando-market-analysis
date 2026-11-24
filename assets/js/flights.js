@@ -50,6 +50,19 @@
     "VCP-MCO": { name: "Campinas, São Paulo (VCP)", airline: "Azul" },
     "MEX-MCO": { name: "Mexico City", airline: "Aeroméxico, Volaris" },
     "DXB-MCO": { name: "Dubai", airline: "Emirates" },
+    /* Top 10 domestic markets from MCO by departing passengers, Sep 2025 to Aug 2026 (U.S. DOT BTS T-100 via
+       transtats.bts.gov, as tabulated on the MCO Wikipedia page, accessed Nov 24, 2026). Carriers = those BTS reported
+       on the route in that period; schedules change. */
+    "ATL-MCO": { name: "Atlanta", airline: "Delta, Frontier, Southwest, Spirit", domestic: true, pax: "1,342,496" },
+    "SJU-MCO": { name: "San Juan, Puerto Rico", airline: "Frontier, JetBlue, Southwest, Spirit", domestic: true, pax: "962,766" },
+    "ORD-MCO": { name: "Chicago O’Hare", airline: "American, Frontier, Southwest, Spirit, United", domestic: true, pax: "948,383" },
+    "EWR-MCO": { name: "Newark", airline: "Frontier, JetBlue, Spirit, United", domestic: true, pax: "945,712" },
+    "PHL-MCO": { name: "Philadelphia", airline: "American, Frontier, Southwest, Spirit", domestic: true, pax: "851,927" },
+    "DFW-MCO": { name: "Dallas/Fort Worth", airline: "American, Frontier, Spirit", domestic: true, pax: "801,843" },
+    "LGA-MCO": { name: "New York LaGuardia", airline: "American, Delta, Frontier, JetBlue, Spirit", domestic: true, pax: "789,446" },
+    "DEN-MCO": { name: "Denver", airline: "Frontier, Southwest, United", domestic: true, pax: "757,460" },
+    "CLT-MCO": { name: "Charlotte", airline: "American, Frontier, Spirit", domestic: true, pax: "714,713" },
+    "JFK-MCO": { name: "New York JFK", airline: "Delta, Frontier, JetBlue", domestic: true, pax: "708,566" },
     /* SFB: "70+ US cities" has no single origin, so its link is "Flights to SFB" with the date only */
     "ANY-SFB": { name: "70+ US cities", airline: "mostly Allegiant", any: true },
     "BDA-SFB": { name: "Bermuda", airline: "BermudAir", start: "2026-10-31", src: "FlySFB news, as listed on the visit page" },

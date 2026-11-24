@@ -168,3 +168,10 @@
 /* phones: room under the last itinerary item so nothing fixed sits on its buttons */
 @media (max-width:760px){.tc-days{padding-bottom:12px}#concierge{scroll-margin-top:70px}.tc-chat-row .btn{flex:1 1 100%}}
 .tc-cta .btn-solid{background:var(--amber);border-color:var(--amber);color:var(--dark);font-weight:600}
+.isla-note{display:inline-block;font-size:.74rem;font-weight:500;letter-spacing:.04em;color:#5A5A37;margin:6px 0 0 8px;text-transform:none}
+.kicker .isla-note{margin:0;font-size:inherit;letter-spacing:inherit;color:inherit;opacity:.8}
+/* KCOS-3 · name on PDFs + name dialog */
+.pf-name{display:grid;gap:6px;max-width:520px;margin:0 0 18px}
+.pf-name label{font-weight:600;color:var(--forest);font-size:.92rem}
+.pf-name label small{display:block;font-weight:400;color:#5f5f55;font-size:.8rem}
+.pf-name input,.name-dlg input{min-height:44px;padding:0 12px;border:1px solid rgba(30,58,44,.3);border-radius:8px;font:inherit;background:#fff}
