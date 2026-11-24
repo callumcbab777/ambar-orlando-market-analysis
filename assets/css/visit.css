@@ -86,6 +86,8 @@
 .bl-map{display:block;width:100%;height:auto;max-height:560px}
 .bl-land{fill:#F4EFE7;stroke:#989B74;stroke-width:1}
 .bl-rail{fill:none;stroke:#5A5A37;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;opacity:.35}
+.bl-lat path{stroke:#5A5A37;stroke-width:.6;stroke-dasharray:2 4;opacity:.45;fill:none}
+.bl-lat text{font:600 9.5px var(--sans,"DM Sans",sans-serif);fill:#5A5A37;opacity:.8;letter-spacing:.04em}
 .bl-rail-run{fill:none;stroke:#FFA94A;stroke-width:3;stroke-linecap:round;stroke-dasharray:10 14;animation:blRun 2.4s linear infinite}
 @keyframes blRun{to{stroke-dashoffset:-48}}
 .bl-drive{stroke:#B37D50;stroke-width:2;stroke-dasharray:3 4;fill:none}
