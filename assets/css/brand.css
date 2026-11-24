@@ -1,0 +1,142 @@
+/* KCOS-4 · AMBAR brand facelift.
+   Loaded last on every page. Applies the AMBAR Residences Orlando brand guidelines
+   (typography, palette, buttons, effects, section rhythm, logo rules) on top of the
+   existing layout. Guidance from UI/UX Pro Max (subtle motion, focus, contrast, touch
+   targets) is used only where it does not conflict with the guidelines.
+   Font substitutes (the licensed faces are not freely web-licensable):
+     The Seasons  -> Cormorant Garamond (self-hosted, OFL)
+     Jokker       -> DM Sans (the guidelines' named fallback, self-hosted, OFL)
+     DIN Condensed-> Barlow Condensed (self-hosted, OFL), system DIN first if installed */
+:root{
+  --amber:#FFA94A; --black:#010101; --charcoal:#171717; --cream:#F4EFE7; --olive:#5A5A37;
+  --teal:#355965; --terracotta:#B37D50; --sage:#989B74; --grey-1:#555; --grey-2:#888; --grey-3:#F1F1F1;
+  /* legacy tokens remapped onto the brand palette */
+  --forest:#171717; --forest-2:#2B2B26; --forest-3:#010101; --gold:#FFA94A; --gold-2:#FFA94A;
+  --orange:#B37D50; --brown:#B37D50; --blue:#355965; --lgreen:#989B74;
+  --ink:#171717; --muted:#555; --line:rgba(1,1,1,.12); --card:#FFFFFF;
+  --serif:"the-seasons","The Seasons","Cormorant Garamond",Georgia,serif;
+  --sans:"Jokker","DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --din:"DIN Condensed","DIN Alternate","Barlow Condensed","Jokker","DM Sans",sans-serif;
+  --r:2px; --shadow:0 3px 50px rgba(0,0,0,.05); --shadow-strong:0 3px 50px rgba(0,0,0,.15);
+  --ease:cubic-bezier(0,0,.58,1); --t:all .27s cubic-bezier(0,0,.58,1);
+}
+body{color:var(--charcoal);line-height:1.75}
+p{line-height:1.75}
+h1,h2,h3{color:var(--charcoal);line-height:1.15;letter-spacing:0}
+h2{font-size:clamp(2.4rem,4.6vw,4.2rem)}
+h1 em,h2 em,h3 em{color:var(--terracotta)}
+a{color:var(--teal);text-decoration-thickness:1px;text-underline-offset:3px;transition:var(--t)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:0}
+
+/* Eyebrows: DIN-style condensed caps. Olive on light (sage fails contrast on cream), amber on dark. */
+.eyebrow,.kicker{font-family:var(--din);font-weight:600;font-size:1.05rem;letter-spacing:.135em;line-height:1.3}
+.kicker{color:var(--olive)}
+.eyebrow,.kicker.on-dark,.on-dark .kicker,.section-deep .kicker,.hero .kicker,.site-footer .kicker{color:var(--amber)}
+
+/* Header + logo (min 120px wide) */
+.site-header{background:rgba(1,1,1,.96);border-bottom:1px solid rgba(255,169,74,.35)}
+.brand-mark img{height:52px;width:auto;min-width:120px}
+.site-nav a{border-radius:0;font-family:var(--sans);letter-spacing:.06em;text-transform:uppercase;font-size:.76rem;font-weight:500;transition:var(--t)}
+
+/* Hero: black, no gradients, amber rule */
+.hero{background:var(--black);border-bottom:1px solid rgba(255,169,74,.4)}
+.hero-bands{display:none}
+.hero h1 em{color:var(--amber)}
+.hero-stats{border-radius:0;background:rgba(255,169,74,.3);border-color:rgba(255,169,74,.3)}
+.hero-stats div{background:#0d0d0d}
+
+/* Buttons: rectangular, Jokker Medium 14px caps, tracked .06em, 1px outline */
+.btn,.btn-more,.btn-solid,.btn-outline,.tc-go,.as-send,.pf-act,.nh-more,.wa-btn,
+button.btn,a.btn{border-radius:0!important;font-family:var(--sans);font-weight:500;font-size:.875rem;letter-spacing:.06em;text-transform:uppercase;transition:var(--t)}
+.btn:hover{transform:none}
+.btn-gold{background:var(--amber);color:var(--black);border:1px solid var(--amber)}
+.btn-gold:hover{background:transparent;color:var(--amber)}
+.btn-ghost{border:1px solid rgba(244,239,231,.7);color:var(--cream)}
+.btn-ghost:hover{background:var(--cream);color:var(--black)}
+.btn-more{border:1px solid var(--charcoal);color:var(--charcoal);background:transparent}
+.btn-more:hover{background:var(--charcoal);color:var(--cream)}
+.btn-solid{background:var(--charcoal);border-color:var(--charcoal);color:var(--cream)}
+.btn-outline{border:1px solid var(--charcoal);color:var(--charcoal)}
+
+/* Chips and toggles: square corners, same easing */
+.chip,.vo-toolbar .chip,.demand-toolbar .chip,.news-toolbar .chip,.nh-chips .chip,.as-suggest button,.fav-star,.nh-act{border-radius:0!important;transition:var(--t)}
+.chip[aria-pressed="true"],.nh-chips .chip[aria-pressed="true"],.vo-toolbar .chip[aria-pressed="true"],.demand-toolbar .chip[aria-pressed="true"],.news-toolbar .chip[aria-pressed="true"]{background:var(--charcoal);border-color:var(--charcoal);color:var(--cream)}
+
+/* Section rhythm: cream / white / olive / black / teal accents */
+.section-alt{background:#FFFFFF}
+.wa-section{background:#FFFFFF}
+.section-deep{background:var(--olive);color:#F1EDE6}
+.section-deep .section-head h2{color:#FFFFFF}
+.section-deep .section-head h2 em{color:var(--amber)}
+.section-deep .section-sub{color:#F1EDE6}
+.nh{background:var(--cream)}
+
+/* Cards: brand shadow, near-square corners */
+.nitem,.nh-card,.mstat,.hcard,.card,.fh-panel,.tweek,.pf-item,.ev-card,.vo-card{box-shadow:var(--shadow);transition:var(--t)}
+.mstat{background:var(--charcoal)}
+.mstat .v{color:var(--amber)}
+
+/* Gradients removed (guidelines: no gradients) */
+.ev-reco{background:var(--black)}
+.ev-share{background:#FFFFFF}
+.ev-plan{background:var(--cream)}
+.pl-teaser::before{background:var(--amber)}
+.tc-cta{background:var(--black)}
+.tc-k-a{background:rgba(255,169,74,.12)}
+.fam-blist li.is-ambar .fam-brand{background:#FBF3E6}
+.fh-panel{background:#FFFFFF}
+.vh-line::before{background:var(--amber)}
+.tier-luxury::before{background:var(--terracotta)}
+.tier-premium::before{background:var(--sage)}
+.tier-select::before{background:var(--charcoal)}
+.tier-longstay::before{background:var(--amber)}
+.tier-label h3{color:var(--black)}
+.tier-label p,.tier-label .count{color:rgba(1,1,1,.78)}
+.tier-select .tier-label h3{color:var(--amber)}
+.bchip{border-radius:0;transition:var(--t)}
+.bchip:hover,.bchip:focus-visible,.bchip.is-active{transform:none;box-shadow:var(--shadow-strong)}
+.bchip .badge{background:var(--terracotta)}
+.bchip.ambar{background:var(--black);border-color:var(--amber);box-shadow:none}
+.bchip.ambar img{height:auto;width:120px}
+.update-pill{border-radius:0}
+.tier-luxury .tier-label h3,.tier-luxury .tier-label p,.tier-luxury .tier-label .count{color:#FFFFFF}
+.nh-t a,.evh-pick-title a{background:none}
+.nh-t a:hover,.evh-pick-title a:hover{text-decoration:underline;text-decoration-color:var(--amber)}
+
+/* Footer on charcoal: white headings, 70% white links, #888 legal */
+.site-footer{background:var(--charcoal);color:rgba(255,255,255,.78);border-top:3px solid var(--amber)}
+.site-footer h2{color:#FFFFFF}
+.site-footer h3{color:#FFFFFF;font-size:1.125rem;font-family:var(--din);letter-spacing:.135em;text-transform:uppercase;font-weight:600}
+.site-footer a{color:rgba(255,255,255,.7)}
+.site-footer a:hover{color:#FFFFFF}
+.footer-grid p,.footer-grid li{color:rgba(255,255,255,.72)}
+.site-footer small,.site-footer .legal,.footer-legal{color:#888}
+
+/* Subtle reveal (UI/UX Pro Max motion dial 3: 350ms, 12px, ease-out). Headings are never
+   hidden by default: the fade only plays as they arrive, so print, screenshots and slow
+   devices always see the content. */
+@keyframes ambar-rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.rv.is-in{animation:ambar-rise .35s var(--ease) both}
+@media (prefers-reduced-motion:reduce){.rv.is-in{animation:none}}
+
+/* Site guide button and small UI on brand */
+.as-launch{background:var(--black);border:1px solid rgba(255,169,74,.6);border-radius:0;letter-spacing:.06em;text-transform:uppercase;font-size:.8rem}
+.as-launch:hover{background:var(--olive)}
+.as-panel{border-radius:0}
+.as-send{border-radius:0;background:var(--charcoal)}
+
+/* Page heroes and bands on the events, visit and profile pages: flat brand colours */
+.evh{background:var(--cream)}
+.evh::before{display:none}
+.ev-visit-band{background:var(--black)}
+.isla-btn{background:var(--black);border:1px solid var(--amber);border-radius:0;box-shadow:none}
+/* Every button on the site is rectangular (guidelines: no rounded buttons) */
+button:not(.as-close):not(.fav-star),[class*="btn"],.tc-go,.pf-act a,.chip{border-radius:0}
+/* Page datelines follow the eyebrow rule; jump links are square */
+.evh-dateline{font-family:var(--din);font-size:1.05rem;letter-spacing:.135em;color:var(--olive)}
+.evh-dateline span:first-child{color:var(--charcoal)}
+.vh-jump a{border-radius:0;border-color:rgba(1,1,1,.22);color:var(--charcoal);transition:var(--t)}
+.ev-mbar{background:var(--black);border-radius:0;border-top:1px solid rgba(255,169,74,.5)}
+.hero-stats div:last-child:nth-child(odd){grid-column:1/-1}
+@media (min-width:821px){.hero-stats div:last-child:nth-child(odd){grid-column:auto}}
+@media (max-width:820px){.brand-mark img{height:auto;width:120px}}
