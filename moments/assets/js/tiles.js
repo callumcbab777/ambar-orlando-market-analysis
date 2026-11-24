@@ -5,8 +5,8 @@
 (function(){
 "use strict";
 // AMBAR renderings only (see README credits). No other destinations.
-var SRC=["hotel-feeling","picture-it","your-visit","x-pool","x-spa","x-v-pool","x-bright","x-bcalm"];
-var C={forest:"#0F2D21",olive:"#5A5A37",sage:"#989B74",brown:"#B37D50",cream:"#F4EFE7",gold:"#FFA94A"};
+var SRC=["aerial","pool-sunset","event-lawn","lobby","a1-living","cafe-outdoor","main-entry","c1-living"].map(function(s){return "../assets/img/r/"+s+"-1024";}); // KCOS-4: full AMBAR rendering set
+var C={forest:"#171717",olive:"#5A5A37",sage:"#989B74",brown:"#B37D50",cream:"#F4EFE7",gold:"#FFA94A"};
 var PAL=[["forest","cream"],["olive","cream"],["brown","cream"],["forest","sage"],["olive","sage"],["forest","brown"]]; // amber is kept as a sparing accent
 var SHAPES=["tessera","halftone","arc","louvre"];
 var REGIONS=["diagonal","corner","split","band"];
@@ -23,7 +23,7 @@ var order=SRC.slice().sort(function(){return rand()-.5}), rolls={}, n=0;
 function roll(id){
   if(rolls[id]) return rolls[id];
   var p=pick(PAL);
-  rolls[id]={id:id,src:"assets/img/"+order[n++%order.length]+".jpg",
+  rolls[id]={id:id,src:(function(s){return (s.indexOf("/")>=0?s:"assets/img/"+s)+".jpg";})(order[n++%order.length]),
     x:Math.round(20+rand()*60), y:Math.round(25+rand()*50), z:+(1.08+rand()*.32).toFixed(2),
     dark:p[0], light:p[1], shape:pick(SHAPES), region:pick(REGIONS),
     cell:Math.round(16+rand()*12), seed:Math.floor(rand()*1e9).toString(36)};
@@ -78,7 +78,7 @@ Tile.prototype.sample=function(cols,rows){
 };
 // Region the mosaic keeps at rest (soft edge), so the rendering shows through the rest.
 Tile.prototype.mask=function(){
-  var r=this.r, flip=r.seed.charCodeAt(0)%2, th=.42+(r.seed.charCodeAt(1)%20)/100;
+  var r=this.r, flip=r.seed.charCodeAt(0)%2, th=.18+(r.seed.charCodeAt(1)%15)/100; // KCOS-4: mosaic keeps a smaller accent region so the rendering leads
   this.cells.forEach(function(c){
     var u=flip?1-c.u:c.u, v=c.v, m;
     if(r.region==="diagonal") m=(u+v)/2;

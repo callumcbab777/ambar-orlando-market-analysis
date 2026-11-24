@@ -5,14 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>My Profile · AMBAR Orlando</title>
 <meta name="description" content="My Profile on the AMBAR Orlando site: saved Orlando events, favourite hotels, hotel brands you know and your event preferences, kept in this browser. Share it as a link or a branded PDF.">
-<meta name="theme-color" content="#1E3A2C">
-<link rel="icon" href="../assets/ambar-logo.png">
+<meta name="theme-color" content="#010101">
+<link rel="icon" href="../assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../assets/fonts/fonts.css">
 <link rel="stylesheet" href="../assets/css/styles.css">
 <link rel="stylesheet" href="../assets/css/events.css">
 <link rel="stylesheet" href="../assets/css/visit.css">
 <link rel="stylesheet" href="../assets/css/profile.css">
 <link rel="stylesheet" href="../assets/css/assistant.css">
+<link rel="stylesheet" href="../assets/css/brand.css">
 </head>
 <body class="events-page profile-page">
 <a class="skip" href="#main">Skip to content</a>
@@ -20,7 +21,7 @@
 <header class="site-header" id="siteHeader">
   <div class="wrap header-inner">
     <a class="brand-mark" href="../index.html" aria-label="AMBAR Orlando Market Landscape, home">
-      <img src="../assets/ambar-logo.png" alt="AMBAR Residences · Orlando" width="156" height="66">
+      <img src="../assets/brand/ambar-logo-white.svg" alt="Ambar Residences Orlando · Apartments by Marriott Bonvoy" width="217" height="32">
     </a>
     <nav class="site-nav" aria-label="Site">
       <a href="../index.html">← Market landscape</a>
@@ -45,6 +46,11 @@
         <p class="pf-summary" id="pfSummary" aria-live="polite"></p>
         <p class="pf-hero-cta"><a class="btn btn-gold" href="#preferences">Travel Concierge</a> <small class="isla-note">Powered by Isla</small></p>
       </div>
+      <figure class="evh-art evh-photo">
+<!-- ARCH:profile -->
+<div class="arch"><picture><source type="image/avif" srcset="../assets/img/r/a1-bedroom-640.avif 640w, ../assets/img/r/a1-bedroom-1024.avif 1024w, ../assets/img/r/a1-bedroom-1600.avif 1600w" sizes="(max-width: 820px) 80vw, 440px"><source type="image/webp" srcset="../assets/img/r/a1-bedroom-640.webp 640w, ../assets/img/r/a1-bedroom-1024.webp 1024w, ../assets/img/r/a1-bedroom-1600.webp 1600w" sizes="(max-width: 820px) 80vw, 440px"><img src="../assets/img/r/a1-bedroom-1600.jpg" srcset="../assets/img/r/a1-bedroom-640.jpg 640w, ../assets/img/r/a1-bedroom-1024.jpg 1024w, ../assets/img/r/a1-bedroom-1600.jpg 1600w" sizes="(max-width: 820px) 80vw, 440px" alt="Rendering of a one-bedroom residence bedroom at Ambar" width="1600" height="982" fetchpriority="high" decoding="async"></picture></div>
+<!-- /ARCH:profile -->
+      </figure>
     </div>
   </section>
 
@@ -93,6 +99,9 @@
     </div>
   </section>
 
+<!-- BAND:profile-lobby -->
+<figure class="img-band" id="band-profile-lobby" data-band><picture><source type="image/avif" srcset="../assets/img/r/lobby-640.avif 640w, ../assets/img/r/lobby-1024.avif 1024w, ../assets/img/r/lobby-1600.avif 1600w" sizes="100vw"><source type="image/webp" srcset="../assets/img/r/lobby-640.webp 640w, ../assets/img/r/lobby-1024.webp 1024w, ../assets/img/r/lobby-1600.webp 1600w" sizes="100vw"><img src="../assets/img/r/lobby-1600.jpg" srcset="../assets/img/r/lobby-640.jpg 640w, ../assets/img/r/lobby-1024.jpg 1024w, ../assets/img/r/lobby-1600.jpg 1600w" sizes="100vw" alt="Rendering of the Ambar lobby and reception" width="1600" height="900" loading="lazy" decoding="async"></picture><figcaption class="wrap"><span class="ib-plate"><span class="ib-k">Welcome</span><span class="ib-t">The lobby</span><span class="ib-c">Renderings: AMBAR Residences Orlando</span></span></figcaption></figure>
+<!-- /BAND:profile-lobby -->
   <section class="section pf-prefs" id="preferences" aria-labelledby="tpTitle">
     <div class="wrap">
       <header class="section-head">
@@ -276,5 +285,6 @@
 <script src="../assets/js/nav.js"></script>
 <script src="../assets/js/assistant-config.js"></script>
 <script src="../assets/js/assistant.js" data-root="../" data-page="profile"></script>
+<script src="../assets/js/motion.js" defer></script>
 </body>
 </html>

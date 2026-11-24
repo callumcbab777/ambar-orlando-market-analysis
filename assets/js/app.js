@@ -306,7 +306,7 @@
       const list = el("div", { class: "brand-list" });
       bs.forEach((b, i) => {
         const cls = b.featured ? "bchip ambar" : "bchip" + (b.comps.length ? " has-comps" : "");
-        const inner = b.featured ? `<img src="assets/ambar-logo.png" alt="AMBAR Residences · Orlando">`
+        const inner = b.featured ? `<img src="assets/brand/ambar-logo-white.svg" alt="Ambar Residences Orlando · Apartments by Marriott Bonvoy" width="160" height="24">`
           : `<span class="wm ${WM[b.name] || "wm-serif"}">${esc(b.name)}</span>${b.comps.length ? `<span class="badge" aria-hidden="true">${b.comps.length}</span>` : ""}`;
         const btn = el("button", { type: "button", class: cls, "aria-pressed": "false", "aria-label": `${b.name}, ${t.name} tier${b.comps.length ? `, ${b.comps.length} tracked hotel${b.comps.length > 1 ? "s" : ""}` : ""}` }, inner);
         btn._b = b;
