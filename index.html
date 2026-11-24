@@ -164,6 +164,7 @@
         <p class="kicker">05 · Demand context</p>
         <h2 id="deTitle">Conventions, Disney &amp; brief notes</h2>
         <p class="section-sub">Curated demand drivers from the weekly Marriott briefs — conventions, Disney calendars and hotel-linked notes. For the wider public calendar, see the <a href="events/index.html">Orlando events page</a> (Visit Orlando listings). Market occupancy below is metro-wide, not for these hotels.</p>
+        <p class="demand-verified" id="demandVerified"></p>
       </header>
       <div class="market-strip" id="marketStrip"></div>
       <div class="demand-toolbar" id="demandToolbar" role="group" aria-label="Filter demand weeks"></div>
@@ -172,16 +173,22 @@
     </div>
   </section>
 
-  <!-- 7 NEWS -->
-  <section class="section" id="news" aria-labelledby="neTitle">
+  <!-- 7 NEWS HUB (assets/js/news.js; feed: data/news_feed.json, refreshed by scripts/update_news.py) -->
+  <section class="section nh" id="news" aria-labelledby="neTitle">
     <div class="wrap">
       <header class="section-head">
-        <p class="kicker">06 · Orlando &amp; hospitality news</p>
-        <h2 id="neTitle">Wider Orlando and hospitality headlines</h2>
-        <p class="section-sub">Marriott items from the weekly briefs, plus wider Orlando destination news and hospitality / meetings media that frame the local market.</p>
+        <p class="kicker">06 · News</p>
+        <h2 id="neTitle">The Orlando <em>live blog</em></h2>
+        <p class="section-sub">Short, dated stories for buyers: theme parks, the airport, new restaurants, bars and coffee shops, Lake Nona, hotels and the wider Orlando market. Compiled from public news feeds and our weekly briefs; every story links to its original publisher. Save the ones you like to <a href="profile/">My Profile</a>, or share them.</p>
+        <p class="nh-stamp" id="newsStamp"></p>
       </header>
-      <div class="news-toolbar" id="newsToolbar" role="group" aria-label="Filter news"></div>
-      <div class="news-grid" id="newsList"></div>
+      <div id="newsHub">
+        <div class="nh-chips" id="newsChips" role="group" aria-label="Filter news by topic"></div>
+        <div class="nh-list" id="newsList" aria-live="polite"><p class="nh-empty">Loading stories…</p></div>
+        <p class="nh-more-wrap"><button type="button" class="btn btn-outline nh-more" id="newsMore" hidden>Show more stories</button></p>
+        <p class="nh-status" id="newsStatus" role="status" aria-live="polite"></p>
+        <p class="fineprint">Headlines and links belong to their publishers and open on their sites. Stories are gathered automatically from Google News search feeds every few hours, filtered to Orlando topics, and are not edited or endorsed by AMBAR. Items marked “From the weekly brief” come from the Monday Marriott Orlando brief.</p>
+      </div>
     </div>
   </section>
 </main>
@@ -223,6 +230,8 @@
 <script src="assets/js/profile.js"></script>
 <script src="data/brands.js"></script>
 <script src="assets/js/fav-hotels.js"></script>
+<script src="data/news_feed.js"></script>
+<script src="assets/js/news.js"></script>
 <script src="assets/js/app.js"></script>
 <script src="assets/js/familiar.js"></script>
 <script src="assets/js/week-ahead-engine.js"></script>

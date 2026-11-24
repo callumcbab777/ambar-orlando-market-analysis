@@ -64,6 +64,7 @@
     if (t.access.length || t.access_note) out.push(["Accessibility needs", [...t.access.map((a) => ACC_L[a]), t.access_note].filter(Boolean).join(", ")]);
     return out;
   }
+  const NEWS_CAT = { "theme-parks": "Theme parks", mco: "MCO / Airport", dining: "New restaurants, bars and coffee", "lake-nona": "Lake Nona", hospitality: "Hospitality and hotels", marriott: "Marriott", orlando: "Wider Orlando", development: "Development and real estate", events: "Events and conventions" };
   /* readable sections; hotels and brands not in the current data are dropped */
   function sections(profile, d) {
     const out = [];
@@ -96,6 +97,8 @@
     const other = P.cleanOther ? P.cleanOther(profile.other_brand || "") : "";
     if (other) bs.push({ title: "Other", dates: "1 brand · not on the list", location: other, other: true, n: 1 });
     if (bs.length) out.push({ key: "brands", kicker: "Hotel brands", heading: "Brands I know", note: `Brands with Orlando-area hotels, verified as of ${d.brands.as_of ? fMDY(d.brands.as_of) : "the date shown on the site"}.`, entries: bs });
+    const ns = (profile.news || []).map((n) => ({ id: n.id, title: n.title || "Saved story", dates: [n.date ? fMDY(n.date) : "", n.source].filter(Boolean).join(" · "), location: NEWS_CAT[n.cat] || "", url: n.url }));
+    if (ns.length) out.push({ key: "news", kicker: "Orlando news", heading: "Saved stories", note: "Headlines saved from the News hub on the AMBAR Orlando site. Each links to the original publisher.", entries: ns });
     const pl = prefsLines(profile.prefs).concat(tripLines(profile.trip));
     if (pl.length) out.push({ key: "prefs", kicker: "Events", heading: "My preferences", entries: pl.map(([k, v]) => ({ title: v, dates: k })) });
     return out;
@@ -110,21 +113,62 @@
     if (n("hotels")) bits.push(`${n("hotels")} hotel${n("hotels") === 1 ? "" : "s"}`);
     const nb = secs.find((s) => s.key === "brands");
     if (nb) { const c = nb.entries.reduce((t, e) => t + (Number(e.n) || Number(e.dates.split(" ")[0]) || 0), 0); bits.push(`${c} brand${c === 1 ? "" : "s"}`); }
+    if (n("news")) bits.push(`${n("news")} stor${n("news") === 1 ? "y" : "ies"}`);
     if (n("prefs")) bits.push("preferences");
     return bits.join(" · ");
+  }
+  /* the PDF shows the visitor's name (My Profile > Your name), never a generic "My Profile" */
+  const possessive = (n) => (/s$/i.test(n) ? `${n}’` : `${n}’s`);
+  function titleFor(name, what) { return name ? `${possessive(name)} Orlando ${what}` : `Your Orlando ${what}`; }
+  /* ask once for a name if none is stored; resolves "" when skipped (the PDF then says "Your Orlando …") */
+  function askName() {
+    return new Promise((resolve) => {
+      if (typeof document === "undefined" || typeof HTMLDialogElement === "undefined") { resolve(""); return; }
+      const dlg = document.createElement("dialog");
+      dlg.className = "name-dlg";
+      dlg.setAttribute("aria-labelledby", "nameDlgT");
+      dlg.innerHTML = `<form method="dialog" class="name-dlg-f">
+        <h2 id="nameDlgT">Whose name should go on the PDF?</h2>
+        <p>We’ll put it on the cover and keep it in this browser’s My Profile. It is never added to share links.</p>
+        <label for="nameDlgI">Your name</label>
+        <input id="nameDlgI" name="n" type="text" autocomplete="name" maxlength="60" required>
+        <p class="name-dlg-err" id="nameDlgE" role="alert" hidden>Use letters, spaces, apostrophes or hyphens.</p>
+        <div class="name-dlg-a"><button type="submit" class="btn btn-gold" value="ok">Add name and download</button><button type="submit" class="btn btn-outline" value="skip" formnovalidate>Skip</button></div>
+      </form>`;
+      document.body.appendChild(dlg);
+      const inp = dlg.querySelector("#nameDlgI");
+      dlg.addEventListener("close", () => {
+        const v = dlg.returnValue === "ok" ? P.cleanName(inp.value) : "";
+        if (v && P.setName) P.setName(v);
+        dlg.remove();
+        resolve(v);
+      });
+      dlg.querySelector("form").addEventListener("submit", (e) => {
+        const btn = e.submitter;
+        if (btn && btn.value === "ok" && !P.cleanName(inp.value)) { e.preventDefault(); dlg.querySelector("#nameDlgE").hidden = false; inp.focus(); }
+      });
+      dlg.showModal();
+      inp.focus();
+    });
+  }
+  async function nameForPdf() {
+    const n = P.getName ? P.getName() : "";
+    return n || askName();
   }
   async function pdf(root, profile, opts = {}) {
     const d = await data(root);
     const secs = sections(profile, d);
     if (!secs.length) throw new Error("empty");
     const link = P.shareUrl(profileBase(root), profile, d.bIdx);
+    const name = opts.name != null ? opts.name : await nameForPdf();
     await window.AMBAR_EV_PDF.download(root, secs, {
-      title: opts.title || "My Orlando profile",
+      preparedFor: name,
+      title: titleFor(name, "profile"),
       generated: genDate(),
       subtitle: `${summary(secs)}  ·  Generated ${genDate()}`,
       pageUrl: link,
       footnote: "Events from the Visit Orlando calendar; hotels and brands from the AMBAR Orlando site. Check each listing for times, prices and changes.",
-    }, opts.filename || `my-orlando-profile-${new Date().toISOString().slice(0, 10)}.pdf`);
+    }, opts.filename || `${name ? name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" : ""}orlando-profile-${new Date().toISOString().slice(0, 10)}.pdf`);
     return secs;
   }
   async function copyText(text) {
@@ -154,5 +198,5 @@
       catch (e) { if (e && e.name !== "AbortError") status("Sharing isn’t available here. Use Copy share link instead."); }
     });
   }
-  window.AMBAR_PROFILE_SHARE = { data, sections, prefsLines, tripLines, loadScript, url, pdf, wire, copyText, summary, profileBase };
+  window.AMBAR_PROFILE_SHARE = { data, sections, prefsLines, tripLines, loadScript, url, pdf, wire, copyText, summary, profileBase, titleFor, nameForPdf, askName };
 })();

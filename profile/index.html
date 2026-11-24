@@ -43,7 +43,7 @@
         <h1 id="pfTitle">My <em>Profile</em></h1>
         <p class="evh-lede">The events you’ve saved, your favourite hotels, the hotel brands you know and your trip preferences, all in one place. It stays in this browser; nothing is sent anywhere unless you share it.</p>
         <p class="pf-summary" id="pfSummary" aria-live="polite"></p>
-        <p class="pf-hero-cta"><a class="btn btn-gold" href="#preferences">Travel Concierge</a></p>
+        <p class="pf-hero-cta"><a class="btn btn-gold" href="#preferences">Travel Concierge</a> <small class="isla-note">Powered by Isla</small></p>
       </div>
     </div>
   </section>
@@ -69,6 +69,11 @@
         <p class="kicker">Your profile</p>
         <h2 id="pfMineTitle">What you’ve saved</h2>
       </header>
+      <div class="pf-name">
+        <label for="pfName">Your name <small>shown on your PDFs, kept in this browser, never in share links</small></label>
+        <input id="pfName" type="text" autocomplete="name" maxlength="60" placeholder="e.g. Alex Morgan">
+        <p class="pf-status" id="pfNameStatus" role="status" aria-live="polite"></p>
+      </div>
       <div class="ev-share pf-share" id="pfShare" hidden>
         <div>
           <h3>Share my profile</h3>
@@ -102,6 +107,7 @@
           <p>Let Isla propose an itinerary for your upcoming trip. Share it with your family and plan it together.</p>
         </div>
         <button type="button" class="btn btn-gold tc-go" id="tcGo" aria-controls="concierge">Travel Concierge</button>
+        <p class="isla-note">Powered by Isla</p>
         <div class="tc-chat" id="tcChat">
           <div class="tc-log" id="tcLog" role="log" aria-live="polite" aria-label="Your chat with Isla" hidden></div>
           <form class="tc-chat-form" id="tcChatForm" novalidate>
@@ -186,7 +192,7 @@
   <section class="section tc" id="concierge" aria-labelledby="tcTitle" hidden>
     <div class="wrap">
       <header class="section-head">
-        <p class="kicker">Travel Concierge</p>
+        <p class="kicker">Travel Concierge <span class="isla-note">· Powered by Isla</span></p>
         <h2 id="tcTitle" tabindex="-1">Your Orlando itinerary</h2>
         <p class="section-sub" id="tcSub"></p>
       </header>

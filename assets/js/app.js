@@ -385,7 +385,11 @@
   /* ---------- 7 demand ---------- */
   function renderDemand() {
     const strip = $("#marketStrip");
-    if (strip) strip.innerHTML = (DB.market || []).map((m) => `<div class="mstat"><div class="p">${esc(m.period)}</div><div class="v">${esc(m.value)}</div><p class="c">${esc(m.metric)} · ${esc(m.change)}</p><p class="s">Metro-wide, not these hotels. ${esc(m.source)}</p></div>`).join("");
+    /* each figure shows its source (linked) and whether it was checked against that source; unverified ones are flagged */
+    if (strip) strip.innerHTML = (DB.market || []).map((m) => `<div class="mstat${m.verified === false ? " is-unverified" : ""}"><div class="p">${esc(m.period)}</div><div class="v">${esc(m.value)}</div><p class="c">${esc(m.metric)} · ${esc(m.change)}</p><p class="s">Metro-wide, not these hotels. ${m.url ? `<a href="${esc(m.url)}" target="_blank" rel="noopener">${esc(m.source)}<span class="sr-only"> (opens in a new tab)</span></a>` : esc(m.source)}</p>${m.verified === true ? `<p class="mv mv-ok">Verified against source ${esc(fMD(m.verified_on))}</p>` : m.verified === false ? `<p class="mv mv-no" title="${esc(m.verify_note || "")}">Unverified · ${esc(m.verify_note || "not confirmed against a primary source")}</p>` : ""}</div>`).join("");
+    const vstamp = $("#demandVerified");
+    const vm = DB.meta && DB.meta.verification;
+    if (vstamp && vm && vm.last_verified) vstamp.innerHTML = `<span class="mv-dot" aria-hidden="true"></span>Last verified ${esc(fLong(vm.last_verified))}. ${esc(vm.scope || "")} <a href="https://github.com/callumcbab777/ambar-orlando-market-analysis/blob/main/${esc(vm.checklist)}" target="_blank" rel="noopener">How we check<span class="sr-only"> (opens in a new tab)</span></a>`;
     const DM_TOP = 3, DA_TOP = 3; // condensed preview: first 3 notes of the chosen week + first 3 'Looking ahead' items
     const evHTML = (e, i, wk) => `<div class="ev${i >= DM_TOP ? " more-extra" : ""}" id="demand-${wk}-${i + 1}"><div class="d"><span class="type type-${esc(e.type || "Other")}">${esc(e.type || "Note")}</span><span>${esc(e.dates)}</span></div><p class="t">${esc(e.title)}</p>${e.detail ? `<p class="x">${esc(e.detail)}</p>` : ""}${(e.hotels && e.hotels.length) ? `<p class="x">Linked hotels: ${e.hotels.map((id) => `<a href="#hotel-${id}">${esc((hotelById[id]||{}).short || id)}</a>`).join(", ")}</p>` : ""}<p class="s">${esc(e.source || "")}</p></div>`;
     const weekList = [...weeks].reverse();
@@ -423,6 +427,8 @@
 
   /* ---------- 8 news ---------- */
   function renderNews() {
+    /* the News hub (assets/js/news.js) replaces the old headline grid when it is on the page */
+    if (window.AMBAR_NEWS && document.getElementById("newsHub")) { window.AMBAR_NEWS.render(DB); return; }
     const list = $("#newsList");
     const toolbar = $("#newsToolbar");
     if (!list) return;
