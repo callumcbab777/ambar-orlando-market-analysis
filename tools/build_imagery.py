@@ -8,7 +8,28 @@ renderings (Renderings: AMBAR Residences Orlando). Usage: python3 tools/build_im
 """
 import re, sys
 from pathlib import Path
-from PIL import Image
+import struct
+
+
+def jpeg_size(path):
+    """(width, height) of a baseline/progressive JPEG, stdlib only (CI has no Pillow)."""
+    with open(path, "rb") as f:
+        if f.read(2) != b"\xff\xd8":
+            raise SystemExit(f"not a JPEG: {path}")
+        while True:
+            b = f.read(1)
+            while b and b != b"\xff":
+                b = f.read(1)
+            while b == b"\xff":
+                b = f.read(1)
+            if not b:
+                raise SystemExit(f"no size in {path}")
+            m = b[0]
+            ln = struct.unpack(">H", f.read(2))[0]
+            if m in (0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7, 0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF):
+                h, w = struct.unpack(">xHH", f.read(5))
+                return w, h
+            f.seek(ln - 2, 1)
 
 ROOT = Path(__file__).resolve().parent.parent
 IMG = ROOT / "assets" / "img" / "r"
@@ -49,8 +70,7 @@ def picture(slug, alt, prefix, sizes="100vw", eager=False, defer=False, cls=""):
     if not ws:
         raise SystemExit(f"missing images for {slug}")
     mid = min(ws, key=lambda w: abs(w - 1600))
-    with Image.open(IMG / f"{slug}-{mid}.jpg") as im:
-        w, h = im.size
+    w, h = jpeg_size(IMG / f"{slug}-{mid}.jpg")
     base = f"{prefix}assets/img/r/{slug}"
     ss = lambda ext: ", ".join(f"{base}-{x}.{ext} {x}w" for x in ws)
     a = "data-srcset" if defer else "srcset"
