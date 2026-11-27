@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-26T16:50Z",
+ "generated": "2026-11-27T01:42Z",
  "max_age_days": 21,
  "source": "Google News RSS search feeds (news.google.com/rss), one query per category; headlines and links are the publishers' own.",
  "categories": [
@@ -52,6 +52,105 @@
  "errors": [],
  "items": [
   {
+   "id": "a43c1091aa7b",
+   "cat": "theme-parks",
+   "title": "Thanksgiving Day 2026 Wait Times at Walt Disney World: How All Four Parks Did",
+   "source": "WDWMagic",
+   "source_site": "https://www.wdwmagic.com",
+   "url": "https://news.google.com/rss/articles/CBMi7gFBVV95cUxNOENJaXZ6QnlkVHJXOUVxcER2djg5X0dFTkc2eDQxUE14TjM1SUptYjBzZDdkeUZBSk5WTHdNRnNBeVFpbGV2NzBNaEhvM1VTYlRhMjlFYlFEcFZtLTR5OWEyR251cmhqZkZkTGFNS2xPTmMyamR6TjhZVUcyUXE5ZnZ2dHlSZFJmMmRJTXNiNktvZ1FfR1JKOUpVTGdDeTlvTXQ0TEtPTHM3dllIUUFiSXhmc3JTM1FPSlRCUHB5d1AwM25NXzlsZnV0Z2dLSWN2ZXNtMExoa2xSYVkya1RTWkNHMUR4Rm5HeFN1eUtn?oc=5",
+   "published": "2026-11-26T22:13Z"
+  },
+  {
+   "id": "8cb6383637e4",
+   "cat": "mco",
+   "title": "Orlando Airport Adds 3 NEW Nonstop Flights This Month",
+   "source": "AllEars.Net",
+   "source_site": "https://allears.net",
+   "url": "https://news.google.com/rss/articles/CBMikAFBVV95cUxPYmxXQWZDMzRyZVZfeTFXSnFuWFByaXNGS0dzb2JnTncybWxvZEk3Q0dVOUNnMk9yS1RQdG9xbmdNQ3FOa1F6N3VnQ2RNanVTNF8yWkNfTGlDbGp6dEFtbThpRUdjUkZCaHNCU3o1c1hPcHFrb3ZHMnZrLWJ1V2p4QWJtcGxjMWNjUE5mMmJNa0M?oc=5",
+   "published": "2026-11-26T22:00Z"
+  },
+  {
+   "id": "35f4c0ac2746",
+   "cat": "hospitality",
+   "title": "Universal Orlando Resort in 2027: Closures, New Rides, and Annual Pass Updates",
+   "source": "disneydining.com",
+   "source_site": "https://www.disneydining.com",
+   "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxNODhYR1IzNDBSSUtObjV4TGM4X0tnSk95cGZLR3FzUUdnSDl5NlV3U3hYLXBHbnp3M3hJa3RtZlBYUlpPQTVLT0F4MXlqV1pMbzhqb3FKaVVMcVJKNm11OEFaLTVpZDhEVEtCaG5nWmFxYWdsX3BxMDFpUkYxc0Vud3RpbnNmaTZkZ2VZcVJOcmZQVHRabVFLa0I1LU5icktxbG5FR1VKVTNtMzB2SVE?oc=5",
+   "published": "2026-11-26T20:42Z"
+  },
+  {
+   "id": "b4c3c6b9aae8",
+   "cat": "theme-parks",
+   "title": "Universal Orlando Schedules 16 Horror Make-Up Show Previews",
+   "source": "Demokratis.co.id",
+   "source_site": "https://demokratis.co.id",
+   "url": "https://news.google.com/rss/articles/CBMiakFVX3lxTE9SSU5pTFFrSWxza1B1blZXbVhpS0JMSmdaVXRMOG9ZcjlZOGpSZkhab1JIUW83X2txSzdJYUZnYjBRRHZPb3g4U2tVakZ4NEpBTzJOc1Y3bm15X2tiT3MtNUVENkt0X3NCdmc?oc=5",
+   "published": "2026-11-26T19:53Z"
+  },
+  {
+   "id": "f5ee9369f5bd",
+   "cat": "theme-parks",
+   "title": "Joffrey's Coffee Introduces New Books & Brew Program at Flagship Disney Springs Location",
+   "source": "LaughingPlace.com",
+   "source_site": "https://www.laughingplace.com",
+   "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxNREFNa1lvN0NQRnJscnpBVFNsNnpvZFFhSVlTeDVLOHlnT1dFMVBydHFNbDVFa0FLdEVRdHViQ3FRc0Y4VEhwNERZeEc2SHpKQU0xWlZYQ3JJZV8zY0lDbG5MWlhmZkxiVnE3eHdMNDk4WXJMcmI1V0xzR1Y0R3ltdzRRWFg0czI4QUE?oc=5",
+   "published": "2026-11-26T19:46Z"
+  },
+  {
+   "id": "ad3ed91cf332",
+   "cat": "theme-parks",
+   "title": "Things Disney World Fans Care About That Make Absolutely NO SENSE to Non-Disney Fans",
+   "source": "The DIS",
+   "source_site": "https://www.wdwinfo.com",
+   "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNa0E5Y0R2S0lEeEx0Z0pEdmZmRmhOUGdlUHZ3ZlJSTzhkSEJKTWVKdllDaFZZVFJJcmc4U28yUUtnVWZnM0dmRmFsSUJzRlZhVUQ2c2k1ckpReE12LTZ0dXhuUDlGdE1UbFVNWGNkVUVVVXQ3dTNsMG5jNnpuczlFNWJQYWF1OVQxa2MwNHJac00zZ1R5RTRDVi1CbGJkYVBxNnBPalFBVU5XWG51LUVzZTVxOWFUUGR0VUhtOXZDV1dHcC02NVE?oc=5",
+   "published": "2026-11-26T19:43Z"
+  },
+  {
+   "id": "d085f9199d2b",
+   "cat": "theme-parks",
+   "title": "Universal Orlando Expands Pass Access and Revives Horror Show",
+   "source": "cwibc.co.id",
+   "source_site": "https://cwibc.co.id",
+   "url": "https://news.google.com/rss/articles/CBMidkFVX3lxTFBpbTd3aXljTnZDQ05GaE1CeEl4LTVkMkZRNm1FTUk0X2hTOVAxRjhCemxWQjhITnhHcWs5cWN5S1cwM1FScGRGbzAwZUJjYUl1Qng2Z091Y1Y2bDhrUkhYbHpNNWM2NHZvem5JR0lleTlZallNWFE?oc=5",
+   "published": "2026-11-26T19:29Z"
+  },
+  {
+   "id": "566089c740a5",
+   "cat": "theme-parks",
+   "title": "Universal Orlando Revamps Horror Make-Up Show for December Return",
+   "source": "bsinews.id",
+   "source_site": "https://bsinews.id",
+   "url": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5NZFc1aC1jOXFrbTBOeWdtcTg3ZmptaXhfdGRBUy15Mm5uSUJUM00zQ3VPb1ZTWG50TWdfTU1wNkVpOWJKSEdlSWp1Z1pXNk5nc2VyQVRwbnNPOHFYMDI2aDh3Ql8zSFc0?oc=5",
+   "published": "2026-11-26T19:29Z"
+  },
+  {
+   "id": "0e580b6860a8",
+   "cat": "theme-parks",
+   "title": "Extended Evening Hours Move Back to Animal Kingdom in February 2027",
+   "source": "BlogMickey.com",
+   "source_site": "https://blogmickey.com",
+   "url": "https://news.google.com/rss/articles/CBMioAFBVV95cUxPaDNfblUxUDBRQTVhZUpSTXY0cEprZDdvYVA1WFY3bEJPSkstdDJQamFyb2dVbEUyczBJcGlDWU9VUDFLdURtdUt2TWRpQzZfMTRJRVJSbUZPc1I1YXNQTzdiZ3RZTGZnSGYyNHVEYS10X01idE5LeTFnSk5rSVdZYnd6bjNDRDBoZEhaMUtIRXBORU9LQkxDWS0tOWZfWnVW?oc=5",
+   "published": "2026-11-26T18:35Z"
+  },
+  {
+   "id": "4a74a02c6476",
+   "cat": "theme-parks",
+   "title": "After 15 Months, Universal Reopens Diagon Alley Shop With Epic Universe Merch",
+   "source": "Inside the Magic",
+   "source_site": "https://insidethemagic.net",
+   "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNVFl6R2J1eEhtVkY0M2dzc0plYXlzdVU3S3g1emx6c0haNndkZ1FScGdCYm4zYThMYl9sOUY1eFVsN29DMHRMVUhjd05vY005eFNIdWVkOXpRMmJuLVVtTXRxdHd3R0dIZ3YzNHpPNldLV1A0MGVaTlN0cGY4OWRVQzJSLWdVLURReVJybU9BRDVNNGJlWGhTU0NLY3hQdE1pMFVHOWpnTmhrS1JianlqZTNB?oc=5",
+   "published": "2026-11-26T17:48Z"
+  },
+  {
+   "id": "d6d22c171269",
+   "cat": "theme-parks",
+   "title": "SeaWorld Orlando’s Seven Seas Food Festival returns with nearly 30 concerts, global food lineup",
+   "source": "WKMG",
+   "source_site": "https://www.clickorlando.com",
+   "url": "https://news.google.com/rss/articles/CBMi3wFBVV95cUxOZ1I2VTlDUmNaVURUZGY4a1RLbDRPNU56dGw3aENzSzhOX1RrM3ZrMjZRUW90RjdSa0NzZGZTS01xMC1FLXN3bkpIbkdWQkNTZE83VS1HM3Bicl9RMlBOeUFCd1lvNEpfR2dQR3RDMzNnMUtEbXVtYURDRjJIN3RybHJYVnhwMDZqWVJ0TzdUNlR6dUlYTnRHOHZ1SEdLMjRlY21McXk3d0ZnakFrOVlaRjl3VVhoTlNwMENhLUpBenpPZnRUZkQ2Zm9wRW1Bd01tM1BLaVZLVFFzMUxXZVJv?oc=5",
+   "published": "2026-11-26T16:58Z"
+  },
+  {
    "id": "a83ccb14f83d",
    "cat": "theme-parks",
    "title": "SeaWorld Orlando´s Christmas Celebration returns with millions of lights, new shows, and holiday traditions",
@@ -59,6 +158,15 @@
    "source_site": "https://en.travel2latam.com",
    "url": "https://news.google.com/rss/articles/CBMi4wFBVV95cUxNWTdVeFFnY3NDbjVyNk90bE1XVFdaX3kzWXRyTDhTc3lOWWNhUnc2NkNpV3l1TzJTeTFNcXJhRHJySjljbnRPVUg1cHNOZHdvLWl3QnlpWklSOGtkQU1uallUbm5mTHBmdkVOQUtnMHNtRnlMRDl0cWl3RExYb1IxenZvUVZCNlR3Z0ROWlQ4LUUwUFRjcHFtc2duY3RQLWtsNVNGcTVNNTd6OWlCQ2JhQmhJc0VkSzgyYmRiaU1EMWZyVkQ1Q2RxUU9JSkhOX3NsUmVJOXYxR21tMTNNTVRFMTRaOA?oc=5",
    "published": "2026-11-26T16:35Z"
+  },
+  {
+   "id": "efca8282f772",
+   "cat": "hospitality",
+   "title": "Universal Orlando Resort Confirms Major Changes for Next Year",
+   "source": "Disney Fanatic",
+   "source_site": "https://www.disneyfanatic.com",
+   "url": "https://news.google.com/rss/articles/CBMinAFBVV95cUxOMjBuYTZpaGZFX19vZzhidTdYT3VmWTdDdGZPTXkwcW5CbExaZjFhc2FEWnVldTlVeWZtcVF4SzdveGI3enZuVXVJM3k3TjVNQm5aQU5Kcms4em5idHplem9jYjRGUS13S0JLWHp2SWtPdHdSWDZ1cUNaTFhaQUZObnlyME5mOURqOEFqbTFvVzJzU0hrSFFMZTFXS1Y?oc=5",
+   "published": "2026-11-26T16:31Z"
   },
   {
    "id": "dd1d4d91bafd",
@@ -70,58 +178,13 @@
    "published": "2026-11-26T16:00Z"
   },
   {
-   "id": "9f9917352639",
-   "cat": "theme-parks",
-   "title": "Epic Universe performers arrested by ICE released on bond",
-   "source": "Orlando Sentinel",
-   "source_site": "https://www.orlandosentinel.com",
-   "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxPbVhlb2k1N3g5M284UkpFdk1IUGFsa2hvM1ZDZmFfRXNaaHhvWEU0UEF3OVJ1YlpyUnlPa1JVR3dqaWxPTGg1Z1RJX2xOVFVEY2IycVBWM2ZaUnZZVWFUVFVwNUhGd0s2MHJMMUJPVEwweFJpWDJqanVzaTVBbEh5MHZBN2c2WWlRY29pdmVOU0tYblYzQTVhWWF6NU9zOWpvVlBGMXI5dVNXNXRDNUZqR0dB?oc=5",
-   "published": "2026-11-26T02:27Z"
-  },
-  {
-   "id": "468038b7b34f",
-   "cat": "theme-parks",
-   "title": "Universal Orlando’s Ghostbusters Firehouse Gets Its Red Window Frame Back",
-   "source": "Ghostbusters News",
-   "source_site": "https://ghostbustersnews.com",
-   "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOUHdpZ3RiSnJWN0p5dTJWamNDbVNCTzNiTHNkT2lKYWFEbGVqQlozN1VISTl3MHVqOV8taERTUXNlT005U2s0TUdLUWpiS2FIWmhhbDdLYm51XzBOY2RUN2RnemM5MlhsM3lVZ285TEwzMWFuYi1ValZMMkJ2U1JkcGdpaUxGSGdNSV9vMlE0RHQzY2FPMnMzWmlvSXZpc28tUHk5WnhxYWhTZWwwTXdvS1FaSQ?oc=5",
-   "published": "2026-11-26T01:54Z"
-  },
-  {
-   "id": "77daa3047383",
-   "cat": "theme-parks",
-   "title": "WESH 2 wants to send you to Universal Orlando Resort!",
-   "source": "WESH",
-   "source_site": "https://www.wesh.com",
-   "url": "https://news.google.com/rss/articles/CBMiekFVX3lxTE5nS2hvWGVoQ3Q3aVNhaGlfQmpJWUJzN3d5ME5PLTFnM2hBbmtTWEJVamZaUExReTJuM1JCaG9BS0JycHZMMzE4U2I3RnltbkQ4dEhDSkU3Mlp2R2cwMXBRb1FJQWI4aGFramtRN1V4ZmpSWHY4aGlRR0dn?oc=5",
-   "published": "2026-11-25T19:24Z"
-  },
-  {
    "id": "91a5260ce6bc",
-   "cat": "theme-parks",
+   "cat": "hospitality",
    "title": "Universal Orlando Resort announces a new indoor roller coaster at Epic Universe",
    "source": "Travel2Latam",
    "source_site": "https://en.travel2latam.com",
    "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNUW5iN1J5MThTenkwOE1KUU9aOXozRlNyeGVJT3lWN3R1V3ZfbXZUYksyVXJTZHRKT1puOGRNcWlaUjZrRHRWd0FBQ29DN0cyZHZheTcyYWxFaXRWcnZteVBuUGtKc0xnWmpOZnJ5d1puSmFLSGJOQWhmTmRxNmRsbWNRQV9lMElPemZ6TmdKOVdnU0FHNGJRc29qM1diYmZZN2o1Y28zNkVVX0d6VFZleWhkek9HQjdld2h3Yi1BU1dUZw?oc=5",
    "published": "2026-11-25T18:44Z"
-  },
-  {
-   "id": "9abe328f68d8",
-   "cat": "theme-parks",
-   "title": "Epic Universe Update: Indoor Coaster Construction, Official Announcement, & Ride Rumors",
-   "source": "Orlando ParkStop",
-   "source_site": "https://orlandoparkstop.com",
-   "url": "https://news.google.com/rss/articles/CBMizAFBVV95cUxOeEFJdEtFTThhUEkwbVpMemw4Uk1JRjBvWldsQ1M0cFlYSnFFRlR2SHd4T1Fyd2lVcGFYTkZkdXZBLW5YZXNSRHFRUmx1NXpXd0k3bk5McEwtSWhGM3A5dVROUXJ2Rkw3b05ISWhOSGFyQkdaQS1PTTVUVTB5OWhicDRtMHpjckFTN3FvcDZpX3hBbVFldG9BTTZBQ2pOb2YxYTVjZVhmcUZkQ2J0SFRlNWlmc29sOFAtWHF3RGkxTFFmTXJzeE9ieUN5Wkg?oc=5",
-   "published": "2026-11-25T18:37Z"
-  },
-  {
-   "id": "80da8eed28d5",
-   "cat": "theme-parks",
-   "title": "Pictures: Universal Epic Universe lights up for second holiday season",
-   "source": "Orlando Sentinel",
-   "source_site": "https://www.orlandosentinel.com",
-   "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQc0xFRlVNRzNJUFotX3l5VnRJUmVKSWZYTnJsT2lmYnpsRk1EcmdUM0kzUFpRRVlacnkyWVNXSkkwTEptMWpUOTJqRVdmQ3pFVUp4SFRkeWViYUlwTndGMHlnZkw0M1V4NmcyNmIyMjlHblRaNFItRFlKTG5IZ1Rjb3d0SXNDc3F1WGx3ZmlpbllQUGJ1VmxBME5BV3FnTFMxRmp6TDdPOWo5ZWg2ZHBpeVV3?oc=5",
-   "published": "2026-11-25T18:25Z"
   },
   {
    "id": "dde92927abb4",
@@ -133,24 +196,6 @@
    "published": "2026-11-25T18:20Z"
   },
   {
-   "id": "74385a0deed2",
-   "cat": "theme-parks",
-   "title": "The Disney Springs Christmas Tree Stroll 2026: A Walkthrough Guide",
-   "source": "The DIS",
-   "source_site": "https://www.wdwinfo.com",
-   "url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxPbUc4Qk5lWFo0cklLYWp3b3pLbkVQQXZsOTlVd2QxNW1TTG5mVXM1cTV2eXdZQkgwalJBQVhWQURfRTFJWDV2Tl9iR19qY0k2R1l5MEZsRmp1U1VkdUV5dVk2b3ZRT0RfMjVOemR1bWljMFBHWG1hY05NZV9pWEU5NmRqa3RXT0ZKU1dhbHVjMFhLNDBOMkhqZW5DMGVPbUpSbnVmZWVWS0ZpQjJXYXIyaE1jdVQ0dHFQMzhJMlhLbHU?oc=5",
-   "published": "2026-11-25T18:00Z"
-  },
-  {
-   "id": "1764e14b00c7",
-   "cat": "theme-parks",
-   "title": "Where to Find Thanksgiving Quick Service Meals at Walt Disney World in 2026",
-   "source": "wdwmagic",
-   "source_site": "https://www.wdwmagic.com",
-   "url": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxObGFzUTM2REgyc0NJRURnRGJ3RHJ1VjJKUXJILVNLMW56THVfelhtRng1R3FuRllhaEdqbjlnQi1iejhZUElpMDc0eEZYcl9FNGdwV2pBOG1xalFlQkx1ZEJaMGwwXzA2MlR2d01ySVRUS3FpSnF5czk1Vm43YzU3NjA5OEc4UnMtMHYyTk5BT3RhLTdEbTh0U0pRaEFYV2RfZFBMRUV4Y2t4dTdyUXowVEhKd1VjQm9hZVVrLWVjOTFGWi1lWFZaMl85ZHppV3UtODlzbk44aC1QeDVZNk5VbFBJczZraE9LeGY1VXhEekJBZWdvMEFqUg?oc=5",
-   "published": "2026-11-25T17:01Z"
-  },
-  {
    "id": "6e0d400b0438",
    "cat": "development",
    "title": "Downtown Orlando office building hits market amid redevelopment interest",
@@ -160,18 +205,9 @@
    "published": "2026-11-25T17:00Z"
   },
   {
-   "id": "7f7f9f6c6ebd",
-   "cat": "theme-parks",
-   "title": "Universal Orlando hotel teams plan to pack more than 500,000 meals Thanksgiving weekend",
-   "source": "WFTV",
-   "source_site": "https://www.wftv.com",
-   "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPdk9zUUFxZHFaV0pjV3hoajQyM1JaaWNPZWJXWWRmWjJ5eUxzZmtrX1FrUkRPZms5dHZPYUtVa211c0hsdjZtZ205dWdNRDI2Z2E0SHYycXFkczRITFhhSEhhMnA2RG1fOVY1elN3bzRUX3lkY0Jsb2FKQzlEekQ1bUtIUjgxa2xTRDNja1ZxVDBwbmRoNW0yRzZ4bHZULXgyaFRvLTcxV2hMd1VDOWlBTWpwS2M2dlVobFRlcWRLaGQta1JFWDhsczNUaktzWFhiOExQYmVpLTBvR1XSAe8BQVVfeXFMT1VGTHpnR0FNWklUQVhrM0hxN0o3Y3M3TWEwcEdJMFdEeGFoVDBxdWxfSTZKOWVCNUt6U1Q0SVdrVVo5UGQ5QnZYbVNZZWdUS2YzYS1NeHN5YWwxcHlrczVFM19NQ0kwbFFfdl9kR3dWSDV4WDlXMjU0MWdNYXpXLWl1XzkyeUk2LTRGWDlJUzkwaFZUalZ6TTl4MUlNc3p2ZGRjRWg5SW5ERFBDSmhudE1QdmFRVlBzaXE2Q2NYSzI3RTBlbzJlZUR4VHR4TVFpcFQ3SE1tMzc5enhBbFJ1a2xmNzBQVkFXNHZZWk1Pcjg?oc=5",
-   "published": "2026-11-25T16:57Z"
-  },
-  {
    "id": "24a58b5f8225",
    "cat": "hospitality",
-   "title": "One of Orlando's largest convention hotels wraps up $72M makeover - Orlando Business Journal",
+   "title": "One of Orlando's largest convention hotels wraps up $72M makeover",
    "source": "The Business Journals",
    "source_site": "https://www.bizjournals.com",
    "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxORnJhSll6SDMyS1JpaU4tYm1BN29VaHQ3d3ZsalY2MV9NVkZKS2FOMGxQdUthaDZFc1VkbG03QTdiaXBSN0owZnB1UVowZVQzV1RDTHVKOHoxaW5zQ01sY2E3dUdza1QwUV9MSXhibC1yZzhxNTdBUWtidm5LZXhmNFk1aFhFZzNKMkZOY3pBSGVSVXl0QTZsdTl2MXA5MmdTS1pOOWFHQnU?oc=5",
@@ -185,15 +221,6 @@
    "source_site": "https://www.orlandosentinel.com",
    "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxPZWtNVGxhTVJCcFR2eldqS3UyajFkbTdFS0NlRTlidjd3UXNkUjZqVldOZEE0bXl2Rk9Nc20ta21MN05IeURIM2hKM0ZNc0hFVVVnaGE4dm9hb1d6OUc1SDRJU2lkZy1NVU1pcVZwTGRZZWtwOGpYdGlPMlVWNGlXOWpxVlJjd29ZY0JRV3BIYTcybThEbmx1ZnpNbVNnM0tGcFJfLWlSa2JhUU9zUWRPeVI1OERvMjFQRElTNlFlUW9ydVczRjdJT1JNTGVjUQ?oc=5",
    "published": "2026-11-25T12:43Z"
-  },
-  {
-   "id": "8dcfa147f831",
-   "cat": "development",
-   "title": "Former Kissimmee hotel turned workforce housing lands $34M refinancing loan",
-   "source": "The Business Journals",
-   "source_site": "https://www.bizjournals.com",
-   "url": "https://news.google.com/rss/articles/CBMipgFBVV95cUxQR0VZMlE1NFZ2UnR0UW9yUFp6dlQ1cVhnVjhocTlfZ1JtVUNmLTNwdjNTTWJrejQtaTNVZjJrWWRtTDdtRDJ2R2Q3bUJFQk5nQWR2LWtjWUNFaGF0aklWMDNWdVZScFFNbTdreFlwbUNvOHJpTnMzamg5dWxaVGcwMGZKbkt0VmprdDBMc2J1amRHQmY2RnZ2cVlpclFQbC1VbFFPVjVB?oc=5",
-   "published": "2026-11-25T11:00Z"
   },
   {
    "id": "578494c1261b",
@@ -286,24 +313,6 @@
    "published": "2026-11-23T20:40Z"
   },
   {
-   "id": "5de972cb99a9",
-   "cat": "orlando",
-   "title": "Air Canada cancelling non-stop service between Ottawa and Orlando in the new year",
-   "source": "CTV News",
-   "source_site": "https://www.ctvnews.ca",
-   "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxNVTl1YkRzZFJkbFNFOXhOaWE0TzN3YV9KSnJqanJ4UFluR1hpd3MzQUZXUGtLc2xrNFZqcWVFMi1ZVTd2c0ttLVRudUFYaTlVSjEwUlhjLTZISDFMenBLQ1BTOWtmQ2haSmVMak5GdktsUzVGMTcxdXdyTl9jeDNXN1RJVmwwbzk0SmRMeTl5aWVsTVRjTUZEZDg2emJYTUJ1QTNfTDk1eHJUZHRMU213RTQtU2p5MXNXcGgyR0N5MTcyM2kwSXc?oc=5",
-   "published": "2026-11-23T17:23Z"
-  },
-  {
-   "id": "e408eeba4999",
-   "cat": "mco",
-   "title": "Thanksgiving Travel at Orlando International Airport: Busiest Days and Tips",
-   "source": "wdwmagic",
-   "source_site": "https://www.wdwmagic.com",
-   "url": "https://news.google.com/rss/articles/CBMi2wFBVV95cUxPMFBvcDZWc0ZJVW9KSm0tOHNFYWhkRHc5ZUxlb1Z4enI3MkozTUdlSnF0YzktbEpnWkNTUGlVLXNlbW5rcU13UWlwT29SNlphT042VkdaazNtWEhKS0d6SzZPbXBDVFBjMGNLbDVueGxWcTVERnpzZ1FKLWNyblV4ODZhaHNXWW5NM1c1ZUtxMTkyZTBlTkR5NzJPeVBfMUZHQ3pfNG1mdDcxUWd2TGxySW1nWi10eG9ZcnVfWVZnd3RrSWVSREdSRjMtNGtsam5sN3hpOVBzbHJtLVk?oc=5",
-   "published": "2026-11-23T16:43Z"
-  },
-  {
    "id": "a4ed6c6b3b4a",
    "cat": "dining",
    "title": "Universal Orlando Is Building a Brand-New Jurassic Park Restaurant Opening in 2027",
@@ -313,21 +322,12 @@
    "published": "2026-11-23T16:00Z"
   },
   {
-   "id": "cb507ca616b6",
-   "cat": "development",
-   "title": "Plaza Lakes to Develop 130,000-Square-Foot Shopping Center in Metro Orlando",
-   "source": "Shopping Center Business",
-   "source_site": "https://shoppingcenterbusiness.com",
-   "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxPU0RlWkhOWG5CZl9UOVR6T2tfZlFqc0RJWmFjUkx1Smd1WU5kRmhDSGZYeVlRX0E3YkdsT2hsQTBuSEhNYmU0b19Zc012OGgtb1lIQlJwNnk1ZHhreFZYMU1SMzZGLUhaSzJ4NjB2MWJVUklDTlFVRl85OG1qQVlhX0NzeGM0T3ZnMndrMXFhTTFTS1F3M3BGSE1nY1Z2LTYySFhpQVNVcjJ5Q2F2LUk0?oc=5",
-   "published": "2026-11-23T13:30Z"
-  },
-  {
-   "id": "29b7d94e7d30",
-   "cat": "development",
-   "title": "WWE Eyes $100 Million Orlando Headquarters and NXT Center",
-   "source": "NGSC Sports -",
-   "source_site": "https://ngscsports.com",
-   "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxOLTRHQ0pUTkp3X1FZdUtfb1dGUTQyY01DU0N3ZF9VdU9wSjFUWHlWdVU2TVBzazUzNVpzbkI4VGwwVHJtV1NoM3VTWlVnZzJTc2ZBejJ1T2o3cFY1MmN3QkRYaHV2OXdJWnpuZ1huQW9xQS03dTE4VkZJWFRpcUY3ZlJXZnp0OGc?oc=5",
+   "id": "395c2f6a495d",
+   "cat": "events",
+   "title": "Best Concerts in Orlando This Week: Nov 23 – Dec 4, 2026",
+   "source": "Ones To Watch",
+   "source_site": "https://onestowatch.com",
+   "url": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9EVnNKblFaeE5mV2dja3lib0Q0Nl9hVWIwWUVhTFRlQmlmdnZESEI1TkRYOHFlNk9EbVdZUzFTNVpqcWNrZW9Ha3o4LVpBNFJjZXJxRkdLeEJOTTdQNEFaeXBmaWhDQQ?oc=5",
    "published": "2026-11-23T08:00Z"
   },
   {
@@ -383,6 +383,15 @@
    "source_site": "https://www.orlandoweekly.com",
    "url": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNN2ZWSzJKODh5ck9yMXk4UGVxTTViaWxqSUJOc3E2QVVZZ0p4NUxPMkdFdXN1QV9JeDdKUFlReTdrWFlKOVI2YnZRbmN0dHFncWU4MDFBaUVlQjZ2UXNja3dnZ2NKcUhHSFhzWEl3cUJFS1J2bEllRDV5Tm5pN09sZFMyaGltem9Qa21JcEwzZDVMUDlfMGRnRVJlbVVYMDVoSkxiZGJ4WUVKenZWV3g4NkVmUkM5NTdjdXdVWHl6RG1QeV9Ka0dwQTdkeFNiN0pTYkJxb2dabnhkWjNPRmc?oc=5",
    "published": "2026-11-20T20:44Z"
+  },
+  {
+   "id": "dd02138fe99c",
+   "cat": "dining",
+   "title": "Roji ramen bar to replace Foxtail Coffee in Orlando’s College Park",
+   "source": "Orlando Weekly",
+   "source_site": "https://www.orlandoweekly.com",
+   "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxOV0dTTHBvQUlHWkdGOFpwQzJjQ0I0WWlOcVVtWnZBLXhxWGFaU0pZcW9vU2pTTmhkaUNjekg5MW1MTFBDT0gyYkVrQmozQnJ3LTVQMVRRY29ZZW9XdThheWZSdC16dHlCbFVUN0RlUldnZGxpcXA2Ul83SEF4Y09EeGV6N3BfMzczMlpQRzg2Mk1JMjNfOTVWN2JTS3R6YjRvVE9odkp4YmZzQ2l3dkF0ZXdUVHRHVFdRUDZwNGNfYUdIbmZfVnl5VEJFdw?oc=5",
+   "published": "2026-11-20T20:30Z"
   },
   {
    "id": "b7181cf9554e",
@@ -502,6 +511,24 @@
    "published": "2026-11-18T01:39Z"
   },
   {
+   "id": "4b810cadcf1e",
+   "cat": "events",
+   "title": "IAAPA Expo Expands Into West Building in Orlando",
+   "source": "Wisevoter",
+   "source_site": "https://wisevoter.com",
+   "url": "https://news.google.com/rss/articles/CBMimAFBVV95cUxQNk40dWNSZTJGQnNEcXU5Sm9UZFdQV25FNzRCX2kzY1dnd3JlUVF1QXlKQllLWlVMN2V2YnFJSl91NkZtVEt2OHlpbHl4U2Z5Tk5yMjRid19QRmZWZlJSZ0JCaDZMbkJDMk5VenhvSVI4Z1RvU2ZBY2tmeWtMU0Z6QzZLNGdVaVJRcjU5Ml8ydDA5dGx2UGNfMQ?oc=5",
+   "published": "2026-11-17T23:36Z"
+  },
+  {
+   "id": "ee888e7fe8ea",
+   "cat": "development",
+   "title": "WWE Reveals Plans For Major $100 Million Orlando Development",
+   "source": "Slam Wrestling",
+   "source_site": "https://slamwrestling.net",
+   "url": "https://news.google.com/rss/articles/CBMilgFBVV95cUxPbXZuWlBpdlVfY1VRTmo3d0d5MWpjRU5nYmNZRzhwempYYnlGVnVqclI0SHE1dGxNbzFjb0ZnYkdVTS1TVW5pNUVoYXJrQlJ6VFRIMlJLblRNZnZYTklfcE9QTUYwME5RY3ZQd3Z3RFVwUmlOYW0wTTFmTVdtYm1vbDExMVZmcFJETmF3MGZGY1I5b2VLM3c?oc=5",
+   "published": "2026-11-17T18:00Z"
+  },
+  {
    "id": "b6c95bb7a50d",
    "cat": "dining",
    "title": "Vice Restaurant & Lounge Opening in Orlando. Here Are Details",
@@ -529,12 +556,30 @@
    "published": "2026-11-17T08:00Z"
   },
   {
+   "id": "f26aba403e38",
+   "cat": "hospitality",
+   "title": "Orlando Hotels Without EV Chargers Risk Losing Guests to Nearby Properties",
+   "source": "The Manila Times",
+   "source_site": "https://www.manilatimes.net",
+   "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxOZ2l0QUM0SjJUX1oydk1Fd0NPc1dycE82NGxOTGY1TkFlbHdmUFBwUmRweHEyTWRmVmlsbkRQRjNmcDlod0NFSWFITDJCSmpncGpKRXdsX2R0ZEdaNVIwaXp6RFJnbGRfQl8wVUdadzFLa0hCNWlZZ0ZvU1g0Uno1SFEyVHJYdjB0Ukx2NWdWWnMyQ1lyVDhyWUFRM1RDYnE1YTRPeTltbFYyLVhUMWZuX2Rpd2MtX2Z0TkVMYXNxTHJNUUdqR1VkOWc0bzFLX2FMRjFYQ3RrVS1XRWdOS05ZTFdR0gHnAUFVX3lxTE1oYjlIV3NldGtLVHAzMVFnYzVlendQdlY3WC1ZTDBva0dHNU44SXllUW9pb2tjaHpIOWZuaGN3Q1prU1l4MDUwTGZFcjZNVFZnaktaYzdMRk9odjJiLU1lck5PdTA3OUlVbG5adzBpV2RUWDMydlF3Yy13OTl6dDd0TWlsOUdsVGlLXzBKNHpBMDc4aFk4TnZTeVRHRHFxb3BHUFRnZE4tWjRYdGQ4V0xYX3YzWGdjaUhBVXlJNnJJU3FjMDlFdVNJZUdVSlh0VExKdkJFMGthbF9IS09xOUFkNmFobzJOaw?oc=5",
+   "published": "2026-11-16T17:10Z"
+  },
+  {
    "id": "341765d78fdf",
    "cat": "events",
    "title": "Review and setlist: Olivia Rodrigo blossoms in sold-out Orlando concert",
    "source": "Tampa Bay Times",
    "source_site": "https://www.tampabay.com",
    "url": "https://news.google.com/rss/articles/CBMizgFBVV95cUxNZUdJVmRBT0JRRUxJS0drOGtYaTNhUlBxWlp2VVdjMW5jcmlrTWVzWUxnSGRWNjg3aDdLWkJTb2x6cnlId09wbWI2VW1qb2taZ0J1TUU1U3JnVmtOVlFyejhuMkRqZl9CeWYzamNwNDZDUmd2MmJoS2VwTEtlTWI0ZnBKdVFDTkxadTZjaVN3Y0tkQ3VVdFVxcGl2R2M0LWI0WUhrQ2E1QjFGRGxjczZoRHdwcVk5d1ZmYkFtQjlxMHJUTy0zeXlWcm55S3pqUQ?oc=5",
+   "published": "2026-11-16T08:00Z"
+  },
+  {
+   "id": "5f4b33510df2",
+   "cat": "development",
+   "title": "Inside Accesso’s 77-acre mixed-use Orlando project near Disney",
+   "source": "The Real Deal",
+   "source_site": "https://therealdeal.com",
+   "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxPdDdpNkpMUGw5cnhleTZrRW1LeTFlY1VUMDFrTER4RjFjUWVYOHlLdEJsNmtrLVNiaGFieGxxXzRvQVpFNldPa2FEUUlLYmJFbmtwemFQSDVTMmFIOS1QU3lKRS15MTkzWEV2MFVBMnhkVUs3YmU2X0JEOGZNaXVrNENPOXNpRmpBcnlHbjJ3YVl6MTdGNFdUU2Y1eEloWjI5OWc?oc=5",
    "published": "2026-11-16T08:00Z"
   },
   {
@@ -557,7 +602,7 @@
   },
   {
    "id": "c1d5a70409a9",
-   "cat": "orlando",
+   "cat": "hospitality",
    "title": "Orlando Airport Cancels 232 Flights as Hotels Offer Discounts to Stranded Travellers",
    "source": "Rus Tourism News",
    "source_site": "https://www.rustourismnews.com",
@@ -574,15 +619,6 @@
    "published": "2026-11-15T08:16Z"
   },
   {
-   "id": "a303de4a27c4",
-   "cat": "events",
-   "title": "UFC 337 will be held February 20, 2027, at Orlando's Kia Center; no fights have been announced",
-   "source": "Nacionale",
-   "source_site": "https://www.nacionale.com",
-   "url": "https://news.google.com/rss/articles/CBMiogFBVV95cUxQSXlHMnF5d1h5cDQ1TTlhMVFsaGxSTnlKT29XWG04aXI2dXY3UmJVZlpKeHNBSHZzX1hIcTliS0tnU1lJcEJzemxxRm5iZ3RTaUFYdHhRTXk1blZjT181NFR4Y1lfZGVCcjlzLVUzbXRlWFlYOXB0Ui16Vmh0WFA5NnREaXozelpWSGl6SmE4a2lHY2RuVk9xdy1sNE9GVkRFRmc?oc=5",
-   "published": "2026-11-15T08:00Z"
-  },
-  {
    "id": "c914b796fb20",
    "cat": "events",
    "title": "Alex Warren schedules Orlando Kia Center debut for 2027 concerts",
@@ -592,6 +628,15 @@
    "published": "2026-11-15T08:00Z"
   },
   {
+   "id": "1d2487433523",
+   "cat": "development",
+   "title": "Trilingual real estate broker in Orlando: Voyance Real Estate works in English, Spanish and Portuguese",
+   "source": "mykxlg.com",
+   "source_site": "https://www.mykxlg.com",
+   "url": "https://news.google.com/rss/articles/CBMirAJBVV95cUxOUWppZVhDRVEwSlFRTl90OWxobmQ2M0I1Y09HY0NkMnV1Zl9ZQWcxc3Z1QUozM0lnZDhYcmlxVVk4bDRuaVRnRW9xbjA4UEMzMUk3ZUcxWUZWQTZPSXdBZGZMVFcwQWV3VEczRkI1SHo2VDE1alBpZW9IMW00QmluSHVfY09jR240bnJ2Zy1xdVRoNjRWXzYtSUJMLU9pTG1uNUpxdVZWZ0xob3drTlZDUDRmbTNnbEJTOV9sdEFjV2NSS01PUXFjWXhLdHNBUlo0UVhIdWFDQWhKQnFGT0V0RGZyS1ZUQ3VNQUhEVnhXVmNrd0s5NFJfalhNdENoZkl0SWs5MkpHaGhuTWVBQk9ZRFBidTFkVGRaOEhzX0NjbHBTUG5YejlESGJKVUI?oc=5",
+   "published": "2026-11-14T08:45Z"
+  },
+  {
    "id": "dfd98bb0bf8d",
    "cat": "lake-nona",
    "title": "Lake Nona, Alexandra Snyder win second girls golf title in three years",
@@ -599,24 +644,6 @@
    "source_site": "https://www.orlandosentinel.com",
    "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxOZXFSdlhUdF9UalFfUklBTUtDZVd5VE5sQnR4WnQwczN4RDVsUmZYWTNPUXBoSTZlX05DXzJlUzhVSjFYY1d3QjBQdW4yUnlhM2ROMGMxYzMtZDY0WjNmYnI0eDFLN2FRY20wMXNMQU8zMDV5RlJLR1pzWjM4U211cXNCSW5SbVVVMVB3U3VEaHJLVEtkSDVSa3EtbllQeFUxUTFlMWxFYTBVZXgzVFhHdm1VQQ?oc=5",
    "published": "2026-11-14T08:00Z"
-  },
-  {
-   "id": "eff49cf4b4e3",
-   "cat": "events",
-   "title": "Vans Warped Tour returns to Camping World Stadium in Orlando today",
-   "source": "WFTV",
-   "source_site": "https://www.wftv.com",
-   "url": "https://news.google.com/rss/articles/CBMizwFBVV95cUxOTkZuMVRWRkNuUWw1YzRaM2RLRmxpakpsb3Y4QWxmYWE1Rm13S3RMdU93UHlNYzBxRExZa3dUdHQ5aUFCVE5jMnk3Qy1KZUIxZlUxV3NObmc0OS05N1Q2emhNVkpKeUl3SThNUzI1OEJCMkJQQk1aLTg4a0pzUld4ck1sY1JwRnhqRk1aWmZ3YW1VTkJaWTdzajQxTUVmQV84ZzJrZFl5LXlITkJtMDlpdkpqdzBmQjQyY3NzMDdoZUdMdVlvU0ZQU0dhSEVhb2fSAeMBQVVfeXFMTi1UYXZXcGJFQTNRa002U01jZVFKcEhFZVdhM1EyMUFERmNPd09ORnB2RUlGMFBuQzBrakt6Sk5rQTZTWjlmMnN6MU1lejdiXy1kMDRGajh3ajFvZjhhZno2d0JHX21OeHVsRDhNekpHWDBrRUd5U3FVSE9nV1FSVmtKVGdsYUsyWnhxdjI5bUJNY01LdTJhSHlyZW1nODhvWE5IcGFCa184MHBZTU9qdEtEMFRxZWc5d0VZMDVnLTM0S09OZkJOLWppbXRSY1JWNTNlRlBhaFJFaGFhTHJ6dWI2X2M?oc=5",
-   "published": "2026-11-14T08:00Z"
-  },
-  {
-   "id": "dfa6728f9e72",
-   "cat": "dining",
-   "title": "Cassie Ramone of Vivian Girls to play impromptu Orlando gig at a coffee shop",
-   "source": "Orlando Weekly",
-   "source_site": "https://www.orlandoweekly.com",
-   "url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxOdGhadTBqNkpYekFZRU5oWVNyc1pXLVBXZkhVLXpQeTZZMElFSnVWSzlrT3J6V1g0WmpmRjJuTXJHNm1xbHdOWlNGUExZb3BLblV1OGdoT3Vwbm1xMjRBMHBhUGxqOWlEZk8yRVhjZ1MyYm1FN0laYldBZG8yUVpqY1E2SXdHX0N3QVE1X3N3eEVPVHd6LV94QUhxcXR3MGR6YTF4cmhRVGZZWDdBckxIbkpDVHJYaHlHYm55aHA1SlFZZnZWZW0xQmxTcjNSX2l4YkN3V21n?oc=5",
-   "published": "2026-11-13T08:00Z"
   }
  ]
 }
